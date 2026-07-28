@@ -1,0 +1,16 @@
+/* Light theme CSS custom properties.
+   Applied when <html class="light"> (ThemeContext default). */
+:root,
+.light {
+  --color-bg:          #f9fafb;
+  --color-surface:     #ffffff;
+  --color-border:      #e5e7eb;
+  --color-text:        #111827;
+  --color-text-muted:  #6b7280;
+  --color-primary:     #16a34a;
+  --color-primary-hover: #15803d;
+  --color-sidebar-bg:  #111827;
+  --color-sidebar-text:#d1d5db;
+  --color-sidebar-active: #16a34a;
+  --shadow-card:       0 1px 3px 0 rgb(0 0 0 / .07);
+}

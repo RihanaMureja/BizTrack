@@ -1,0 +1,25 @@
+/* Dark theme CSS custom properties.
+   Applied when <html class="dark"> (ThemeContext toggleTheme). */
+.dark {
+  --color-bg:          #0f172a;
+  --color-surface:     #1e293b;
+  --color-border:      #334155;
+  --color-text:        #f1f5f9;
+  --color-text-muted:  #94a3b8;
+  --color-primary:     #22c55e;
+  --color-primary-hover: #16a34a;
+  --color-sidebar-bg:  #0f172a;
+  --color-sidebar-text:#94a3b8;
+  --color-sidebar-active: #22c55e;
+  --shadow-card:       0 1px 3px 0 rgb(0 0 0 / .4);
+}
+
+/* Dark-mode surface overrides */
+.dark body             { background-color: var(--color-bg); color: var(--color-text); }
+.dark .bg-white        { background-color: var(--color-surface) !important; }
+.dark .bg-gray-50      { background-color: #1e293b !important; }
+.dark .border-gray-100,
+.dark .border-gray-200 { border-color: var(--color-border) !important; }
+.dark .text-gray-900   { color: var(--color-text) !important; }
+.dark .text-gray-500,
+.dark .text-gray-600   { color: var(--color-text-muted) !important; }
