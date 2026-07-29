@@ -20,9 +20,22 @@ export type ServerNavItem = {
     icon: string;
 };
 
+export type SharedNotification = {
+    id: number;
+    title: string;
+    message: string;
+    type: string;
+    is_read: boolean;
+    created_at: string;
+};
+
 export type SharedData = {
     name: string;
     auth: Auth;
     navigation: ServerNavItem[];
+    notificationSummary: {
+        unreadCount: number;
+        recent: SharedNotification[];
+    };
     sidebarOpen: boolean;
 };

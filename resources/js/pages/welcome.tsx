@@ -70,7 +70,7 @@ export default function Welcome() {
                     <div className="flex flex-col justify-center">
                         <div className="inline-flex w-fit items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm text-muted-foreground shadow-sm">
                             <ShieldCheck className="size-4 text-primary" />
-                            Built for small business control
+                            Control Your Small Business in a smart way with BizTrack
                         </div>
                         <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-tight tracking-normal md:text-6xl">
                             Track every sale, manage every product, and grow with clean business records.
@@ -131,7 +131,8 @@ export default function Welcome() {
                                 <p className="font-semibold">Ready for the Next Chapter of Business</p>
                             </div>
                             <p className="mt-3 text-sm leading-6 text-sidebar-foreground/70">
-                                Foundation, auth, subscriptions, dashboards, and categories are prepared for the product catalog phase.
+                                Digitalised business records are the key to growth. BizTrack gives you a professional workspace for
+                                revenue, inventory, customers, payments, subscriptions, and reports. Start tracking your business today.
                             </p>
                         </div>
                     </div>

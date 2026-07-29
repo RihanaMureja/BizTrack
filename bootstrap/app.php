@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\BusinessMiddleware;
 use App\Http\Middleware\EnsureBusinessIsActive;
+use App\Http\Middleware\EnsureBusinessIsApproved;
 use App\Http\Middleware\EnsureSubscriptionIsActive;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'business' => BusinessMiddleware::class,
             'business.active' => EnsureBusinessIsActive::class,
+            'business.approved' => EnsureBusinessIsApproved::class,
             'subscription.active' => EnsureSubscriptionIsActive::class,
             'role' => RoleMiddleware::class,
             'log.activity' => LogActivity::class,

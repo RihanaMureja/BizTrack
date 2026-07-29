@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\RBACService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -45,6 +46,10 @@ class HandleInertiaRequests extends Middleware
             'navigation' => $request->user()
                 ? app(RBACService::class)->navigationFor($request->user())
                 : [],
+            'notificationSummary' => [
+                'unreadCount' => app(NotificationService::class)->unreadCountForUser($request->user()),
+                'recent' => app(NotificationService::class)->recentForUser($request->user()),
+            ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

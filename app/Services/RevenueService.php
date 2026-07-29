@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Business;
+use App\Models\Expense;
 use App\Models\Sale;
 use Illuminate\Support\Facades\Schema;
 
@@ -26,7 +27,10 @@ class RevenueService
             return 0.0;
         }
 
-        return 0.0;
+        return (float) Expense::query()
+            ->when($business, fn ($query) => $query->where('business_id', $business->id))
+            ->whereDate('expense_date', today())
+            ->sum('amount');
     }
 
     public function todayProfit(?Business $business = null): float

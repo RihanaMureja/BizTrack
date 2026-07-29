@@ -1,14 +1,17 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Bell,
     Boxes,
     Building2,
     ChartNoAxesCombined,
     CreditCard,
+    KeyRound,
     LayoutGrid,
     Package,
     Receipt,
     ScrollText,
     Settings,
+    ShieldCheck,
     Tags,
     UserRound,
     Users,
@@ -30,15 +33,18 @@ import { dashboard } from '@/routes';
 import type { SharedData } from '@/types';
 
 const icons = {
+    Bell,
     Boxes,
     Building2,
     ChartNoAxesCombined,
     CreditCard,
+    KeyRound,
     LayoutGrid,
     Package,
     Receipt,
     ScrollText,
     Settings,
+    ShieldCheck,
     Tags,
     UserRound,
     Users,

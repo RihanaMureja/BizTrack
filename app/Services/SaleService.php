@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\InventoryTransactionType;
+use App\Enums\PaymentStatus;
 use App\Enums\SaleStatus;
+use App\Events\InventoryLow;
 use App\Events\SaleCompleted;
 use App\Models\Business;
 use App\Models\Inventory;
@@ -16,6 +18,8 @@ use Illuminate\Validation\ValidationException;
 
 class SaleService
 {
+    public function __construct(private readonly CustomerCreditService $customerCreditService) {}
+
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
     {
         return Sale::query()
@@ -78,7 +82,10 @@ class SaleService
                 'tax_amount' => $tax,
                 'discount_amount' => $discount,
                 'grand_total' => $grandTotal,
+                'paid_amount' => 0,
+                'balance_due' => $grandTotal,
                 'status' => SaleStatus::Completed,
+                'payment_status' => PaymentStatus::Unpaid,
                 'notes' => $data['notes'] ?? null,
                 'sold_at' => now(),
             ]);
@@ -109,9 +116,14 @@ class SaleService
                     'quantity_after' => $after,
                     'notes' => 'Sale '.$sale->invoice_number,
                 ]);
+
+                if ($after <= $item['product']->reorder_level) {
+                    InventoryLow::dispatch($item['inventory']->refresh());
+                }
             }
 
             $sale = $sale->load(['customer', 'user', 'items.product']);
+            $this->customerCreditService->syncForSale($sale);
             SaleCompleted::dispatch($sale);
 
             return $sale;

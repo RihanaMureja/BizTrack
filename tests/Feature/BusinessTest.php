@@ -6,7 +6,9 @@ use App\Models\Business;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\BusinessApprovedNotification;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 test('guest is redirected away from business profile', function () {
     $this->get(route('business.profile'))
@@ -23,8 +25,27 @@ test('cashier cannot access owner business profile', function () {
         ->assertForbidden();
 });
 
-test('owner can create a business profile and receives approval notification', function () {
+function businessPayload(array $overrides = []): array
+{
+    return [
+        'business_name' => 'Merkato Fresh Mart',
+        'business_type' => 'Retail',
+        'email' => 'hello@merkato.test',
+        'phone' => '0911223344',
+        'address' => 'Addis Ababa',
+        'national_id_fan_number' => 'FAN-123456',
+        'national_id_photo' => UploadedFile::fake()->image('national-id.jpg'),
+        'trade_license' => UploadedFile::fake()->create('trade-license.pdf', 120, 'application/pdf'),
+        'tin_certificate' => UploadedFile::fake()->create('tin-certificate.pdf', 120, 'application/pdf'),
+        'is_vat_registered' => false,
+        'has_physical_shop' => false,
+        ...$overrides,
+    ];
+}
+
+test('owner can submit a business profile for review without receiving approval notification', function () {
     Notification::fake();
+    Storage::fake('public');
 
     $owner = User::factory()->create([
         'role' => Role::Owner,
@@ -35,14 +56,9 @@ test('owner can create a business profile and receives approval notification', f
     ]);
 
     $this->actingAs($owner)
-        ->post(route('business.profile.store'), [
-            'business_name' => 'Merkato Fresh Mart',
-            'business_type' => 'Retail',
+        ->post(route('business.profile.store'), businessPayload([
             'subscription_id' => $subscription->id,
-            'email' => 'hello@merkato.test',
-            'phone' => '0911223344',
-            'address' => 'Addis Ababa',
-        ])
+        ]))
         ->assertRedirect(route('business.profile', absolute: false));
 
     $this->assertDatabaseHas('businesses', [
@@ -50,11 +66,17 @@ test('owner can create a business profile and receives approval notification', f
         'subscription_id' => $subscription->id,
         'business_name' => 'Merkato Fresh Mart',
         'email' => 'hello@merkato.test',
+        'status' => RecordStatus::PendingReview->value,
+        'national_id_fan_number' => 'FAN-123456',
     ]);
 
-    expect($owner->refresh()->business_id)->not->toBeNull();
+    $business = Business::firstWhere('owner_id', $owner->id);
+    expect($owner->refresh()->business_id)->not->toBeNull()
+        ->and($business?->national_id_photo_path)->not->toBeNull()
+        ->and($business?->trade_license_path)->not->toBeNull()
+        ->and($business?->tin_certificate_path)->not->toBeNull();
 
-    Notification::assertSentTo($owner, BusinessApprovedNotification::class);
+    Notification::assertNothingSent();
 });
 
 test('owner can update business profile without creating a duplicate business', function () {
@@ -65,7 +87,7 @@ test('owner can update business profile without creating a duplicate business', 
     ]);
 
     $subscription = Subscription::factory()->create([
-        'status' => RecordStatus::Active,
+        'status' => RecordStatus::Active->value,
     ]);
 
     $business = Business::factory()->create([
@@ -78,14 +100,14 @@ test('owner can update business profile without creating a duplicate business', 
     $owner->forceFill(['business_id' => $business->id])->save();
 
     $this->actingAs($owner)
-        ->put(route('business.profile.update'), [
+        ->put(route('business.profile.update'), businessPayload([
             'business_name' => 'New Name',
             'business_type' => 'Service',
             'subscription_id' => $subscription->id,
             'email' => 'new@example.test',
             'phone' => '0911223344',
             'address' => 'Bole',
-        ])
+        ]))
         ->assertRedirect(route('business.profile', absolute: false));
 
     $this->assertDatabaseCount('businesses', 1);
@@ -96,6 +118,87 @@ test('owner can update business profile without creating a duplicate business', 
     ]);
 
     Notification::assertNothingSent();
+});
+
+test('owner cannot access business modules until business is approved', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::PendingReview,
+    ]);
+
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->get(route('products.index'))
+        ->assertRedirect(route('business.profile', absolute: false));
+});
+
+test('owner is redirected from dashboard to verification until business is approved', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::PendingReview,
+    ]);
+
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('business.profile', absolute: false));
+});
+
+test('approved owner can access dashboard', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::Active,
+    ]);
+
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->get(route('dashboard'))
+        ->assertOk();
+});
+
+test('super admin approval activates the business and notifies the owner', function () {
+    Notification::fake();
+
+    $superAdmin = User::factory()->create([
+        'role' => Role::SuperAdmin,
+    ]);
+
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::PendingReview,
+    ]);
+
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($superAdmin)
+        ->post(route('admin.businesses.approve', $business))
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('businesses', [
+        'id' => $business->id,
+        'status' => RecordStatus::Active,
+    ]);
+
+    Notification::assertSentTo($owner, BusinessApprovedNotification::class);
 });
 
 test('business name is required', function () {
@@ -142,4 +245,30 @@ test('subscription must be an active plan', function () {
             'subscription_id' => $inactiveSubscription->id,
         ])
         ->assertSessionHasErrors('subscription_id');
+});
+
+test('vat certificate is required only for vat registered businesses', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('business.profile.store'), businessPayload([
+            'is_vat_registered' => true,
+            'vat_certificate' => null,
+        ]))
+        ->assertSessionHasErrors('vat_certificate');
+});
+
+test('rental agreement is required only for physical shops', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('business.profile.store'), businessPayload([
+            'has_physical_shop' => true,
+            'rental_agreement' => null,
+        ]))
+        ->assertSessionHasErrors('rental_agreement');
 });

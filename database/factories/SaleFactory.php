@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\SaleStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Business;
 use App\Models\Sale;
 use App\Models\User;
@@ -24,7 +25,10 @@ class SaleFactory extends Factory
             'tax_amount' => 0,
             'discount_amount' => 0,
             'grand_total' => 100,
+            'paid_amount' => 0,
+            'balance_due' => 100,
             'status' => SaleStatus::Completed,
+            'payment_status' => PaymentStatus::Unpaid,
             'sold_at' => now(),
         ];
     }

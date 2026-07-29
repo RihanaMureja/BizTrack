@@ -1,6 +1,6 @@
 import { BusinessForm } from '@/components/forms/business-form';
 import { Head } from '@inertiajs/react';
-import { Building2, ShieldCheck } from 'lucide-react';
+import { Building2, Clock3, ShieldCheck } from 'lucide-react';
 import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
 
 type Props = {
@@ -9,6 +9,9 @@ type Props = {
 };
 
 export default function BusinessProfile({ business, subscriptions }: Props) {
+    const statusLabel = business?.status ? business.status.replace(/_/g, ' ') : 'not submitted';
+    const isActive = business?.status === 'active';
+
     return (
         <>
             <Head title="Business Profile" />
@@ -32,13 +35,19 @@ export default function BusinessProfile({ business, subscriptions }: Props) {
 
                     <aside className="h-fit rounded-md border bg-card p-5 shadow-sm">
                         <div className="flex items-center gap-2">
-                            <ShieldCheck className="size-5 text-primary" />
-                            <h2 className="font-semibold">Business access</h2>
+                            {isActive ? <ShieldCheck className="size-5 text-primary" /> : <Clock3 className="size-5 text-amber-600" />}
+                            <h2 className="font-semibold">Verification status</h2>
+                        </div>
+                        <div className="mt-4 inline-flex rounded-full border bg-background px-3 py-1 text-xs font-semibold capitalize text-foreground">
+                            {statusLabel}
                         </div>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                            This profile becomes the owner workspace for products, inventory, cashiers,
-                            customers, sales, expenses, and reports. Cashiers created later will inherit this
-                            business scope automatically.
+                            Submit your National ID, FAN number, trade license, and TIN certificate for review.
+                            VAT and rental documents are only required when they apply to your business.
+                        </p>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                            Products, inventory, cashiers, customers, sales, expenses, and reports unlock after a
+                            super admin approves this business.
                         </p>
                     </aside>
                 </div>

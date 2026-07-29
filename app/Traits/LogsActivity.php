@@ -12,6 +12,6 @@ trait LogsActivity
      */
     protected function logActivity(string $action, ?string $tableName = null, ?int $recordId = null, ?array $oldValues = null, ?array $newValues = null): void
     {
-        app(AuditLogService::class)->record($action, $tableName, $recordId, $oldValues, $newValues);
+        app(AuditLogService::class)->record($action, $tableName, $recordId, $oldValues, $newValues, auth()->user());
     }
 }

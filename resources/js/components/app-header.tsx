@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, Search } from 'lucide-react';
+import { Bell, Menu, Search } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -26,7 +26,7 @@ type Props = {
 };
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
-    const { auth, navigation = [] } = usePage<SharedData>().props;
+    const { auth, navigation = [], notificationSummary } = usePage<SharedData>().props;
     const getInitials = useInitials();
 
     return (
@@ -67,6 +67,16 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="ml-auto flex items-center gap-2">
                         <Button variant="ghost" size="icon" className="hidden md:inline-flex">
                             <Search className="size-5 opacity-70" />
+                        </Button>
+                        <Button variant="ghost" size="icon" asChild className="relative">
+                            <Link href="/notifications" aria-label="Notifications">
+                                <Bell className="size-5" />
+                                {notificationSummary.unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                                        {notificationSummary.unreadCount > 99 ? '99+' : notificationSummary.unreadCount}
+                                    </span>
+                                )}
+                            </Link>
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
