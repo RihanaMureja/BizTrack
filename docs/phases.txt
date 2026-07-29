@@ -1,0 +1,913 @@
+
+Below is the clean module-first development phase plan for BizTrack.
+
+## Phase 1: Foundation, Authentication, And RBAC
+
+This phase creates the base of the whole system. Users must be able to register, log in, log out, reset passwords, and access only the pages allowed for their role. The system will support three main roles: `super_admin`, `owner`, and `cashier`.
+
+It also prepares middleware, enums, traits, and policies that future modules will depend on.
+
+Files created or updated:
+
+```text
+app/Models/User.php
+
+app/Http/Controllers/Auth/AuthenticatedSessionController.php
+app/Http/Controllers/Auth/RegisteredUserController.php
+app/Http/Controllers/Auth/PasswordResetLinkController.php
+app/Http/Controllers/Auth/NewPasswordController.php
+app/Http/Controllers/Auth/VerifyEmailController.php
+app/Http/Controllers/Auth/EmailVerificationPromptController.php
+app/Http/Controllers/Auth/ConfirmablePasswordController.php
+app/Http/Controllers/Auth/PasswordController.php
+
+app/Http/Requests/LoginRequest.php
+app/Http/Requests/RegisterRequest.php
+app/Http/Requests/UpdatePasswordRequest.php
+
+app/Services/AuthService.php
+app/Services/RBACService.php
+
+app/Policies/UserPolicy.php
+
+app/Http/Middleware/RoleMiddleware.php
+app/Http/Middleware/LogActivity.php
+
+app/Traits/HasRoles.php
+app/Traits/LogsActivity.php
+
+app/Enums/Role.php
+
+routes/auth.php
+routes/web.php
+
+resources/js/Pages/Auth/
+resources/js/Layouts/AuthLayout.jsx
+```
+
+Implements:
+
+```text
+User registration
+Login
+Logout
+Forgot password
+Reset password
+Email verification
+Role assignment
+Role-based route protection
+Dynamic sidebar permissions
+Basic activity logging
+```
+
+## Phase 2: Business Registration And Subscription Setup
+
+This phase allows a business owner to register or update their business profile. It also introduces subscription plans, which later control limits like maximum cashiers.
+
+This phase is important because almost every business module belongs to a business.
+
+Files created or updated:
+
+```text
+app/Models/Business.php
+app/Models/Subscription.php
+
+app/Http/Controllers/BusinessController.php
+app/Http/Controllers/SubscriptionController.php
+
+app/Http/Requests/StoreBusinessRequest.php
+app/Http/Requests/UpdateBusinessRequest.php
+
+app/Services/BusinessService.php
+app/Services/SubscriptionService.php
+
+app/Policies/BusinessPolicy.php
+
+app/Http/Middleware/BusinessMiddleware.php
+app/Http/Middleware/EnsureBusinessIsActive.php
+app/Http/Middleware/EnsureSubscriptionIsActive.php
+
+app/Events/BusinessRegistered.php
+
+app/Notifications/BusinessApprovedNotification.php
+
+database/seeders/SubscriptionSeeder.php
+database/factories/BusinessFactory.php
+
+resources/js/Pages/Business/
+resources/js/Components/Forms/BusinessForm.jsx
+```
+
+Implements:
+
+```text
+Business profile creation
+Business profile update
+Business status management
+Subscription plan selection
+Active/inactive business checks
+Owner-to-business relationship
+Business approval notification
+```
+
+## Phase 3: Dashboard Module
+
+This phase builds dashboards for each role. The dashboard is not just one page; it changes based on the logged-in user role.
+
+The owner sees business performance. The cashier sees today’s sales activity. The super admin sees platform-level statistics.
+
+Files created or updated:
+
+```text
+app/Http/Controllers/DashboardController.php
+
+app/Services/DashboardService.php
+app/Services/RevenueService.php
+
+resources/js/Pages/Dashboard/
+resources/js/Layouts/DashboardLayout.jsx
+
+resources/js/Components/StatCard/
+resources/js/Components/Charts/
+```
+
+Implements:
+
+```text
+Owner dashboard
+Cashier dashboard
+Super admin dashboard
+Revenue summary
+Sales summary
+Expense summary
+Low stock preview
+Top products preview
+Role-based dashboard data
+```
+
+## Phase 4: Category Module
+
+This phase creates product categories. Categories are required before products are fully useful because products belong to categories.
+
+Only business owners should manage categories. Cashiers may view categories indirectly through sales/product search.
+
+Files created or updated:
+
+```text
+app/Models/Category.php
+
+app/Http/Controllers/CategoryController.php
+
+app/Http/Requests/StoreCategoryRequest.php
+app/Http/Requests/UpdateCategoryRequest.php
+
+app/Services/CategoryService.php
+
+app/Policies/CategoryPolicy.php
+
+database/seeders/CategorySeeder.php
+database/factories/CategoryFactory.php
+
+resources/js/Pages/Categories/
+resources/js/Components/DataTable/
+resources/js/Components/SearchBox/
+resources/js/Components/Pagination/
+resources/js/Components/ConfirmDialog/
+resources/js/Components/DeleteDialog/
+```
+
+Implements:
+
+```text
+Create category
+Update category
+Delete category
+List categories
+Search categories
+Business-owned category protection
+Category validation
+```
+
+## Phase 5: Product Module
+
+This phase creates the product catalog. Products include barcode, prices, unit, category, reorder level, and status.
+
+Products are central because inventory, sales, reports, and receipts all depend on them.
+
+Files created or updated:
+
+```text
+app/Models/Product.php
+
+app/Http/Controllers/ProductController.php
+
+app/Http/Requests/StoreProductRequest.php
+app/Http/Requests/UpdateProductRequest.php
+
+app/Services/ProductService.php
+
+app/Policies/ProductPolicy.php
+
+app/Observers/ProductObserver.php
+
+database/seeders/ProductSeeder.php
+database/factories/ProductFactory.php
+
+resources/js/Pages/Products/
+resources/js/Components/ProductCard/
+resources/js/Components/Forms/ProductForm.jsx
+resources/js/Components/DataTable/
+```
+
+Implements:
+
+```text
+Create product
+Update product
+Delete/deactivate product
+List products
+Search products
+Filter by category
+Barcode support
+Buy price and selling price
+Reorder level setup
+Automatic inventory record creation
+```
+
+## Phase 6: Inventory Module
+
+This phase tracks stock levels for every product. It handles restocking, stock adjustment, damaged stock, returns, and low-stock detection.
+
+Inventory must be completed before sales because sales reduce stock automatically.
+
+Files created or updated:
+
+```text
+app/Models/Inventory.php
+app/Models/InventoryTransaction.php
+
+app/Http/Controllers/InventoryController.php
+app/Http/Controllers/InventoryTransactionController.php
+
+app/Http/Requests/StockAdjustmentRequest.php
+app/Http/Requests/RestockRequest.php
+
+app/Services/InventoryService.php
+
+app/Policies/InventoryPolicy.php
+
+app/Events/InventoryLow.php
+
+app/Listeners/SendLowStockNotification.php
+
+app/Notifications/LowStockNotification.php
+
+resources/js/Pages/Inventory/
+resources/js/Components/Alerts/
+resources/js/Components/Modals/
+```
+
+Implements:
+
+```text
+View stock levels
+Restock products
+Adjust stock manually
+Record damaged stock
+Record inventory returns
+Track inventory history
+Detect low stock
+Send low-stock notifications
+Prevent invalid stock changes
+```
+
+## Phase 7: Customer Module
+
+This phase creates customer management. Customers can later be attached to sales, payments, receipts, and customer credit.
+
+Both owners and cashiers can manage customers depending on permissions.
+
+Files created or updated:
+
+```text
+app/Models/Customer.php
+
+app/Http/Controllers/CustomerController.php
+
+app/Http/Requests/StoreCustomerRequest.php
+app/Http/Requests/UpdateCustomerRequest.php
+
+app/Services/CustomerService.php
+
+app/Policies/CustomerPolicy.php
+
+database/seeders/CustomerSeeder.php
+database/factories/CustomerFactory.php
+
+resources/js/Pages/Customers/
+resources/js/Components/Forms/CustomerForm.jsx
+resources/js/Components/DataTable/
+```
+
+Implements:
+
+```text
+Create customer
+Update customer
+Delete customer
+Search customer
+View customer profile
+Track credit limit
+Track current balance
+Prepare customer purchase history
+Business-owned customer protection
+```
+
+## Phase 8: Cashier Module
+
+This phase allows business owners to manage cashier accounts under their business.
+
+Cashiers have limited permissions. They should only access sales, customers, payments, receipts, and profile-related pages.
+
+Files created or updated:
+
+```text
+app/Http/Controllers/CashierController.php
+
+app/Http/Requests/StoreCashierRequest.php
+app/Http/Requests/UpdateCashierRequest.php
+
+app/Services/CashierService.php
+
+app/Policies/CashierPolicy.php
+
+app/Events/CashierCreated.php
+
+database/seeders/UserSeeder.php
+database/factories/UserFactory.php
+
+resources/js/Pages/Cashiers/
+resources/js/Components/Forms/CashierForm.jsx
+```
+
+Implements:
+
+```text
+Create cashier
+Update cashier
+Deactivate cashier
+Delete cashier
+Reset cashier password
+Limit cashier count by subscription
+Assign cashier role
+Restrict cashier sidebar items
+```
+
+## Phase 9: Sales And POS Module
+
+This phase builds the point-of-sale workflow. Cashiers and owners can create sales, add products to cart, calculate totals, apply tax/discount, and generate invoices.
+
+This phase also triggers inventory updates, revenue calculations, audit logs, and notifications.
+
+Files created or updated:
+
+```text
+app/Models/Sale.php
+app/Models/SaleItem.php
+
+app/Http/Controllers/SaleController.php
+
+app/Http/Requests/StoreSaleRequest.php
+app/Http/Requests/UpdateSaleRequest.php
+
+app/Services/SaleService.php
+app/Services/RevenueService.php
+
+app/Policies/SalePolicy.php
+
+app/Events/SaleCompleted.php
+
+app/Listeners/UpdateInventory.php
+app/Listeners/GenerateReceipt.php
+app/Listeners/CalculateRevenue.php
+app/Listeners/CreateAuditLog.php
+
+app/Observers/SaleObserver.php
+
+database/factories/SaleFactory.php
+
+resources/js/Pages/Sales/
+resources/js/Components/Forms/
+resources/js/Components/Modals/
+```
+
+Implements:
+
+```text
+POS screen
+Product search
+Barcode-ready product selection
+Cart management
+Sale subtotal calculation
+Tax calculation
+Discount calculation
+Grand total calculation
+Invoice number generation
+Sale item creation
+Inventory reduction
+Sale audit logging
+Receipt generation
+```
+
+## Phase 10: Payment Module
+
+This phase records payments for sales. It supports cash, bank, Telebirr, and Chapa. It also supports payment verification and payment status tracking.
+
+Files created or updated:
+
+```text
+app/Models/Payment.php
+
+app/Http/Controllers/PaymentController.php
+
+app/Http/Requests/StorePaymentRequest.php
+app/Http/Requests/VerifyPaymentRequest.php
+
+app/Services/PaymentService.php
+
+app/Policies/PaymentPolicy.php
+
+app/Enums/PaymentMethod.php
+app/Enums/PaymentStatus.php
+
+app/Events/PaymentCompleted.php
+
+app/Listeners/SendPaymentNotification.php
+
+app/Notifications/PaymentReceivedNotification.php
+
+app/Observers/PaymentObserver.php
+
+resources/js/Pages/Payments/
+```
+
+Implements:
+
+```text
+Record payment
+Verify payment
+Track pending/completed/failed payments
+Support cash payment
+Support bank payment
+Support Telebirr payment
+Prepare Chapa payment integration
+Update sale payment status
+Send payment notification
+Log payment activity
+```
+
+## Phase 11: Customer Credit Module
+
+This phase handles credit sales. If a customer does not fully pay during a sale, the remaining balance is tracked as credit.
+
+Files created or updated:
+
+```text
+app/Models/CustomerCredit.php
+
+app/Http/Controllers/CustomerCreditController.php
+
+app/Services/CustomerService.php
+app/Services/PaymentService.php
+
+app/Enums/PaymentStatus.php
+
+app/Notifications/CreditReminderNotification.php
+
+resources/js/Pages/Customers/
+resources/js/Pages/Payments/
+```
+
+Implements:
+
+```text
+Create customer credit
+Track credit amount
+Track paid amount
+Track remaining balance
+Set due date
+Mark credit as paid
+Mark credit as overdue
+Send credit reminder notification
+Update customer balance
+```
+
+## Phase 12: Expense And Expense Category Module
+
+This phase records business expenses. Expenses are grouped by expense categories and later used in profit and tax reports.
+
+Files created or updated:
+
+```text
+app/Models/Expense.php
+app/Models/ExpenseCategory.php
+
+app/Http/Controllers/ExpenseController.php
+app/Http/Controllers/ExpenseCategoryController.php
+
+app/Http/Requests/StoreExpenseRequest.php
+app/Http/Requests/UpdateExpenseRequest.php
+app/Http/Requests/StoreExpenseCategoryRequest.php
+
+app/Services/ExpenseService.php
+
+app/Policies/ExpensePolicy.php
+
+app/Enums/ExpenseStatus.php
+
+app/Events/ExpenseRecorded.php
+
+app/Observers/ExpenseObserver.php
+
+database/seeders/ExpenseSeeder.php
+database/factories/ExpenseFactory.php
+
+resources/js/Pages/Expenses/
+```
+
+Implements:
+
+```text
+Create expense category
+Create expense
+Update expense
+Delete expense
+Upload receipt
+Filter expenses by date/category
+Calculate total expenses
+Log expense activity
+Feed expense data into reports
+```
+
+## Phase 13: Reports Module
+
+This phase creates business reports. Reports help owners understand sales, expenses, profit, inventory, and tax summaries.
+
+Files created or updated:
+
+```text
+app/Models/Report.php
+
+app/Http/Controllers/ReportController.php
+
+app/Http/Requests/GenerateReportRequest.php
+
+app/Services/ReportService.php
+
+app/Policies/ReportPolicy.php
+
+app/Helpers/ReportHelper.php
+app/Helpers/DateHelper.php
+app/Helpers/CurrencyHelper.php
+
+app/Enums/SaleStatus.php
+
+resources/js/Pages/Reports/
+resources/js/Components/Charts/
+```
+
+Implements:
+
+```text
+Sales report
+Expense report
+Profit report
+Inventory report
+Tax report
+Date range filtering
+Report generation
+Dashboard charts
+Export-ready report structure
+Store generated report metadata
+```
+
+## Phase 14: Notifications Module
+
+This phase centralizes all system notifications. Notifications are created by events like low stock, completed payments, credit reminders, and daily summaries.
+
+Files created or updated:
+
+```text
+app/Models/Notification.php
+
+app/Http/Controllers/NotificationController.php
+
+app/Services/NotificationService.php
+
+app/Policies/NotificationPolicy.php
+
+app/Enums/NotificationType.php
+
+app/Notifications/LowStockNotification.php
+app/Notifications/PaymentReceivedNotification.php
+app/Notifications/CreditReminderNotification.php
+app/Notifications/DailySalesNotification.php
+
+resources/js/Pages/Notifications/
+resources/js/Components/Toast/
+resources/js/Components/Alerts/
+```
+
+Implements:
+
+```text
+List notifications
+Mark notification as read
+Mark all as read
+Low-stock notifications
+Payment notifications
+Credit reminders
+Daily sales notifications
+Toast messages
+Unread notification count
+```
+
+## Phase 15: Audit Logging Module
+
+This phase records important system activities. It helps track who did what, when, and from which IP address.
+
+Files created or updated:
+
+```text
+app/Models/AuditLog.php
+
+app/Services/AuditLogService.php
+
+app/Listeners/CreateAuditLog.php
+
+app/Observers/SaleObserver.php
+app/Observers/ProductObserver.php
+app/Observers/ExpenseObserver.php
+app/Observers/PaymentObserver.php
+
+app/Traits/LogsActivity.php
+
+resources/js/Pages/Admin/AuditLogs/
+```
+
+Implements:
+
+```text
+Log login
+Log logout
+Log create actions
+Log update actions
+Log delete actions
+Log sale activity
+Log payment activity
+Log inventory activity
+Store old values
+Store new values
+Store user IP address
+```
+
+## Phase 16: Super Admin Module
+
+This phase gives platform administrators control over the whole system.
+
+Super admins can manage businesses, users, subscriptions, platform reports, and audit logs.
+
+Files created or updated:
+
+```text
+app/Http/Controllers/SuperAdminController.php
+app/Http/Controllers/BusinessManagementController.php
+app/Http/Controllers/UserManagementController.php
+app/Http/Controllers/RoleController.php
+app/Http/Controllers/PermissionController.php
+
+app/Services/BusinessService.php
+app/Services/SubscriptionService.php
+app/Services/RBACService.php
+app/Services/ReportService.php
+
+app/Policies/UserPolicy.php
+app/Policies/BusinessPolicy.php
+
+database/seeders/RoleSeeder.php
+database/seeders/PermissionSeeder.php
+database/seeders/SuperAdminSeeder.php
+database/seeders/BusinessSeeder.php
+
+resources/js/Pages/Admin/
+resources/js/Layouts/AdminLayout.jsx
+```
+
+Implements:
+
+```text
+Super admin dashboard
+Manage businesses
+Approve/deactivate businesses
+Manage business owners
+Manage subscriptions
+Manage roles
+Manage permissions
+View platform reports
+View audit logs
+Monitor system activity
+```
+
+## Phase 17: Settings And Profile Module
+
+This phase allows users to manage their personal account, profile, password, and application preferences.
+
+Files created or updated:
+
+```text
+app/Http/Controllers/ProfileController.php
+app/Http/Controllers/SettingsController.php
+
+app/Http/Requests/UpdatePasswordRequest.php
+
+resources/js/Pages/Settings/
+resources/js/Layouts/AppLayout.jsx
+```
+
+Implements:
+
+```text
+Update profile
+Change password
+Manage account settings
+User preferences
+Profile page
+Settings page
+```
+
+## Phase 18: Helpers, UI Components, And Layout Polish
+
+This phase improves developer productivity and frontend consistency. It creates reusable helpers and UI components used across all modules.
+
+Files created or updated:
+
+```text
+app/Helpers/CurrencyHelper.php
+app/Helpers/DateHelper.php
+app/Helpers/BarcodeHelper.php
+app/Helpers/ReportHelper.php
+
+resources/js/Components/Sidebar/
+resources/js/Components/Navbar/
+resources/js/Components/Breadcrumbs/
+resources/js/Components/DataTable/
+resources/js/Components/SearchBox/
+resources/js/Components/Pagination/
+resources/js/Components/ConfirmDialog/
+resources/js/Components/DeleteDialog/
+resources/js/Components/ProductCard/
+resources/js/Components/StatCard/
+resources/js/Components/Charts/
+resources/js/Components/Forms/
+resources/js/Components/Buttons/
+resources/js/Components/Modals/
+resources/js/Components/Alerts/
+resources/js/Components/Toast/
+
+resources/js/Layouts/AppLayout.jsx
+resources/js/Layouts/AuthLayout.jsx
+resources/js/Layouts/AdminLayout.jsx
+resources/js/Layouts/DashboardLayout.jsx
+```
+
+Implements:
+
+```text
+Reusable tables
+Reusable forms
+Reusable modals
+Reusable buttons
+Reusable stat cards
+Reusable chart components
+Consistent sidebar
+Consistent navbar
+Consistent breadcrumbs
+Currency formatting
+Date formatting
+Barcode helpers
+Report helpers
+```
+
+## Phase 19: Database Seeders And Factories
+
+This phase creates fake and default data for development, testing, and demos.
+
+Files created or updated:
+
+```text
+database/seeders/DatabaseSeeder.php
+database/seeders/RoleSeeder.php
+database/seeders/PermissionSeeder.php
+database/seeders/SubscriptionSeeder.php
+database/seeders/SuperAdminSeeder.php
+database/seeders/BusinessSeeder.php
+database/seeders/UserSeeder.php
+database/seeders/CategorySeeder.php
+database/seeders/ProductSeeder.php
+database/seeders/CustomerSeeder.php
+database/seeders/ExpenseSeeder.php
+
+database/factories/BusinessFactory.php
+database/factories/ProductFactory.php
+database/factories/CategoryFactory.php
+database/factories/CustomerFactory.php
+database/factories/SaleFactory.php
+database/factories/ExpenseFactory.php
+database/factories/UserFactory.php
+```
+
+Implements:
+
+```text
+Default roles
+Default permissions
+Default subscriptions
+Default super admin account
+Sample business data
+Sample users
+Sample categories
+Sample products
+Sample customers
+Sample expenses
+Factory data for tests
+```
+
+## Phase 20: Testing, Optimization, And Deployment Preparation
+
+This phase stabilizes the system. After all core features are built, the app is tested, optimized, and prepared for deployment.
+
+Files created or updated:
+
+```text
+tests/Feature/Auth/
+tests/Feature/Business/
+tests/Feature/Categories/
+tests/Feature/Products/
+tests/Feature/Inventory/
+tests/Feature/Customers/
+tests/Feature/Cashiers/
+tests/Feature/Sales/
+tests/Feature/Payments/
+tests/Feature/Expenses/
+tests/Feature/Reports/
+tests/Feature/Admin/
+
+README.md
+docs/testing-checklist.md
+docs/deployment.md
+.env.example
+```
+
+Implements:
+
+```text
+Feature tests
+Authorization tests
+Validation tests
+Business ownership tests
+Sales workflow tests
+Inventory update tests
+Payment tests
+Report tests
+Seeder testing
+Performance checks
+Pagination checks
+Query optimization
+Deployment documentation
+Environment setup documentation
+```
+
+Recommended build order:
+
+```text
+1. Foundation, Authentication, RBAC
+2. Business Registration And Subscription Setup
+3. Dashboard
+4. Categories
+5. Products
+6. Inventory
+7. Customers
+8. Cashiers
+9. Sales And POS
+10. Payments
+11. Customer Credit
+12. Expenses
+13. Reports
+14. Notifications
+15. Audit Logs
+16. Super Admin
+17. Settings/Profile
+18. UI Components And Helpers
+19. Seeders And Factories
+20. Testing, Optimization, Deployment
+```
