@@ -1,0 +1,163 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\Role;
+use App\Models\Business;
+use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Inventory;
+use App\Models\Product;
+use App\Models\Subscription;
+use App\Models\User;
+use Illuminate\Support\Facades\Schema;
+
+class DashboardService
+{
+    public function __construct(private readonly RevenueService $revenueService) {}
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function forUser(User $user): array
+    {
+        return match ($user->role) {
+            Role::SuperAdmin => $this->superAdminDashboard(),
+            Role::Owner => $this->ownerDashboard($user),
+            Role::Cashier => $this->cashierDashboard($user),
+        };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function ownerDashboard(User $user): array
+    {
+        $business = $user->ownedBusiness ?? $user->business;
+
+        return [
+            'role' => Role::Owner->value,
+            'business' => $business,
+            'stats' => [
+                ['label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Sales module pending'],
+                ['label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'Ready after POS phase'],
+                ['label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Catalog coverage'],
+                ['label' => 'Customers', 'value' => (string) $this->businessCount(Customer::class, $business), 'trend' => 'Customer base'],
+            ],
+            'chart' => $this->emptySeries(),
+            'lowStock' => $this->lowStock($business),
+            'topProducts' => [],
+            'nextSteps' => [
+                'Complete product categories',
+                'Add products and opening stock',
+                'Create cashier accounts before POS rollout',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function cashierDashboard(User $user): array
+    {
+        return [
+            'role' => Role::Cashier->value,
+            'business' => $user->business,
+            'stats' => [
+                ['label' => 'Today sales', 'value' => '0', 'trend' => 'POS module pending'],
+                ['label' => 'Transactions', 'value' => '0', 'trend' => 'No transactions yet'],
+                ['label' => 'Customers', 'value' => (string) $this->businessCount(Customer::class, $user->business), 'trend' => 'Available customers'],
+                ['label' => 'Receipts', 'value' => '0', 'trend' => 'Receipt module pending'],
+            ],
+            'chart' => $this->emptySeries(),
+            'queue' => [
+                'Open POS when sales module is available',
+                'Register walk-in customers',
+                'Review pending payments',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function superAdminDashboard(): array
+    {
+        return [
+            'role' => Role::SuperAdmin->value,
+            'stats' => [
+                ['label' => 'Businesses', 'value' => (string) Business::count(), 'trend' => 'Registered workspaces'],
+                ['label' => 'Users', 'value' => (string) User::count(), 'trend' => 'Platform accounts'],
+                ['label' => 'Subscriptions', 'value' => (string) Subscription::count(), 'trend' => 'Available plans'],
+                ['label' => 'Revenue', 'value' => $this->money(0), 'trend' => 'Payments module pending'],
+            ],
+            'chart' => $this->emptySeries(),
+            'recentBusinesses' => Business::query()
+                ->latest()
+                ->take(5)
+                ->get(['id', 'business_name', 'business_type', 'status', 'created_at']),
+        ];
+    }
+
+    private function businessCount(string $modelClass, ?Business $business): int
+    {
+        if (! $business) {
+            return 0;
+        }
+
+        return $modelClass::query()->where('business_id', $business->id)->count();
+    }
+
+    private function todaySalesCount(?Business $business): int
+    {
+        if (! $business || ! Schema::hasTable('sales')) {
+            return 0;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @return list<array{name: string, stock: int, reorder: int}>
+     */
+    private function lowStock(?Business $business): array
+    {
+        if (! $business) {
+            return [];
+        }
+
+        return Product::query()
+            ->with('inventory')
+            ->where('business_id', $business->id)
+            ->whereHas('inventory', fn ($query) => $query->whereColumn('available_stock', '<=', 'products.reorder_level'))
+            ->take(5)
+            ->get()
+            ->map(fn (Product $product): array => [
+                'name' => $product->name,
+                'stock' => (int) ($product->inventory?->available_stock ?? 0),
+                'reorder' => (int) $product->reorder_level,
+            ])
+            ->all();
+    }
+
+    /**
+     * @return list<array{label: string, value: int}>
+     */
+    private function emptySeries(): array
+    {
+        return [
+            ['label' => 'Mon', 'value' => 0],
+            ['label' => 'Tue', 'value' => 0],
+            ['label' => 'Wed', 'value' => 0],
+            ['label' => 'Thu', 'value' => 0],
+            ['label' => 'Fri', 'value' => 0],
+            ['label' => 'Sat', 'value' => 0],
+            ['label' => 'Sun', 'value' => 0],
+        ];
+    }
+
+    private function money(float $amount): string
+    {
+        return number_format($amount, 2).' ETB';
+    }
+}

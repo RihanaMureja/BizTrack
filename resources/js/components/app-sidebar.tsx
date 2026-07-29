@@ -1,7 +1,20 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    Boxes,
+    Building2,
+    ChartNoAxesCombined,
+    CreditCard,
+    LayoutGrid,
+    Package,
+    Receipt,
+    ScrollText,
+    Settings,
+    Tags,
+    UserRound,
+    Users,
+    WalletCards,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -14,36 +27,37 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
+import type { SharedData } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+const icons = {
+    Boxes,
+    Building2,
+    ChartNoAxesCombined,
+    CreditCard,
+    LayoutGrid,
+    Package,
+    Receipt,
+    ScrollText,
+    Settings,
+    Tags,
+    UserRound,
+    Users,
+    WalletCards,
+};
 
 export function AppSidebar() {
+    const { navigation = [] } = usePage<SharedData>().props;
+    const mainNavItems = navigation.map((item) => ({
+        ...item,
+        icon: icons[item.icon as keyof typeof icons] ?? LayoutGrid,
+    }));
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" className="h-16 px-3" asChild>
                             <Link href={dashboard()} prefetch>
                                 <AppLogo />
                             </Link>
@@ -57,7 +71,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

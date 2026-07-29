@@ -1,0 +1,11 @@
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, ReceiptText } from 'lucide-react';
+import { DataTable } from '@/components/data-table/data-table';
+import { Button } from '@/components/ui/button';
+
+type Item = { id: number; quantity: number; unit_price: string; line_total: string; product: { name: string } };
+type Sale = { invoice_number: string; subtotal: string; tax_amount: string; discount_amount: string; grand_total: string; status: string; customer: { full_name: string } | null; user: { name: string } | null; items: Item[] };
+export default function SaleShow({ sale }: { sale: Sale }) {
+    return <><Head title={sale.invoice_number} /><div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6"><div className="flex justify-between"><div className="flex items-center gap-3"><div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground"><ReceiptText className="size-5" /></div><div><h1 className="text-xl font-semibold">{sale.invoice_number}</h1><p className="text-sm text-muted-foreground">{sale.customer?.full_name ?? 'Walk-in customer'} | {sale.user?.name ?? 'System'}</p></div></div><Button variant="outline" asChild><Link href="/sales"><ArrowLeft className="size-4" />Back</Link></Button></div><DataTable columns={[{key:'product',header:'Product',render:(i)=>i.product.name},{key:'quantity',header:'Qty'},{key:'unit_price',header:'Price',render:(i)=>`${i.unit_price} ETB`},{key:'line_total',header:'Total',render:(i)=>`${i.line_total} ETB`}]} data={sale.items} rowKey={(i)=>i.id} /><div className="ml-auto w-full max-w-sm rounded-md border bg-card p-4 text-sm"><div className="flex justify-between"><span>Subtotal</span><span>{sale.subtotal} ETB</span></div><div className="flex justify-between"><span>Tax</span><span>{sale.tax_amount} ETB</span></div><div className="flex justify-between"><span>Discount</span><span>{sale.discount_amount} ETB</span></div><div className="mt-3 flex justify-between border-t pt-3 text-lg font-semibold"><span>Total</span><span>{sale.grand_total} ETB</span></div></div></div></>;
+}
+SaleShow.layout = { breadcrumbs: [{ title: 'Dashboard', href: '/dashboard' }, { title: 'Sales', href: '/sales' }, { title: 'Receipt', href: '#' }] };

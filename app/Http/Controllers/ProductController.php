@@ -2,121 +2,98 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RecordStatus;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Models\Category;
 use App\Models\Product;
+use App\Services\ProductService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProductController extends Controller
 {
+    use AuthorizesRequests;
 
-    // Show all products
-    public function index()
+    public function __construct(private readonly ProductService $productService) {}
+
+    public function index(Request $request): Response
     {
-        $products = Product::with(['category', 'business'])->get();
+        $this->authorize('viewAny', Product::class);
 
-        return response()->json($products);
-    }
+        $business = $request->user()->ownedBusiness;
+        $search = $request->string('search')->toString() ?: null;
+        $categoryId = $request->integer('category_id') ?: null;
+        $status = $request->string('status')->toString() ?: null;
 
-
-    // Create product
-    public function store(Request $request)
-    {
-        $request->validate([
-
-            'business_id' => 'required|exists:businesses,id',
-
-            'category_id' => 'required|exists:categories,id',
-
-            'product_name' => 'required|string|max:255',
-
-            'sku' => 'required|string|unique:products,sku',
-
-            'buy_price' => 'required|numeric',
-
-            'sell_price' => 'required|numeric',
-
-            'quantity' => 'required|integer|min:0',
-
-            'reorder_level' => 'nullable|integer|min:0',
-
-            'status' => 'boolean',
-
-        ]);
-
-
-        $product = Product::create([
-
-            'business_id' => $request->business_id,
-
-            'category_id' => $request->category_id,
-
-            'product_name' => $request->product_name,
-
-            'sku' => $request->sku,
-
-            'buy_price' => $request->buy_price,
-
-            'sell_price' => $request->sell_price,
-
-            'quantity' => $request->quantity,
-
-            'reorder_level' => $request->reorder_level ?? 10,
-
-            'status' => $request->status ?? true,
-
-        ]);
-
-
-        return response()->json([
-            'message' => 'Product created successfully',
-            'product' => $product
+        return Inertia::render('products/index', [
+            'products' => $business
+                ? $this->productService->paginateForBusiness($business, $search, $categoryId, $status)
+                : null,
+            'categories' => $business
+                ? Category::query()
+                    ->where('business_id', $business->id)
+                    ->orderBy('name')
+                    ->get(['id', 'name'])
+                : [],
+            'filters' => [
+                'search' => $search,
+                'category_id' => $categoryId,
+                'status' => $status,
+            ],
+            'statuses' => collect(RecordStatus::cases())
+                ->map(fn (RecordStatus $status) => [
+                    'value' => $status->value,
+                    'label' => ucfirst($status->value),
+                ])
+                ->values(),
         ]);
     }
 
-
-    // Show single product
-    public function show(Product $product)
+    public function store(StoreProductRequest $request): RedirectResponse
     {
-        return response()->json($product);
+        $business = $request->user()->ownedBusiness;
+
+        if (! $business) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Create your business profile before adding products.',
+            ]);
+
+            return to_route('business.profile');
+        }
+
+        $this->authorize('create', Product::class);
+
+        $product = $this->productService->create($business, $request->validated());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $product->name.' product created.']);
+
+        return back();
     }
 
-
-    // Update product
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
+        $this->authorize('update', $product);
 
-        $request->validate([
+        $product = $this->productService->update($product, $request->validated());
 
-            'product_name' => 'string|max:255',
+        Inertia::flash('toast', ['type' => 'success', 'message' => $product->name.' product updated.']);
 
-            'buy_price' => 'numeric',
-
-            'sell_price' => 'numeric',
-
-            'quantity' => 'integer|min:0',
-
-            'status' => 'boolean',
-
-        ]);
-
-
-        $product->update($request->all());
-
-
-        return response()->json([
-            'message' => 'Product updated successfully',
-            'product' => $product
-        ]);
+        return back();
     }
 
-
-    // Delete product
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product): RedirectResponse
     {
-        $product->delete();
+        $this->authorize('delete', $product);
 
+        $this->productService->deactivate($product);
 
-        return response()->json([
-            'message' => 'Product deleted successfully'
-        ]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Product deactivated.']);
+
+        return back();
     }
 }

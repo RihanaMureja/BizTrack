@@ -2,38 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Business;
+use App\Http\Requests\StoreBusinessRequest;
+use App\Http\Requests\UpdateBusinessRequest;
+use App\Services\BusinessService;
+use App\Services\SubscriptionService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class BusinessController extends Controller
 {
-    public function store(Request $request)
+    public function __construct(
+        private readonly BusinessService $businessService,
+        private readonly SubscriptionService $subscriptionService,
+    ) {}
+
+    public function show(Request $request): Response
     {
-        $request->validate([
-            'owner_id' => 'required|exists:users,id',
-            'business_name' => 'required|string',
-            'business_type' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'address' => 'nullable|string',
-            'status' => 'boolean',
+        return Inertia::render('business/profile', [
+            'business' => $request->user()->ownedBusiness?->load('subscription'),
+            'subscriptions' => $this->subscriptionService->activePlans(),
         ]);
+    }
 
+    public function store(StoreBusinessRequest $request): RedirectResponse
+    {
+        $business = $this->businessService->upsertForOwner($request->user(), $request->validated());
 
-        $business = Business::create([
-            'owner_id' => $request->owner_id,
-            'business_name' => $request->business_name,
-            'business_type' => $request->business_type,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'address' => $request->address,
-            'status' => $request->status ?? true,
-        ]);
+        return to_route('business.profile')->with('success', $business->business_name.' profile created.');
+    }
 
+    public function update(UpdateBusinessRequest $request): RedirectResponse
+    {
+        $business = $this->businessService->upsertForOwner($request->user(), $request->validated());
 
-        return response()->json([
-            'message' => 'Business created successfully',
-            'business' => $business
-        ]);
+        return to_route('business.profile')->with('success', $business->business_name.' profile updated.');
     }
 }

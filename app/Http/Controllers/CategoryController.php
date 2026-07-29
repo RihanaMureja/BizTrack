@@ -2,85 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Services\CategoryService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    use AuthorizesRequests;
 
-    // Get all categories
-    public function index()
+    public function __construct(private readonly CategoryService $categoryService) {}
+
+    public function index(Request $request): Response
     {
-        $categories = Category::all();
+        $this->authorize('viewAny', Category::class);
 
-        return response()->json($categories);
-    }
+        $business = $request->user()->ownedBusiness;
+        $search = $request->string('search')->toString() ?: null;
 
-
-    // Create category
-    public function store(Request $request)
-    {
-        $request->validate([
-            'business_id' => 'required|exists:businesses,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'boolean',
-        ]);
-
-
-        $category = Category::create([
-            'business_id' => $request->business_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'status' => $request->status ?? true,
-        ]);
-
-
-        return response()->json([
-            'message' => 'Category created successfully',
-            'category' => $category
+        return Inertia::render('categories/index', [
+            'categories' => $business
+                ? $this->categoryService->paginateForBusiness($business, $search)
+                : null,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
-
-    // Show one category
-    public function show(Category $category)
+    public function store(StoreCategoryRequest $request): RedirectResponse
     {
-        return response()->json($category);
+        $business = $request->user()->ownedBusiness;
+
+        if (! $business) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Create your business profile before adding categories.',
+            ]);
+
+            return to_route('business.profile');
+        }
+
+        $this->authorize('create', Category::class);
+
+        $category = $this->categoryService->create($business, $request->validated());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $category->name.' category created.']);
+
+        return back();
     }
 
-
-    // Update category
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'boolean',
-        ]);
+        $this->authorize('update', $category);
 
+        $category = $this->categoryService->update($category, $request->validated());
 
-        $category->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'status' => $request->status,
-        ]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $category->name.' category updated.']);
 
-
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'category' => $category
-        ]);
+        return back();
     }
 
-
-    // Delete category
-    public function destroy(Category $category)
+    public function destroy(Request $request, Category $category): RedirectResponse
     {
-        $category->delete();
+        $this->authorize('delete', $category);
 
-        return response()->json([
-            'message' => 'Category deleted successfully'
-        ]);
+        $this->categoryService->delete($category);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Category deleted.']);
+
+        return back();
     }
 }
