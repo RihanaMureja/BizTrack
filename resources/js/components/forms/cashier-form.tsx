@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,7 @@ import type { FormEvent } from 'react';
 
 export type CashierFormCashier = {
     id?: number;
+    business_role_id?: number | null;
     first_name?: string | null;
     last_name?: string | null;
     name?: string;
@@ -17,18 +19,27 @@ export type CashierFormCashier = {
     status?: string;
 };
 
+export type CashierBusinessRole = {
+    id: number;
+    name: string;
+    is_default: boolean;
+};
+
 type Props = {
     cashier: CashierFormCashier | null;
     onSuccess?: () => void;
+    passwordRules?: string;
+    businessRoles?: CashierBusinessRole[];
 };
 
-export function CashierForm({ cashier, onSuccess }: Props) {
+export function CashierForm({ cashier, onSuccess, passwordRules, businessRoles = [] }: Props) {
     const isEditing = Boolean(cashier?.id);
     const form = useForm({
         first_name: cashier?.first_name ?? '',
         last_name: cashier?.last_name ?? '',
         name: cashier?.name ?? '',
         email: cashier?.email ?? '',
+        business_role_id: cashier?.business_role_id ? String(cashier.business_role_id) : String(businessRoles.find((role) => role.is_default)?.id ?? businessRoles[0]?.id ?? ''),
         phone: cashier?.phone ?? '',
         status: cashier?.status ?? 'active',
         password: '',
@@ -82,6 +93,16 @@ export function CashierForm({ cashier, onSuccess }: Props) {
                     <InputError message={form.errors.phone} />
                 </div>
                 <div className="grid gap-2 md:col-span-2">
+                    <Label htmlFor="business_role_id">Employee role</Label>
+                    <select id="business_role_id" value={form.data.business_role_id} onChange={(event) => form.setData('business_role_id', event.target.value)} className="border-input bg-background flex h-9 rounded-md border px-3 text-sm shadow-xs">
+                        <option value="">Use default role</option>
+                        {businessRoles.map((role) => (
+                            <option key={role.id} value={role.id}>{role.name}</option>
+                        ))}
+                    </select>
+                    <InputError message={form.errors.business_role_id} />
+                </div>
+                <div className="grid gap-2 md:col-span-2">
                     <Label htmlFor="status">Status</Label>
                     <select id="status" value={form.data.status} onChange={(event) => form.setData('status', event.target.value)} className="border-input bg-background flex h-9 rounded-md border px-3 text-sm shadow-xs">
                         <option value="active">Active</option>
@@ -90,20 +111,20 @@ export function CashierForm({ cashier, onSuccess }: Props) {
                     <InputError message={form.errors.status} />
                 </div>
                 <div className="grid gap-2">
-                    <Label htmlFor="password">{isEditing ? 'New password' : 'Password'}</Label>
-                    <Input id="password" type="password" value={form.data.password} onChange={(event) => form.setData('password', event.target.value)} required={!isEditing} placeholder={isEditing ? 'Leave unchanged' : undefined} />
+                    <Label htmlFor="password">{isEditing ? 'New temporary password' : 'Temporary password'}</Label>
+                    <PasswordInput id="password" value={form.data.password} onChange={(event) => form.setData('password', event.target.value)} required={!isEditing} placeholder={isEditing ? 'Leave unchanged' : undefined} passwordrules={passwordRules} />
                     <InputError message={form.errors.password} />
                 </div>
                 <div className="grid gap-2">
                     <Label htmlFor="password_confirmation">Confirm password</Label>
-                    <Input id="password_confirmation" type="password" value={form.data.password_confirmation} onChange={(event) => form.setData('password_confirmation', event.target.value)} required={!isEditing} />
+                    <PasswordInput id="password_confirmation" value={form.data.password_confirmation} onChange={(event) => form.setData('password_confirmation', event.target.value)} required={!isEditing} passwordrules={passwordRules} />
                     <InputError message={form.errors.password_confirmation} />
                 </div>
             </div>
 
             <Button type="submit" className="w-fit" disabled={form.processing}>
                 {form.processing ? <Spinner /> : <Save className="size-4" />}
-                {isEditing ? 'Save changes' : 'Create cashier'}
+                {isEditing ? 'Save changes' : 'Create employee'}
             </Button>
         </form>
     );

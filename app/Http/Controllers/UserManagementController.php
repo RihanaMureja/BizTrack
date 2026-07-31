@@ -44,6 +44,7 @@ class UserManagementController extends Controller
             'roles' => collect(Role::cases())->map(fn (Role $role): array => ['value' => $role->value, 'label' => $role->label()]),
             'statuses' => collect(RecordStatus::cases())->map(fn (RecordStatus $status): array => ['value' => $status->value, 'label' => ucfirst($status->value)]),
             'filters' => $filters,
+            'currentUserId' => $request->user()->id,
         ]);
     }
 
@@ -51,17 +52,17 @@ class UserManagementController extends Controller
     {
         $this->authorize('update', $user);
         abort_unless($request->user()->isSuperAdmin(), 403);
-        abort_if($request->user()->is($user) && $request->input('status') === RecordStatus::Inactive->value, 422, 'You cannot deactivate your own super admin account.');
+        abort_if($request->user()->is($user), 422, 'You cannot update your own super admin account from this screen.');
+        abort_if($user->isSuperAdmin(), 422, 'Super admin accounts cannot be changed from this screen.');
 
         $data = $request->validate([
-            'role' => ['required', Rule::enum(Role::class)],
             'status' => ['required', Rule::enum(RecordStatus::class)],
         ]);
-        $oldValues = $user->only(['role', 'status']);
+        $oldValues = $user->only(['status']);
         $user->forceFill($data)->save();
 
-        $this->auditLogService->log('user.updated', $user, $user->business, $oldValues, $user->only(['role', 'status']), $request->user(), $request);
+        $this->auditLogService->log('user.status_updated', $user, $user->business, $oldValues, $user->only(['status']), $request->user(), $request);
 
-        return back()->with('success', 'User updated.');
+        return back()->with('success', 'User status updated.');
     }
 }

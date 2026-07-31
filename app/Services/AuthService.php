@@ -21,6 +21,8 @@ class AuthService
             'phone' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
             'role' => Role::Owner,
+            'must_reset_password' => false,
+            'password_changed_at' => now(),
         ]);
     }
 }

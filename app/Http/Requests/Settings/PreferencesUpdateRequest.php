@@ -25,6 +25,10 @@ class PreferencesUpdateRequest extends FormRequest
             'notify_low_stock' => ['boolean'],
             'notify_payments' => ['boolean'],
             'notify_credit_reminders' => ['boolean'],
+            'notify_stagnant_products' => ['boolean'],
+            'stagnant_product_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
+            'stagnant_product_minimum_stock' => ['sometimes', 'integer', 'min:0', 'max:999999'],
+            'stagnant_product_notification_frequency' => ['sometimes', 'integer', 'min:1', 'max:90'],
             'compact_sidebar' => ['boolean'],
         ];
     }

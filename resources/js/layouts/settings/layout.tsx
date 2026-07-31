@@ -23,6 +23,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Security Questions',
+        href: '/settings/security-questions',
+        icon: null,
+    },
+    {
         title: 'Preferences',
         href: editPreferences(),
         icon: null,

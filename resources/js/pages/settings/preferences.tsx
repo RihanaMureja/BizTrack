@@ -16,6 +16,10 @@ type Preferences = {
     notify_low_stock: boolean;
     notify_payments: boolean;
     notify_credit_reminders: boolean;
+    notify_stagnant_products: boolean;
+    stagnant_product_days: number;
+    stagnant_product_minimum_stock: number;
+    stagnant_product_notification_frequency: number;
     compact_sidebar: boolean;
 };
 type Props = {
@@ -36,6 +40,10 @@ export default function Preferences({ preferences, options }: Props) {
         notify_low_stock: preferences.notify_low_stock,
         notify_payments: preferences.notify_payments,
         notify_credit_reminders: preferences.notify_credit_reminders,
+        notify_stagnant_products: preferences.notify_stagnant_products,
+        stagnant_product_days: String(preferences.stagnant_product_days),
+        stagnant_product_minimum_stock: String(preferences.stagnant_product_minimum_stock),
+        stagnant_product_notification_frequency: String(preferences.stagnant_product_notification_frequency),
         compact_sidebar: preferences.compact_sidebar,
     });
 
@@ -123,7 +131,50 @@ export default function Preferences({ preferences, options }: Props) {
                             <PreferenceToggle label="Low stock alerts" checked={form.data.notify_low_stock} onChange={(checked) => form.setData('notify_low_stock', checked)} />
                             <PreferenceToggle label="Payment notifications" checked={form.data.notify_payments} onChange={(checked) => form.setData('notify_payments', checked)} />
                             <PreferenceToggle label="Credit reminders" checked={form.data.notify_credit_reminders} onChange={(checked) => form.setData('notify_credit_reminders', checked)} />
+                            <PreferenceToggle label="Stagnant product alerts" checked={form.data.notify_stagnant_products} onChange={(checked) => form.setData('notify_stagnant_products', checked)} />
                             <PreferenceToggle label="Compact sidebar" checked={form.data.compact_sidebar} onChange={(checked) => form.setData('compact_sidebar', checked)} />
+                        </div>
+                    </div>
+
+                    <div className="rounded-md border bg-card p-4 shadow-sm">
+                        <h2 className="font-semibold">Stagnant product detection</h2>
+                        <div className="mt-4 grid gap-4 md:grid-cols-3">
+                            <div className="grid gap-2">
+                                <Label htmlFor="stagnant_product_days">Days without sale</Label>
+                                <Input
+                                    id="stagnant_product_days"
+                                    type="number"
+                                    min="1"
+                                    max="365"
+                                    value={form.data.stagnant_product_days}
+                                    onChange={(event) => form.setData('stagnant_product_days', event.target.value)}
+                                />
+                                <InputError message={form.errors.stagnant_product_days} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="stagnant_product_minimum_stock">Minimum stock</Label>
+                                <Input
+                                    id="stagnant_product_minimum_stock"
+                                    type="number"
+                                    min="0"
+                                    max="999999"
+                                    value={form.data.stagnant_product_minimum_stock}
+                                    onChange={(event) => form.setData('stagnant_product_minimum_stock', event.target.value)}
+                                />
+                                <InputError message={form.errors.stagnant_product_minimum_stock} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="stagnant_product_notification_frequency">Reminder frequency days</Label>
+                                <Input
+                                    id="stagnant_product_notification_frequency"
+                                    type="number"
+                                    min="1"
+                                    max="90"
+                                    value={form.data.stagnant_product_notification_frequency}
+                                    onChange={(event) => form.setData('stagnant_product_notification_frequency', event.target.value)}
+                                />
+                                <InputError message={form.errors.stagnant_product_notification_frequency} />
+                            </div>
                         </div>
                     </div>
 

@@ -20,6 +20,15 @@ class RoleController extends Controller
                 'label' => $role->label(),
                 'users_count' => User::where('role', $role)->count(),
             ]),
+            'permissions' => [
+                ['module' => 'Platform', 'permission' => 'View super admin dashboard', 'roles' => ['super_admin']],
+                ['module' => 'Businesses', 'permission' => 'Approve and deactivate businesses', 'roles' => ['super_admin']],
+                ['module' => 'Users', 'permission' => 'Manage business owners and cashiers', 'roles' => ['super_admin']],
+                ['module' => 'Subscriptions', 'permission' => 'Create and manage subscription plans', 'roles' => ['super_admin']],
+                ['module' => 'Audit Logs', 'permission' => 'View all platform audit logs', 'roles' => ['super_admin']],
+                ['module' => 'Business', 'permission' => 'Manage own business modules', 'roles' => ['owner']],
+                ['module' => 'POS', 'permission' => 'Create sales and payments', 'roles' => ['owner', 'cashier']],
+            ],
         ]);
     }
 }

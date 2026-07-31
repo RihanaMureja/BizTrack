@@ -3,6 +3,8 @@
 use App\Http\Middleware\BusinessMiddleware;
 use App\Http\Middleware\EnsureBusinessIsActive;
 use App\Http\Middleware\EnsureBusinessIsApproved;
+use App\Http\Middleware\EnsureBusinessPermission;
+use App\Http\Middleware\EnsurePasswordIsNotTemporary;
 use App\Http\Middleware\EnsureSubscriptionIsActive;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -28,15 +30,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'business' => BusinessMiddleware::class,
             'business.active' => EnsureBusinessIsActive::class,
             'business.approved' => EnsureBusinessIsApproved::class,
+            'business.permission' => EnsureBusinessPermission::class,
             'subscription.active' => EnsureSubscriptionIsActive::class,
             'role' => RoleMiddleware::class,
             'log.activity' => LogActivity::class,
+            'password.not_temporary' => EnsurePasswordIsNotTemporary::class,
         ]);
 
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            EnsurePasswordIsNotTemporary::class,
             LogActivity::class,
         ]);
     })

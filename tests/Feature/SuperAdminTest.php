@@ -68,19 +68,37 @@ test('super admin can approve deactivate and change business subscription', func
         ->assertRedirect();
     expect($business->refresh()->status)->toBe(RecordStatus::Inactive);
 
-    expect(AuditLog::where('action', 'business.approved')->exists())->toBeTrue()
+    expect(AuditLog::where('action', 'business.verification.approved')->exists())->toBeTrue()
         ->and(AuditLog::where('action', 'business.subscription_updated')->exists())->toBeTrue()
         ->and(AuditLog::where('action', 'business.deactivated')->exists())->toBeTrue();
 });
 
-test('super admin can manage users', function () {
+test('super admin can view users and update non super admin status only', function () {
     $admin = superAdminUser();
     $user = User::factory()->create(['role' => Role::Owner, 'status' => RecordStatus::Active]);
 
     $this->actingAs($admin)
         ->get(route('admin.users.index', ['role' => Role::Owner->value]))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('admin/users/index')->where('users.total', 1));
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/users/index')
+            ->where('users.total', 1)
+            ->where('currentUserId', $admin->id));
+
+    $this->actingAs($admin)
+        ->put(route('admin.users.update', $user), [
+            'status' => RecordStatus::Inactive->value,
+        ])
+        ->assertRedirect();
+
+    expect($user->refresh()->role)->toBe(Role::Owner)
+        ->and($user->status)->toBe(RecordStatus::Inactive)
+        ->and(AuditLog::where('action', 'user.status_updated')->exists())->toBeTrue();
+});
+
+test('super admin cannot change user roles from admin users page', function () {
+    $admin = superAdminUser();
+    $user = User::factory()->create(['role' => Role::Owner, 'status' => RecordStatus::Active]);
 
     $this->actingAs($admin)
         ->put(route('admin.users.update', $user), [
@@ -89,9 +107,28 @@ test('super admin can manage users', function () {
         ])
         ->assertRedirect();
 
-    expect($user->refresh()->role)->toBe(Role::Cashier)
-        ->and($user->status)->toBe(RecordStatus::Inactive)
-        ->and(AuditLog::where('action', 'user.updated')->exists())->toBeTrue();
+    expect($user->refresh()->role)->toBe(Role::Owner)
+        ->and($user->status)->toBe(RecordStatus::Inactive);
+});
+
+test('super admin cannot update own row or another super admin row', function () {
+    $admin = superAdminUser();
+    $otherAdmin = superAdminUser();
+
+    $this->actingAs($admin)
+        ->put(route('admin.users.update', $admin), [
+            'status' => RecordStatus::Inactive->value,
+        ])
+        ->assertStatus(422);
+
+    $this->actingAs($admin)
+        ->put(route('admin.users.update', $otherAdmin), [
+            'status' => RecordStatus::Suspended->value,
+        ])
+        ->assertStatus(422);
+
+    expect($admin->refresh()->status)->toBe(RecordStatus::Active)
+        ->and($otherAdmin->refresh()->status)->toBe(RecordStatus::Active);
 });
 
 test('super admin can create update and deactivate subscription plans', function () {
@@ -138,11 +175,13 @@ test('super admin can view role and permission overviews', function () {
     $this->actingAs($admin)
         ->get(route('admin.roles.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('admin/roles/index')->has('roles', 3));
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/roles/index')
+            ->has('roles', 3)
+            ->has('permissions'));
 
     $this->actingAs($admin)
         ->get(route('admin.permissions.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('admin/permissions/index')->has('permissions'));
 });
-

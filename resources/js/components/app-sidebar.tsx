@@ -1,9 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     Bell,
+    BadgeDollarSign,
     Boxes,
     Building2,
     ChartNoAxesCombined,
+    ChartColumnIncreasing,
     CreditCard,
     KeyRound,
     LayoutGrid,
@@ -33,10 +35,12 @@ import { dashboard } from '@/routes';
 import type { SharedData } from '@/types';
 
 const icons = {
+    BadgeDollarSign,
     Bell,
     Boxes,
     Building2,
     ChartNoAxesCombined,
+    ChartColumnIncreasing,
     CreditCard,
     KeyRound,
     LayoutGrid,

@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\Rules\Password;
 
 class CashierController extends Controller
 {
@@ -29,8 +30,12 @@ class CashierController extends Controller
             'cashiers' => $business
                 ? $this->cashierService->paginateForBusiness($business, $search)
                 : null,
+            'businessRoles' => $business
+                ? $business->roles()->with('permissions:id,key,name,group')->orderBy('name')->get(['id', 'business_id', 'name', 'description', 'is_default'])
+                : [],
             'filters' => ['search' => $search],
             'cashierLimit' => $business?->subscription?->max_cashiers ?? 0,
+            'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]);
     }
 
@@ -39,7 +44,7 @@ class CashierController extends Controller
         $business = $request->user()->ownedBusiness;
 
         if (! $business) {
-            Inertia::flash('toast', ['type' => 'error', 'message' => 'Create your business profile before adding cashiers.']);
+            Inertia::flash('toast', ['type' => 'error', 'message' => 'Create your business profile before adding employees.']);
 
             return to_route('business.profile');
         }
@@ -48,7 +53,7 @@ class CashierController extends Controller
 
         $cashier = $this->cashierService->create($business, $request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => $cashier->name.' cashier created.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cashier->name.' employee created.']);
 
         return back();
     }
@@ -59,7 +64,7 @@ class CashierController extends Controller
 
         $cashier = $this->cashierService->update($cashier, $request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => $cashier->name.' cashier updated.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $cashier->name.' employee updated.']);
 
         return back();
     }
@@ -70,7 +75,7 @@ class CashierController extends Controller
 
         $this->cashierService->deactivate($cashier);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Cashier deactivated.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Employee deactivated.']);
 
         return back();
     }
@@ -95,7 +100,7 @@ class CashierController extends Controller
 
         $this->cashierService->delete($cashier);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Cashier deleted.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Employee deleted.']);
 
         return back();
     }

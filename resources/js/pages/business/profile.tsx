@@ -4,7 +4,10 @@ import { Building2, Clock3, ShieldCheck } from 'lucide-react';
 import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
 
 type Props = {
-    business: BusinessFormBusiness | null;
+    business: (BusinessFormBusiness & {
+        verification_documents?: Array<{ id: number; label: string; status: string; notes: string | null }>;
+        verification_reviews?: Array<{ id: number; decision: string; reason: string | null; reviewed_at: string; status_after: string }>;
+    }) | null;
     subscriptions: BusinessFormSubscription[];
 };
 
@@ -49,6 +52,38 @@ export default function BusinessProfile({ business, subscriptions }: Props) {
                             Products, inventory, cashiers, customers, sales, expenses, and reports unlock after a
                             super admin approves this business.
                         </p>
+                        {business?.verification_documents && business.verification_documents.length > 0 && (
+                            <div className="mt-5 border-t pt-4">
+                                <h3 className="text-sm font-semibold">Submitted documents</h3>
+                                <div className="mt-3 grid gap-2">
+                                    {business.verification_documents.map((document) => (
+                                        <div key={document.id} className="rounded-md border bg-background px-3 py-2 text-xs">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium">{document.label}</span>
+                                                <span className="capitalize text-muted-foreground">{document.status.replace(/_/g, ' ')}</span>
+                                            </div>
+                                            {document.notes && <p className="mt-1 text-muted-foreground">{document.notes}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {business?.verification_reviews && business.verification_reviews.length > 0 && (
+                            <div className="mt-5 border-t pt-4">
+                                <h3 className="text-sm font-semibold">Review history</h3>
+                                <div className="mt-3 grid gap-2">
+                                    {business.verification_reviews.map((review) => (
+                                        <div key={review.id} className="rounded-md border bg-background px-3 py-2 text-xs">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium capitalize">{review.decision.replace(/_/g, ' ')}</span>
+                                                <span className="text-muted-foreground">{new Date(review.reviewed_at).toLocaleDateString()}</span>
+                                            </div>
+                                            {review.reason && <p className="mt-1 text-muted-foreground">{review.reason}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </aside>
                 </div>
             </div>

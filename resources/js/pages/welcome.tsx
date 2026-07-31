@@ -1,14 +1,16 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
-    BarChart3,
     Boxes,
-    CheckCircle2,
     CreditCard,
     ReceiptText,
     ShieldCheck,
     WalletCards,
 } from 'lucide-react';
 import { dashboard, login, register } from '@/routes';
+import landingImageOne from '../../../assets/images/1 img.png';
+import landingImageTwo from '../../../assets/images/2 img.png';
+import landingImageThree from '../../../assets/images/3 img.png';
+import landingImageFour from '../../../assets/images/4 img.png';
 
 const highlights = [
     { label: 'Revenue tracking', icon: WalletCards },
@@ -17,10 +19,11 @@ const highlights = [
     { label: 'Payment records', icon: CreditCard },
 ];
 
-const metrics = [
-    ['0 ETB', 'Starter plan ready'],
-    ['3', 'Subscription tiers'],
-    ['Role based', 'Owner, cashier, admin'],
+const landingImages = [
+    landingImageOne,
+    landingImageTwo,
+    landingImageThree,
+    landingImageFour,
 ];
 
 export default function Welcome() {
@@ -66,7 +69,7 @@ export default function Welcome() {
                     </nav>
                 </header>
 
-                <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[minmax(0,1fr)_30rem] lg:px-8 lg:py-16">
+                <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[minmax(0,1fr)_34rem] lg:px-8 lg:py-16">
                     <div className="flex flex-col justify-center">
                         <div className="inline-flex w-fit items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm text-muted-foreground shadow-sm">
                             <ShieldCheck className="size-4 text-primary" />
@@ -107,33 +110,28 @@ export default function Welcome() {
                         </div>
                     </div>
 
-                    <div className="rounded-md border bg-card p-5 shadow-xl shadow-primary/10">
-                        <div className="flex items-center justify-between border-b pb-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Today overview</p>
-                                <h2 className="mt-1 text-2xl font-semibold">Business command center</h2>
+                    <div className="relative min-h-[26rem] overflow-hidden rounded-md border bg-card shadow-xl shadow-primary/10 lg:min-h-[34rem]">
+                        {landingImages.map((image, index) => (
+                            <img
+                                key={image}
+                                src={image}
+                                alt=""
+                                aria-hidden="true"
+                                className="landing-hero-image absolute inset-0 h-full w-full object-cover"
+                                style={{ animationDelay: `${index * 5}s` }}
+                            />
+                        ))}
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-white/10" />
+                        <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8">
+                            <div className="max-w-md">
+                                <p className="text-sm font-medium text-white/80">Built for real business operations</p>
+                                <h2 className="mt-2 text-3xl font-semibold leading-tight">
+                                    Sales, stock, payments, and reports in one calm workspace.
+                                </h2>
+                                <p className="mt-3 text-sm leading-6 text-white/75">
+                                    BizTrack gives owners a clear view of daily operations while employees get focused tools for the work they are trusted to do.
+                                </p>
                             </div>
-                            <BarChart3 className="size-8 text-primary" />
-                        </div>
-
-                        <div className="mt-5 grid gap-3">
-                            {metrics.map(([value, label]) => (
-                                <div key={label} className="rounded-md bg-background p-4">
-                                    <p className="text-2xl font-semibold">{value}</p>
-                                    <p className="mt-1 text-sm text-muted-foreground">{label}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="mt-5 rounded-md bg-sidebar p-5 text-sidebar-foreground">
-                            <div className="flex items-center gap-2">
-                                <CheckCircle2 className="size-5 text-sidebar-primary" />
-                                <p className="font-semibold">Ready for the Next Chapter of Business</p>
-                            </div>
-                            <p className="mt-3 text-sm leading-6 text-sidebar-foreground/70">
-                                Digitalised business records are the key to growth. BizTrack gives you a professional workspace for
-                                revenue, inventory, customers, payments, subscriptions, and reports. Start tracking your business today.
-                            </p>
                         </div>
                     </div>
                 </section>

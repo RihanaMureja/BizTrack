@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\BusinessRole;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class BusinessRoleRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user()?->isOwner() ?? false;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        $business = $this->user()?->ownedBusiness;
+        $role = $this->route('businessRole');
+
+        return [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('business_roles', 'name')
+                    ->where('business_id', $business?->id)
+                    ->ignore($role instanceof BusinessRole ? $role->id : null),
+            ],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'is_default' => ['boolean'],
+            'permission_ids' => ['array'],
+            'permission_ids.*' => ['integer', Rule::exists('business_permissions', 'id')],
+        ];
+    }
+}

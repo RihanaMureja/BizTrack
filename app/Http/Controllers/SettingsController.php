@@ -60,6 +60,10 @@ class SettingsController extends Controller
             'notify_low_stock' => (bool) ($preferences['notify_low_stock'] ?? true),
             'notify_payments' => (bool) ($preferences['notify_payments'] ?? true),
             'notify_credit_reminders' => (bool) ($preferences['notify_credit_reminders'] ?? true),
+            'notify_stagnant_products' => (bool) ($preferences['notify_stagnant_products'] ?? true),
+            'stagnant_product_days' => (int) ($preferences['stagnant_product_days'] ?? 30),
+            'stagnant_product_minimum_stock' => (int) ($preferences['stagnant_product_minimum_stock'] ?? 1),
+            'stagnant_product_notification_frequency' => (int) ($preferences['stagnant_product_notification_frequency'] ?? 7),
             'compact_sidebar' => (bool) ($preferences['compact_sidebar'] ?? false),
         ];
     }

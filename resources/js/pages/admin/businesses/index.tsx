@@ -5,8 +5,8 @@ import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, router } from '@inertiajs/react';
-import { Building2, Check, Power } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Building2, Check, Eye, Power } from 'lucide-react';
 
 type Business = {
     id: number;
@@ -56,6 +56,11 @@ export default function AdminBusinessesIndex({ businesses, subscriptions, status
                         <option value="">Change plan</option>
                         {subscriptions.map((subscription) => <option key={subscription.id} value={subscription.id}>{subscription.name}</option>)}
                     </select>
+                    <Button asChild type="button" variant="outline" size="sm">
+                        <Link href={`/admin/business-verifications/${business.id}`}>
+                            <Eye className="size-4" /> Review
+                        </Link>
+                    </Button>
                     {business.status === 'active' ? (
                         <Button type="button" variant="outline" size="sm" onClick={() => router.post(`/admin/businesses/${business.id}/deactivate`, {}, { preserveScroll: true })}>
                             <Power className="size-4" /> Deactivate

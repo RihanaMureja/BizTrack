@@ -1,0 +1,71 @@
+You currently have **36 tables**.
+
+**Clean Classification**
+- **BizTrack application tables:** **27**
+- **Laravel/system infrastructure tables:** **9**
+
+Small note: `users` originally comes from Laravel auth, but in this system it is heavily extended with BizTrack roles, business ownership, cashier accounts, preferences, temporary passwords, etc. So I count it as a **BizTrack application table**.
+
+**BizTrack Tables: 27**
+
+| Table | What It Does |
+|---|---|
+| `users` | Stores all system accounts: super admin, business owners, cashiers/employees. Also stores role, business link, preferences, password security fields, etc. |
+| `businesses` | Stores each registered business profile, owner, subscription, verification status, business documents, TIN/VAT/license data. |
+| `subscriptions` | Stores subscription plans businesses can choose from, including price, limits, and active/inactive status. |
+| `categories` | Product categories for each business, like drinks, food, cosmetics, electronics. |
+| `products` | Business product catalog: barcode, name, prices, unit, category, reorder level, status. |
+| `inventory` | Current stock quantity for each product. |
+| `inventory_transactions` | Stock movement history: restock, adjustment, sale deduction, and other inventory changes. |
+| `customers` | Business customers, including contact info and customer profile data. |
+| `sales` | Main sales invoices/transactions created from POS or sales module. |
+| `sale_items` | Individual products inside each sale, including quantity, unit price, and line total. |
+| `payments` | Payments made against sales: cash, bank, Telebirr, Chapa/Santim later, status, amount, reference. |
+| `customer_credits` | Tracks unpaid/partial customer balances, credit status, due dates, reminders. |
+| `expense_categories` | Expense groupings like rent, salary, transport, utilities. |
+| `expenses` | Business expenses recorded by owner/authorized employees. |
+| `reports` | Generated report records: sales reports, expense reports, inventory reports, etc. |
+| `notifications` | In-app notification records for low stock, payments, credit reminders, stagnant products, approvals. |
+| `audit_logs` | Tracks important actions: login/logout, payments, approvals, service fee changes, business updates. |
+| `business_verification_documents` | Stores uploaded verification document references: national ID, trade license, TIN certificate, VAT certificate, rental agreement if needed. |
+| `business_verification_reviews` | Stores super admin review decisions: approved, rejected, resubmission requested, reason, reviewer. |
+| `business_permissions` | Master list of permission keys like manage products, view reports, create sales. |
+| `business_roles` | Custom employee roles created by business owners, like Manager, Cashier, Stock Keeper. |
+| `business_permission_business_role` | Pivot table connecting custom business roles to permissions. |
+| `security_questions` | Available security questions for account recovery/security. |
+| `user_security_questions` | Stores each user’s selected security question answers securely. |
+| `service_fee_settings` | Stores each business’s agreed BizTrack service fee percentage and terms. |
+| `service_fees` | Tracks platform service fees generated from completed business payments. |
+| `product_movement_insights` | Stores stagnant product alerts: products not sold for X days, status, suggested action, notification tracking. |
+
+**Laravel/System Tables: 9**
+
+| Table | What It Does |
+|---|---|
+| `migrations` | Tracks which database migrations have already run. |
+| `cache` | Stores Laravel cache values when database cache driver is used. |
+| `cache_locks` | Handles atomic cache locks for safe concurrent operations. |
+| `jobs` | Stores queued jobs waiting to be processed. |
+| `job_batches` | Tracks batches of queued jobs. |
+| `failed_jobs` | Stores jobs that failed during queue processing. |
+| `sessions` | Stores user session data when database sessions are used. |
+| `password_reset_tokens` | Stores password reset tokens for forgot-password flow. |
+| `passkeys` | Stores passkey/WebAuthn authentication credentials from Laravel/Fortify security features. |
+
+So the simple answer is:
+
+```text
+Total tables: 36
+
+BizTrack application tables: 27
+Laravel/system tables: 9
+```
+
+If someone counts `users` as a Laravel auth table instead, then it becomes:
+
+```text
+BizTrack tables: 26
+Laravel/auth/system tables: 10
+```
+
+But for this project, `users` is part of BizTrack’s business logic, so **27 BizTrack + 9 Laravel/system** is the better classification.a

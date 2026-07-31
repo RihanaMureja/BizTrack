@@ -1,0 +1,154 @@
+Use this prompt for the other AI agent:
+
+```text
+You are working on a Laravel + Inertia React + TypeScript project called BizTrack. The app already has authentication, dashboards, RBAC, business owner modules, super admin modules, and custom styling. Your task is to fix UI/UX and permission polish issues. Do not rebuild the app or change unrelated behavior.
+
+Main goals:
+
+1. Simplify the login page
+- Current problem: the login page uses a split layout where the form is on the right and the left side repeats marketing/system description from the landing page.
+- Required behavior:
+  - When the user clicks Login, show only a centered login form.
+  - Keep the BizTrack logo at the top-left corner.
+  - Remove the descriptive/marketing half from the login page.
+  - The page should look clean, professional, and focused.
+  - Do not use default Laravel/Breeze styling.
+- Relevant files to inspect/update:
+  - resources/js/pages/auth/login.tsx
+  - resources/js/layouts/auth-layout.tsx
+  - resources/js/layouts/auth/simple-layout.tsx if it exists
+  - resources/js/components/app-logo.tsx
+  - resources/css/app.css
+
+2. Improve Super Admin users page role/status controls
+- Current problem:
+  - Super admin can change any user role, even another super admin’s role.
+  - This is dangerous and unprofessional.
+  - Status is changed through a dropdown, which feels weak and unsafe.
+  - Super admin row actions are clickable.
+- Required behavior:
+  - Super admin must NOT be able to change user roles from the super admin users page.
+  - Remove/disable role-changing controls from the super admin users table.
+  - Role should display as a badge/text only.
+  - Status changes should use a confirmation modal, not a dropdown.
+  - The modal should clearly show Activate and Deactivate style actions:
+    - green styling for activation
+    - red/destructive styling for deactivation/suspension
+  - Support/display all statuses professionally:
+    - active
+    - inactive
+    - pending_review
+    - rejected
+    - resubmission_required
+    - suspended
+  - For the super admin’s own row, all role/status actions must be disabled or hidden.
+  - Super admin should not be able to deactivate/suspend/change themselves.
+- Relevant files to inspect/update:
+  - app/Http/Controllers/UserManagementController.php
+  - app/Policies/UserPolicy.php
+  - app/Services/RBACService.php
+  - routes/web.php
+  - resources/js/pages/admin/users/index.tsx
+  - resources/js/components/ui/dialog.tsx
+  - resources/js/components/ui/badge.tsx
+  - resources/js/components/ui/button.tsx
+  - app/Enums/Role.php
+  - app/Enums/RecordStatus.php
+  - tests/Feature/SuperAdminTest.php
+- Add/update tests:
+  - Super admin cannot change another user’s role from admin users page.
+  - Super admin cannot change own status.
+  - Super admin can activate/deactivate/suspend non-superadmin users if that behavior exists.
+  - Users table still loads correctly.
+
+3. Combine Super Admin “Roles” and “Permissions” sidebar nav
+- Current problem:
+  - Super admin sidebar has separate “Roles” and “Permissions” links.
+- Required behavior:
+  - Replace them with one sidebar item: “Roles & Permissions”.
+  - It can point to the existing roles page or a combined page.
+  - If possible, make the roles page show permissions context too, or rename the existing roles page heading.
+- Relevant files:
+  - app/Services/RBACService.php
+  - resources/js/components/app-sidebar.tsx
+  - resources/js/pages/admin/roles/index.tsx
+  - resources/js/pages/admin/permissions/index.tsx
+  - routes/web.php
+
+4. Preserve business owner employee-role flexibility
+- Important exception:
+  - Only super admin role-changing should be removed.
+  - Business owners must still be able to change an employee’s custom business role.
+- Required behavior:
+  - Business owner can still edit an employee and change their business role, for example Cashier -> Inventory Tracker.
+  - Do not remove dynamic employee-role assignment from owner pages.
+  - Rename “Cashiers” in the business owner sidebar to “Employees”.
+  - Update visible page labels where appropriate from “Cashiers” to “Employees”, but avoid breaking route names unless necessary.
+- Relevant files:
+  - app/Http/Controllers/CashierController.php
+  - app/Services/CashierService.php
+  - app/Http/Requests/CashierRequest.php
+  - app/Services/RBACService.php
+  - resources/js/pages/cashiers/index.tsx
+  - resources/js/components/forms/cashier-form.tsx
+  - tests/Feature/CashierTest.php
+  - tests/Feature/BusinessRoleTest.php
+
+5. Fix business owner Employee Roles modal scrolling
+- Current problem:
+  - On the employee roles page, clicking “+ New Role” opens a popup that is too tall and not scrollable.
+- Required behavior:
+  - Make the modal content scrollable.
+  - Set a max height like `max-h-[85vh]`.
+  - Keep modal header visible and allow form body to scroll if needed.
+  - Ensure it works on desktop and mobile.
+- Relevant files:
+  - resources/js/pages/roles/index.tsx
+  - resources/js/components/ui/dialog.tsx
+  - resources/css/app.css
+
+6. Improve landing page and remove “Today’s overview”
+- Current problem:
+  - Landing page feels bland.
+  - “Today’s overview” section should be removed completely.
+- Required behavior:
+  - Remove the “Today’s overview” section from the landing page.
+  - Improve landing page visual richness while keeping the BizTrack professional style.
+  - Add support for 3 or 4 rotating background images on the landing page only.
+  - Use CSS keyframes or a React timed background change.
+  - Do not affect internal dashboards/app pages.
+  - Keep the design bright, clean, and consistent with the BizTrack logo palette.
+- Relevant files:
+  - resources/js/pages/welcome.tsx
+  - resources/css/app.css
+  - public/images/ or resources/images/ depending on current asset pattern
+  - vite.config.ts if assets need importing
+
+New image assets to create/add:
+- Add 3 or 4 landing background images, for example:
+  - public/images/landing/retail-pos-dashboard.jpg
+  - public/images/landing/shop-inventory-management.jpg
+  - public/images/landing/business-owner-analytics.jpg
+  - public/images/landing/digital-payment-checkout.jpg
+
+Image generation prompt:
+Generate four professional, bright, realistic background images for a SaaS business management system called BizTrack. The system is for Ethiopian small and medium businesses, retail shops, pharmacies, mini markets, and online sellers. Visual style should be clean, modern, premium, and trustworthy. Use bright natural lighting, white and soft neutral interiors, subtle teal/blue/green accents matching a business software brand, realistic point-of-sale screens, inventory shelves, business analytics dashboards, product catalog management, and digital payment workflow. Do not include readable brand names, fake text, Laravel logos, exaggerated gradients, dark blue-black themes, or cartoon illustrations. Leave enough negative space for white hero text overlays. Create:
+1. Retail cashier using a clean POS dashboard in a modern shop.
+2. Business owner reviewing inventory and analytics on a laptop/tablet.
+3. Organized product shelves with subtle software dashboard overlay.
+4. Digital payment checkout scene with phone payment and receipt.
+Aspect ratio: 16:9, high resolution, professional SaaS landing page background.
+
+Testing/checks to run:
+- npm run types:check
+- npm run build
+- php artisan test tests/Feature/SuperAdminTest.php tests/Feature/CashierTest.php tests/Feature/BusinessRoleTest.php
+- If login/landing have existing tests, run those too.
+
+Important constraints:
+- Do not remove owner employee role flexibility.
+- Do not make super admin able to edit their own row.
+- Do not restore Laravel starter-kit looking UI.
+- Keep the current BizTrack styling direction: clean, bright, custom, professional.
+- Keep changes focused to these polish/permission issues.
+```

@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\RecordStatus;
 use App\Models\Business;
 use App\Models\Subscription;
-use App\Notifications\BusinessApprovedNotification;
 use App\Services\AuditLogService;
 use App\Services\BusinessService;
+use App\Services\BusinessVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -19,6 +19,7 @@ class BusinessManagementController extends Controller
     public function __construct(
         private readonly BusinessService $businessService,
         private readonly AuditLogService $auditLogService,
+        private readonly BusinessVerificationService $businessVerificationService,
     ) {}
 
     public function index(Request $request): Response
@@ -44,10 +45,8 @@ class BusinessManagementController extends Controller
     public function approve(Request $request, Business $business): RedirectResponse
     {
         $this->authorize('updateStatus', Business::class);
-        $oldValues = $business->only(['status']);
-        $approvedBusiness = $this->businessService->activate($business);
-        $approvedBusiness->owner?->notify(new BusinessApprovedNotification($approvedBusiness));
-        $this->auditLogService->log('business.approved', $business, $business, $oldValues, $business->only(['status']), $request->user(), $request);
+        $this->businessVerificationService->approve($business, $request->user());
+        $business->refresh();
 
         return back()->with('success', $business->business_name.' approved.');
     }

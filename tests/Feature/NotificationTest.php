@@ -46,7 +46,7 @@ test('owner can list business notifications and unread count', function () {
             ->component('notifications/index')
             ->where('notifications.total', 2)
             ->where('unreadCount', 1)
-            ->has('types', 5));
+            ->has('types', count(NotificationType::cases())));
 });
 
 test('notifications can be filtered by type and read state', function () {

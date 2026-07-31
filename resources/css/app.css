@@ -141,3 +141,27 @@
         @apply bg-background text-foreground antialiased;
     }
 }
+
+@keyframes landing-hero-fade {
+    0%,
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    25%,
+    95% {
+        opacity: 0;
+        transform: scale(1.035);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.landing-hero-image {
+    animation: landing-hero-fade 20s infinite;
+    opacity: 0;
+}

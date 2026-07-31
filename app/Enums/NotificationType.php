@@ -9,6 +9,7 @@ enum NotificationType: string
     case CreditReminder = 'credit_reminder';
     case DailySales = 'daily_sales';
     case BusinessApproved = 'business_approved';
+    case StagnantProduct = 'stagnant_product';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum NotificationType: string
             self::CreditReminder => 'Credit reminder',
             self::DailySales => 'Daily sales',
             self::BusinessApproved => 'Business approved',
+            self::StagnantProduct => 'Stagnant product',
         };
     }
 }

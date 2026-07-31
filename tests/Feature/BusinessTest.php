@@ -3,9 +3,13 @@
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\Business;
+use App\Models\BusinessVerificationDocument;
+use App\Models\BusinessVerificationReview;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\BusinessApprovedNotification;
+use App\Notifications\BusinessVerificationRejectedNotification;
+use App\Notifications\BusinessVerificationResubmissionRequestedNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -75,6 +79,8 @@ test('owner can submit a business profile for review without receiving approval 
         ->and($business?->national_id_photo_path)->not->toBeNull()
         ->and($business?->trade_license_path)->not->toBeNull()
         ->and($business?->tin_certificate_path)->not->toBeNull();
+
+    expect(BusinessVerificationDocument::query()->where('business_id', $business->id)->count())->toBe(3);
 
     Notification::assertNothingSent();
 });
@@ -199,6 +205,133 @@ test('super admin approval activates the business and notifies the owner', funct
     ]);
 
     Notification::assertSentTo($owner, BusinessApprovedNotification::class);
+    expect(BusinessVerificationReview::query()->where('business_id', $business->id)->where('decision', 'approved')->exists())->toBeTrue();
+});
+
+test('super admin can view business verification review page', function () {
+    $superAdmin = User::factory()->create([
+        'role' => Role::SuperAdmin,
+    ]);
+
+    $business = Business::factory()->create([
+        'status' => RecordStatus::PendingReview,
+    ]);
+
+    BusinessVerificationDocument::create([
+        'business_id' => $business->id,
+        'type' => 'national_id',
+        'label' => 'National ID photo',
+        'path' => 'business-verifications/national-id.jpg',
+        'status' => RecordStatus::PendingReview,
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->get(route('admin.business-verifications.show', $business))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/business-verifications/show')
+            ->where('business.id', $business->id)
+            ->has('business.verification_documents', 1));
+});
+
+test('super admin can reject business verification with a reason', function () {
+    Notification::fake();
+
+    $superAdmin = User::factory()->create([
+        'role' => Role::SuperAdmin,
+    ]);
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::PendingReview,
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($superAdmin)
+        ->post(route('admin.business-verifications.review', $business), [
+            'decision' => 'rejected',
+            'reason' => 'Trade license is expired.',
+        ])
+        ->assertRedirect(route('admin.business-verifications.show', $business, absolute: false));
+
+    $this->assertDatabaseHas('businesses', [
+        'id' => $business->id,
+        'status' => RecordStatus::Rejected->value,
+    ]);
+    $this->assertDatabaseHas('business_verification_reviews', [
+        'business_id' => $business->id,
+        'decision' => 'rejected',
+        'reason' => 'Trade license is expired.',
+    ]);
+
+    Notification::assertSentTo($owner, BusinessVerificationRejectedNotification::class);
+});
+
+test('rejection and resubmission decisions require a reason', function () {
+    $superAdmin = User::factory()->create([
+        'role' => Role::SuperAdmin,
+    ]);
+    $business = Business::factory()->create([
+        'status' => RecordStatus::PendingReview,
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->post(route('admin.business-verifications.review', $business), [
+            'decision' => 'resubmission_required',
+            'reason' => '',
+        ])
+        ->assertSessionHasErrors('reason');
+});
+
+test('super admin can request verification resubmission and owner can resubmit documents', function () {
+    Notification::fake();
+    Storage::fake('public');
+
+    $superAdmin = User::factory()->create([
+        'role' => Role::SuperAdmin,
+    ]);
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::PendingReview,
+        'national_id_photo_path' => 'business-verifications/old-id.jpg',
+        'trade_license_path' => 'business-verifications/old-license.pdf',
+        'tin_certificate_path' => 'business-verifications/old-tin.pdf',
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($superAdmin)
+        ->post(route('admin.business-verifications.review', $business), [
+            'decision' => 'resubmission_required',
+            'reason' => 'National ID image is unclear.',
+        ])
+        ->assertRedirect(route('admin.business-verifications.show', $business, absolute: false));
+
+    $this->assertDatabaseHas('businesses', [
+        'id' => $business->id,
+        'status' => RecordStatus::ResubmissionRequired->value,
+    ]);
+    Notification::assertSentTo($owner, BusinessVerificationResubmissionRequestedNotification::class);
+
+    $this->actingAs($owner)
+        ->put(route('business.profile.update'), businessPayload([
+            'email' => 'resubmitted@example.test',
+            'national_id_photo' => UploadedFile::fake()->image('clear-national-id.jpg'),
+        ]))
+        ->assertRedirect(route('business.profile', absolute: false));
+
+    $this->assertDatabaseHas('businesses', [
+        'id' => $business->id,
+        'status' => RecordStatus::PendingReview->value,
+        'email' => 'resubmitted@example.test',
+    ]);
+
+    expect(BusinessVerificationDocument::query()->where('business_id', $business->id)->where('type', 'national_id')->first()?->path)
+        ->toContain('business-verifications');
 });
 
 test('business name is required', function () {

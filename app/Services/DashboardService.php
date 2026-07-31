@@ -10,13 +10,17 @@ use App\Models\Expense;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\ServiceFee;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardService
 {
-    public function __construct(private readonly RevenueService $revenueService) {}
+    public function __construct(
+        private readonly RevenueService $revenueService,
+        private readonly ProductInsightService $productInsightService,
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -44,10 +48,11 @@ class DashboardService
                 ['label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Completed sales'],
                 ['label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'POS activity'],
                 ['label' => 'Expenses today', 'value' => $this->money($this->revenueService->todayExpenses($business)), 'trend' => 'Recorded costs'],
-                ['label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Catalog coverage'],
+                ['label' => 'Service fees owed', 'value' => $this->money($this->serviceFeesOwed($business)), 'trend' => 'BizTrack platform balance'],
             ],
             'chart' => $this->emptySeries(),
             'lowStock' => $this->lowStock($business),
+            'stagnantProducts' => $this->productInsightService->previewForBusiness($business),
             'topProducts' => [],
             'nextSteps' => [
                 'Complete product categories',
@@ -91,7 +96,7 @@ class DashboardService
                 ['label' => 'Businesses', 'value' => (string) Business::count(), 'trend' => 'Registered workspaces'],
                 ['label' => 'Users', 'value' => (string) User::count(), 'trend' => 'Platform accounts'],
                 ['label' => 'Subscriptions', 'value' => (string) Subscription::count(), 'trend' => 'Available plans'],
-                ['label' => 'Revenue', 'value' => $this->money(0), 'trend' => 'Payments module pending'],
+                ['label' => 'Service revenue', 'value' => $this->money($this->platformServiceRevenue()), 'trend' => 'Paid platform fees'],
             ],
             'chart' => $this->emptySeries(),
             'recentBusinesses' => Business::query()
@@ -120,6 +125,29 @@ class DashboardService
             ->where('business_id', $business->id)
             ->whereDate('sold_at', today())
             ->count();
+    }
+
+    private function serviceFeesOwed(?Business $business): float
+    {
+        if (! $business || ! Schema::hasTable('service_fees')) {
+            return 0;
+        }
+
+        return (float) ServiceFee::query()
+            ->where('business_id', $business->id)
+            ->where('status', 'unpaid')
+            ->sum('fee_amount');
+    }
+
+    private function platformServiceRevenue(): float
+    {
+        if (! Schema::hasTable('service_fees')) {
+            return 0;
+        }
+
+        return (float) ServiceFee::query()
+            ->where('status', 'paid')
+            ->sum('fee_amount');
     }
 
     /**

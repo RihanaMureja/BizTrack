@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class BusinessService
 {
+    public function __construct(private readonly BusinessVerificationService $businessVerificationService) {}
+
     public function paginateForAdmin(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
         return Business::query()
@@ -76,6 +78,17 @@ class BusinessService
             );
 
             $owner->forceFill(['business_id' => $business->id])->save();
+            $this->businessVerificationService->syncSubmittedDocuments(
+                $business,
+                $owner,
+                Arr::only($business->getAttributes(), [
+                    'national_id_photo_path',
+                    'trade_license_path',
+                    'tin_certificate_path',
+                    'vat_certificate_path',
+                    'rental_agreement_path',
+                ]),
+            );
 
             if (! $existingBusiness) {
                 BusinessRegistered::dispatch($business->refresh());
