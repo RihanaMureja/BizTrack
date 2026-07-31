@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Bell, Menu, Search } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import { AppearanceToggleButton } from '@/components/appearance-toggle-button';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -68,6 +69,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <Button variant="ghost" size="icon" className="hidden md:inline-flex">
                             <Search className="size-5 opacity-70" />
                         </Button>
+                        <AppearanceToggleButton />
                         <Button variant="ghost" size="icon" asChild className="relative">
                             <Link href="/notifications" aria-label="Notifications">
                                 <Bell className="size-5" />

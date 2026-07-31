@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { AppearanceToggleButton } from '@/components/appearance-toggle-button';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
@@ -18,16 +19,19 @@ export function AppSidebarHeader({
                 <SidebarTrigger className="-ml-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
-            <Button variant="ghost" size="icon" asChild className="relative">
-                <Link href="/notifications" aria-label="Notifications">
-                    <Bell className="size-5" />
-                    {notificationSummary.unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                            {notificationSummary.unreadCount > 99 ? '99+' : notificationSummary.unreadCount}
-                        </span>
-                    )}
-                </Link>
-            </Button>
+            <div className="flex items-center gap-1">
+                <AppearanceToggleButton />
+                <Button variant="ghost" size="icon" asChild className="relative">
+                    <Link href="/notifications" aria-label="Notifications">
+                        <Bell className="size-5" />
+                        {notificationSummary.unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                                {notificationSummary.unreadCount > 99 ? '99+' : notificationSummary.unreadCount}
+                            </span>
+                        )}
+                    </Link>
+                </Button>
+            </div>
         </header>
     );
 }

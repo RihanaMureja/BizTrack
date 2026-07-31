@@ -1,0 +1,245 @@
+{"kind":"deck","id":"pr/lxvsud","name":"Deck"}
+{"kind":"layout","layoutId":"f8b1ca13-7e83-4172-b932-3f9057f75a8a","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"3eae2f1f-bfc2-415c-95ad-d5e9fc38482f","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/zwdw91","slide":1,"title":"Smart business management for growing SMEs","textShapes":6}
+{"kind":"shape","id":"sh/1gru14z6","slide":1,"bbox":[704,0,576,720]}
+{"kind":"textbox","id":"sh/rqpcvuh4","slide":1,"text":"Smart business management for growing SMEs","textPreview":"Smart business management for growing SMEs","textChars":42,"textLines":1,"bbox":[72,210,560,155]}
+{"kind":"textbox","id":"sh/qpgbmp0j","slide":1,"text":"A professional platform for owners to manage sales, products, inventory, employees, credits, payments, expenses, reports, subscriptions, and verification in one secure system.","textPreview":"A professional platform for owners to manage sales, products, inventory, employees, credits, payments, expenses, reports, subscriptions, ...","textChars":175,"textLines":1,"bbox":[76,390,556,96]}
+{"kind":"shape","id":"sh/dc7ux4za","slide":1,"bbox":[76,535,246,118]}
+{"kind":"textbox","id":"sh/crytozip","slide":1,"text":"27","textPreview":"27","textChars":2,"textLines":1,"bbox":[98,557,190,38]}
+{"kind":"textbox","id":"sh/bm9c7yh8","slide":1,"text":"BizTrack domain tables","textPreview":"BizTrack domain tables","textChars":22,"textLines":1,"bbox":[98,603,198,30]}
+{"kind":"shape","id":"sh/al0vyt0n","slide":1,"bbox":[344,535,246,118]}
+{"kind":"textbox","id":"sh/0redsvm9","slide":1,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[366,557,190,38]}
+{"kind":"textbox","id":"sh/1snu10nu","slide":1,"text":"Laravel/system tables","textPreview":"Laravel/system tables","textChars":21,"textLines":1,"bbox":[366,603,198,30]}
+{"kind":"image","id":"im/j6dkfa94","slide":1,"name":"","alt":"Business dashboard workspace","bbox":[704,0,576,720]}
+{"kind":"image","id":"im/58v2h0ra","slide":1,"name":"","alt":"BizTrack logo","bbox":[72,62,230,72]}
+{"kind":"notes","id":"nt/zwdw91","slide":1,"text":"[Sources]\nPrepared from the BizTrack project scope, database table list, and implemented module phases in this repository."}
+{"kind":"slide","id":"sl/njwjcb","slide":2,"title":"SYSTEM PURPOSE","textShapes":11}
+{"kind":"textbox","id":"sh/ep0ja1cb","slide":2,"text":"SYSTEM PURPOSE","textPreview":"SYSTEM PURPOSE","textChars":14,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/1sb2lwbm","slide":2,"text":"BizTrack brings daily business operations into one controlled workflow","textPreview":"BizTrack brings daily business operations into one controlled workflow","textChars":70,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/0ri1cru1","slide":2,"bbox":[72,133,1136,0]}
+{"kind":"textbox","id":"sh/nutkn6ts","slide":2,"text":"The platform replaces disconnected notebooks, spreadsheets, manual receipts, and informal employee controls with a verified, role-aware digital operating system.","textPreview":"The platform replaces disconnected notebooks, spreadsheets, manual receipts, and informal employee controls with a verified, role-aware d...","textChars":161,"textLines":1,"bbox":[72,166,840,70]}
+{"kind":"shape","id":"sh/mtkje1c7","slide":2,"bbox":[96,289,10,10]}
+{"kind":"textbox","id":"sh/9wb2pgby","slide":2,"text":"Owners see performance, cash movement, credit exposure, expenses, and stock health.","textPreview":"Owners see performance, cash movement, credit exposure, expenses, and stock health.","textChars":83,"textLines":1,"bbox":[122,282,870,54]}
+{"kind":"shape","id":"sh/ov2lgbud","slide":2,"bbox":[96,347,10,10]}
+{"kind":"textbox","id":"sh/bytkr6to","slide":2,"text":"Employees work only inside the permissions assigned by the owner.","textPreview":"Employees work only inside the permissions assigned by the owner.","textChars":65,"textLines":1,"bbox":[122,340,870,54]}
+{"kind":"shape","id":"sh/axk3ilc3","slide":2,"bbox":[96,405,10,10]}
+{"kind":"textbox","id":"sh/wrm5crml","slide":2,"text":"Super admins protect platform quality through verification, subscriptions, and oversight.","textPreview":"Super admins protect platform quality through verification, subscriptions, and oversight.","textChars":89,"textLines":1,"bbox":[122,398,870,54]}
+{"kind":"shape","id":"sh/xsvmlw36","slide":2,"bbox":[96,463,10,10]}
+{"kind":"textbox","id":"sh/apkna14f","slide":2,"text":"Audit logs and notifications create traceability across sensitive actions.","textPreview":"Audit logs and notifications create traceability across sensitive actions.","textChars":74,"textLines":1,"bbox":[122,456,870,54]}
+{"kind":"shape","id":"sh/bqt4j6l0","slide":2,"bbox":[946,170,262,398]}
+{"kind":"textbox","id":"sh/kvm5gbmx","slide":2,"text":"Core promise","textPreview":"Core promise","textChars":12,"textLines":1,"bbox":[978,210,200,32]}
+{"kind":"textbox","id":"sh/lgvmpg32","slide":2,"text":"Make small and medium businesses easier to run, easier to monitor, and safer to scale.","textPreview":"Make small and medium businesses easier to run, easier to monitor, and safer to scale.","textChars":86,"textLines":1,"bbox":[978,266,198,160]}
+{"kind":"textbox","id":"sh/yt4ne14r","slide":2,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/jud4n6lc","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/njwjcb","slide":2,"text":"[Sources]\nPrepared from the BizTrack system overview and implemented module behavior."}
+{"kind":"slide","id":"sl/glclny","slide":3,"title":"TECHNOLOGY","textShapes":12}
+{"kind":"textbox","id":"sh/l4nydgve","slide":3,"text":"TECHNOLOGY","textPreview":"TECHNOLOGY","textChars":10,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/y1wz2lcn","slide":3,"text":"The current framework is built for professional expansion","textPreview":"The current framework is built for professional expansion","textChars":57,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/z25gbqd8","slide":3,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/87eh8vu5","slide":3,"bbox":[72,178,520,138]}
+{"kind":"textbox","id":"sh/987yh0va","slide":3,"text":"Laravel","textPreview":"Laravel","textChars":7,"textLines":1,"bbox":[100,202,250,34]}
+{"kind":"textbox","id":"sh/m5wz6lcz","slide":3,"text":"Backend structure, authentication, policies, middleware, migrations, queues, notifications, tests.","textPreview":"Backend structure, authentication, policies, middleware, migrations, queues, notifications, tests.","textChars":98,"textLines":1,"bbox":[100,248,456,48]}
+{"kind":"shape","id":"sh/n65gfqdk","slide":3,"bbox":[640,178,520,138]}
+{"kind":"textbox","id":"sh/obuxwrul","slide":3,"text":"Inertia + React","textPreview":"Inertia + React","textChars":15,"textLines":1,"bbox":[668,202,250,34]}
+{"kind":"textbox","id":"sh/pc3y5wv6","slide":3,"text":"Modern single-page user experience without separating the project into two disconnected apps.","textPreview":"Modern single-page user experience without separating the project into two disconnected apps.","textChars":93,"textLines":1,"bbox":[668,248,456,48]}
+{"kind":"shape","id":"sh/pwbuhsf6","slide":3,"bbox":[72,366,520,138]}
+{"kind":"textbox","id":"sh/ov2tonel","slide":3,"text":"MySQL","textPreview":"MySQL","textChars":5,"textLines":1,"bbox":[100,390,250,34]}
+{"kind":"textbox","id":"sh/3atcfix0","slide":3,"text":"Relational database for business operations, transactions, permissions, and audit history.","textPreview":"Relational database for business operations, transactions, permissions, and audit history.","textChars":90,"textLines":1,"bbox":[100,436,456,48]}
+{"kind":"shape","id":"sh/29kbmdwv","slide":3,"bbox":[640,366,520,138]}
+{"kind":"textbox","id":"sh/x0vulcfi","slide":3,"text":"Tailwind CSS","textPreview":"Tailwind CSS","textChars":12,"textLines":1,"bbox":[668,390,250,34]}
+{"kind":"textbox","id":"sh/czmds7ex","slide":3,"text":"Consistent, custom product styling instead of default Laravel starter-kit visuals.","textPreview":"Consistent, custom product styling instead of default Laravel starter-kit visuals.","textChars":82,"textLines":1,"bbox":[668,436,456,48]}
+{"kind":"textbox","id":"sh/bydcj2xc","slide":3,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/ax4bqxwr","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/glclny","slide":3,"text":"[Sources]\nPrepared from the repository technology stack and installed Laravel/Inertia/React project structure."}
+{"kind":"slide","id":"sl/9j6x5n","slide":4,"title":"BUSINESS MODEL","textShapes":12}
+{"kind":"textbox","id":"sh/o7ixorm1","slide":4,"text":"BUSINESS MODEL","textPreview":"BUSINESS MODEL","textChars":14,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/n69wvmlg","slide":4,"text":"BizTrack earns from both access and platform usage","textPreview":"BizTrack earns from both access and platform usage","textChars":50,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/250fmh4v","slide":4,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/14retc3a","slide":4,"bbox":[92,188,498,348]}
+{"kind":"textbox","id":"sh/03yxk7mp","slide":4,"text":"Subscription revenue","textPreview":"Subscription revenue","textChars":20,"textLines":1,"bbox":[128,228,390,40]}
+{"kind":"shape","id":"sh/f2pwr2l4","slide":4,"bbox":[138,307,10,10]}
+{"kind":"textbox","id":"sh/e1gfix4z","slide":4,"text":"Business owners choose an active plan.","textPreview":"Business owners choose an active plan.","textChars":38,"textLines":1,"bbox":[164,300,390,54]}
+{"kind":"shape","id":"sh/tg7eps3e","slide":4,"bbox":[138,365,10,10]}
+{"kind":"textbox","id":"sh/sfyxg7mt","slide":4,"text":"Plans can control limits such as employees, features, and reporting access.","textPreview":"Plans can control limits such as employees, features, and reporting access.","textChars":75,"textLines":1,"bbox":[164,358,390,54]}
+{"kind":"shape","id":"sh/e503e5sv","slide":4,"bbox":[138,423,10,10]}
+{"kind":"textbox","id":"sh/z69knatg","slide":4,"text":"Inactive or expired subscriptions can block premium workflows.","textPreview":"Inactive or expired subscriptions can block premium workflows.","textChars":62,"textLines":1,"bbox":[164,416,390,54]}
+{"kind":"shape","id":"sh/07ilgfa1","slide":4,"bbox":[690,188,498,348]}
+{"kind":"textbox","id":"sh/l8r2pkbm","slide":4,"text":"Service fee revenue","textPreview":"Service fee revenue","textChars":19,"textLines":1,"bbox":[726,228,390,40]}
+{"kind":"shape","id":"sh/q1g3a5sz","slide":4,"bbox":[736,307,10,10]}
+{"kind":"textbox","id":"sh/r29kjat4","slide":4,"text":"A configurable percentage is calculated from recorded payments.","textPreview":"A configurable percentage is calculated from recorded payments.","textChars":63,"textLines":1,"bbox":[762,300,390,54]}
+{"kind":"shape","id":"sh/c3ilcvap","slide":4,"bbox":[736,365,10,10]}
+{"kind":"textbox","id":"sh/d4r2l0ba","slide":4,"text":"Owners can see how each fee was created and what is owed.","textPreview":"Owners can see how each fee was created and what is owed.","textChars":57,"textLines":1,"bbox":[762,358,390,54]}
+{"kind":"shape","id":"sh/2dg36lsn","slide":4,"bbox":[736,423,10,10]}
+{"kind":"textbox","id":"sh/3epkfqt8","slide":4,"text":"The percentage can be negotiated per business.","textPreview":"The percentage can be negotiated per business.","textChars":46,"textLines":1,"bbox":[762,416,390,54]}
+{"kind":"textbox","id":"sh/76l8r25o","slide":4,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/65cryx43","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/9j6x5n","slide":4,"text":"[Sources]\nPrepared from the implemented subscription and platform service fee modules in BizTrack."}
+{"kind":"slide","id":"sl/tnve36","slide":5,"title":"ROLES","textShapes":13}
+{"kind":"textbox","id":"sh/ori5w7q1","slide":5,"text":"ROLES","textPreview":"ROLES","textChars":5,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/3q9o32pg","slide":5,"text":"Three primary roles separate platform control from business work","textPreview":"Three primary roles separate platform control from business work","textChars":64,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/2pgnuh8v","slide":5,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/dgr69w7i","slide":5,"bbox":[86,191,76,76]}
+{"kind":"textbox","id":"sh/cfip0rqx","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[86,210,76,32]}
+{"kind":"textbox","id":"sh/bu9o7mpc","slide":5,"text":"Super Admin","textPreview":"Super Admin","textChars":11,"textLines":1,"bbox":[194,184,330,38]}
+{"kind":"textbox","id":"sh/qt0nyh87","slide":5,"text":"Owns platform oversight: verification review, business status, subscriptions, service fees, users, and platform reports.","textPreview":"Owns platform oversight: verification review, business status, subscriptions, service fees, users, and platform reports.","textChars":120,"textLines":1,"bbox":[196,230,830,52]}
+{"kind":"shape","id":"sh/lkb6dw7u","slide":5,"bbox":[86,333,76,76]}
+{"kind":"textbox","id":"sh/0j2p4rq9","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[86,352,76,32]}
+{"kind":"textbox","id":"sh/ydszelw7","slide":5,"text":"Business Owner","textPreview":"Business Owner","textChars":14,"textLines":1,"bbox":[194,326,330,38]}
+{"kind":"textbox","id":"sh/ze10nqxs","slide":5,"text":"Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports, notifications, and settings.","textPreview":"Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports, notifications, and settings.","textChars":124,"textLines":1,"bbox":[196,372,830,52]}
+{"kind":"shape","id":"sh/0fahgbed","slide":5,"bbox":[86,475,76,76]}
+{"kind":"textbox","id":"sh/lgjipgfy","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[86,494,76,32]}
+{"kind":"textbox","id":"sh/mhszilw3","slide":5,"text":"Employee","textPreview":"Employee","textChars":8,"textLines":1,"bbox":[194,468,330,38]}
+{"kind":"textbox","id":"sh/ni10rqxo","slide":5,"text":"Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer, or another custom role.","textPreview":"Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer, or another custom role.","textChars":122,"textLines":1,"bbox":[196,514,830,52]}
+{"kind":"textbox","id":"sh/8juhkve9","slide":5,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/9k3it0fu","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/tnve36","slide":5,"text":"[Sources]\nPrepared from BizTrack RBAC design and implemented role modules."}
+{"kind":"slide","id":"sl/bxjgso","slide":6,"title":"RBAC","textShapes":12}
+{"kind":"textbox","id":"sh/z6twzqpg","slide":6,"text":"RBAC","textPreview":"RBAC","textChars":4,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/072d8bq1","slide":6,"text":"Permissions are fixed for platform safety and dynamic for business teams","textPreview":"Permissions are fixed for platform safety and dynamic for business teams","textChars":72,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/l8ve1g76","slide":6,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/m94val8r","slide":6,"bbox":[86,178,512,362]}
+{"kind":"textbox","id":"sh/nadw3qpc","slide":6,"text":"Static platform guardrails","textPreview":"Static platform guardrails","textChars":26,"textLines":1,"bbox":[122,222,390,34]}
+{"kind":"shape","id":"sh/8bmdcvqx","slide":6,"bbox":[132,301,10,10]}
+{"kind":"textbox","id":"sh/9wve507i","slide":6,"text":"Super admin access is protected and cannot be casually reassigned.","textPreview":"Super admin access is protected and cannot be casually reassigned.","textChars":66,"textLines":1,"bbox":[158,294,390,54]}
+{"kind":"shape","id":"sh/2d0vy18n","slide":6,"bbox":[132,359,10,10]}
+{"kind":"textbox","id":"sh/3e9cr6p8","slide":6,"text":"Owner-only and employee-only routes are guarded by middleware and policies.","textPreview":"Owner-only and employee-only routes are guarded by middleware and policies.","textChars":75,"textLines":1,"bbox":[158,352,390,54]}
+{"kind":"shape","id":"sh/j65g7q5s","slide":6,"bbox":[132,417,10,10]}
+{"kind":"textbox","id":"sh/i5wfyl47","slide":6,"text":"Sensitive modules are separated by role-aware sidebar navigation.","textPreview":"Sensitive modules are separated by role-aware sidebar navigation.","textChars":65,"textLines":1,"bbox":[158,410,390,54]}
+{"kind":"shape","id":"sh/5sny9gny","slide":6,"bbox":[682,178,512,362]}
+{"kind":"textbox","id":"sh/4rex0bmd","slide":6,"text":"Dynamic business permissions","textPreview":"Dynamic business permissions","textChars":28,"textLines":1,"bbox":[718,222,410,34]}
+{"kind":"shape","id":"sh/v25g365w","slide":6,"bbox":[728,301,10,10]}
+{"kind":"textbox","id":"sh/u1wfu14b","slide":6,"text":"Owners create employee roles with custom names.","textPreview":"Owners create employee roles with custom names.","textChars":47,"textLines":1,"bbox":[754,294,390,54]}
+{"kind":"shape","id":"sh/h4ny5gn2","slide":6,"bbox":[728,359,10,10]}
+{"kind":"textbox","id":"sh/w3exwbmh","slide":6,"text":"Owners decide which modules each employee can access.","textPreview":"Owners decide which modules each employee can access.","textChars":53,"textLines":1,"bbox":[754,352,390,54]}
+{"kind":"shape","id":"sh/7ylgz65k","slide":6,"bbox":[728,417,10,10]}
+{"kind":"textbox","id":"sh/mxcfq14f","slide":6,"text":"The sidebar adapts so employees see only useful, allowed navigation.","textPreview":"The sidebar adapts so employees see only useful, allowed navigation.","textChars":68,"textLines":1,"bbox":[754,410,390,54]}
+{"kind":"textbox","id":"sh/atsz2h87","slide":6,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/bulgbmps","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/bxjgso","slide":6,"text":"[Sources]\nPrepared from the dynamic employee roles and permissions module and RBAC sidebar behavior."}
+{"kind":"slide","id":"sl/k5vt8y","slide":7,"title":"OWNER VALUE","textShapes":9}
+{"kind":"textbox","id":"sh/xsfmpkzu","slide":7,"text":"OWNER VALUE","textPreview":"OWNER VALUE","textChars":11,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/apo3e503","slide":7,"text":"The owner gains control over money, people, stock, and decisions","textPreview":"The owner gains control over money, people, stock, and decisions","textChars":64,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/vqx4naho","slide":7,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/8nmlcvid","slide":7,"bbox":[96,185,10,10]}
+{"kind":"textbox","id":"sh/9ofml0zi","slide":7,"text":"Sales and POS: record customer purchases, sale items, payments, and receipts.","textPreview":"Sales and POS: record customer purchases, sale items, payments, and receipts.","textChars":77,"textLines":1,"bbox":[122,178,980,63]}
+{"kind":"shape","id":"sh/ml43a507","slide":7,"bbox":[96,252,10,10]}
+{"kind":"textbox","id":"sh/nmdkjahs","slide":7,"text":"Inventory: track stock movement, restocks, adjustments, low stock, and stagnant products.","textPreview":"Inventory: track stock movement, restocks, adjustments, low stock, and stagnant products.","textChars":89,"textLines":1,"bbox":[122,245,980,63]}
+{"kind":"shape","id":"sh/0zml8vi1","slide":7,"bbox":[96,319,10,10]}
+{"kind":"textbox","id":"sh/l0v2h0jm","slide":7,"text":"Customers and credit: manage customer records, unpaid balances, and repayment history.","textPreview":"Customers and credit: manage customer records, unpaid balances, and repayment history.","textChars":86,"textLines":1,"bbox":[122,312,980,63]}
+{"kind":"shape","id":"sh/xcfu10ri","slide":7,"bbox":[96,386,10,10]}
+{"kind":"textbox","id":"sh/wb6tsvax","slide":7,"text":"Expenses and reports: compare sales, payments, expenses, inventory value, and revenue trends.","textPreview":"Expenses and reports: compare sales, payments, expenses, inventory value, and revenue trends.","textChars":93,"textLines":1,"bbox":[122,379,980,63]}
+{"kind":"shape","id":"sh/baxczq9c","slide":7,"bbox":[96,453,10,10]}
+{"kind":"textbox","id":"sh/a94bqls7","slide":7,"text":"Security: verification, audit logs, strong passwords, temporary passwords, and role-based access.","textPreview":"Security: verification, audit logs, strong passwords, temporary passwords, and role-based access.","textChars":97,"textLines":1,"bbox":[122,446,980,63]}
+{"kind":"textbox","id":"sh/98vuxgbm","slide":7,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/onmtoba1","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/k5vt8y","slide":7,"text":"[Sources]\nPrepared from BizTrack module phases: POS, inventory, customers, customer credit, expenses, reports, audit logging, and security."}
+{"kind":"slide","id":"sl/z1yuce","slide":8,"title":"VERIFICATION WORKFLOW","textShapes":16}
+{"kind":"textbox","id":"sh/v6lcb2lg","slide":8,"text":"VERIFICATION WORKFLOW","textPreview":"VERIFICATION WORKFLOW","textChars":21,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/w7ut4721","slide":8,"text":"Business verification protects the platform before access is granted","textPreview":"Business verification protects the platform before access is granted","textChars":68,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/h83udc3m","slide":8,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/i9cb6hk7","slide":8,"bbox":[100,190,54,54]}
+{"kind":"textbox","id":"sh/jalcf2ls","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[100,201,54,28]}
+{"kind":"textbox","id":"sh/4but872d","slide":8,"text":"Owner signs up","textPreview":"Owner signs up","textChars":14,"textLines":1,"bbox":[172,186,360,30]}
+{"kind":"textbox","id":"sh/5cnuhc3y","slide":8,"text":"The account is created, but full system access waits for verification.","textPreview":"The account is created, but full system access waits for verification.","textChars":70,"textLines":1,"bbox":[172,222,420,58]}
+{"kind":"shape","id":"sh/ydsbudk3","slide":8,"bbox":[100,318,54,54]}
+{"kind":"textbox","id":"sh/ze1s3ilo","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[100,329,54,28]}
+{"kind":"textbox","id":"sh/ruxsjyhc","slide":8,"text":"Documents submitted","textPreview":"Documents submitted","textChars":19,"textLines":1,"bbox":[172,314,360,30]}
+{"kind":"textbox","id":"sh/6tobqt0r","slide":8,"text":"National ID photo, FAN number, trade license, TIN, and dynamic VAT or rental documents.","textPreview":"National ID photo, FAN number, trade license, TIN, and dynamic VAT or rental documents.","textChars":87,"textLines":1,"bbox":[172,350,420,58]}
+{"kind":"shape","id":"sh/twfalozi","slide":8,"bbox":[690,190,54,54]}
+{"kind":"textbox","id":"sh/sv6tsjix","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[690,201,54,28]}
+{"kind":"textbox","id":"sh/j6dsfehg","slide":8,"text":"Super admin reviews","textPreview":"Super admin reviews","textChars":19,"textLines":1,"bbox":[762,186,360,30]}
+{"kind":"textbox","id":"sh/i54bm90v","slide":8,"text":"Documents can be approved, rejected with reason, or marked for resubmission.","textPreview":"Documents can be approved, rejected with reason, or marked for resubmission.","textChars":76,"textLines":1,"bbox":[762,222,420,58]}
+{"kind":"shape","id":"sh/58vahoz6","slide":8,"bbox":[690,318,54,54]}
+{"kind":"textbox","id":"sh/47mtojil","slide":8,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[690,329,54,28]}
+{"kind":"textbox","id":"sh/v2dsbeh4","slide":8,"text":"Business activated","textPreview":"Business activated","textChars":18,"textLines":1,"bbox":[762,314,360,30]}
+{"kind":"textbox","id":"sh/u14ri90j","slide":8,"text":"A verified business can complete setup, select subscription, and use the system.","textPreview":"A verified business can complete setup, select subscription, and use the system.","textChars":80,"textLines":1,"bbox":[762,350,420,58]}
+{"kind":"textbox","id":"sh/yxkbu9kr","slide":8,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/zytcnu1w","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/z1yuce","slide":8,"text":"[Sources]\nPrepared from implemented business verification review and resubmission workflow."}
+{"kind":"slide","id":"sl/xwn9az","slide":9,"title":"SUBSCRIPTION WORKFLOW","textShapes":16}
+{"kind":"textbox","id":"sh/zuxonq1k","slide":9,"text":"SUBSCRIPTION WORKFLOW","textPreview":"SUBSCRIPTION WORKFLOW","textChars":21,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/0f65wvi5","slide":9,"text":"Subscription controls whether a verified business can operate normally","textPreview":"Subscription controls whether a verified business can operate normally","textChars":70,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/lgf6p0jq","slide":9,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/qp4nql03","slide":9,"bbox":[98,184,54,54]}
+{"kind":"textbox","id":"sh/bqdojq1o","slide":9,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[98,195,54,28]}
+{"kind":"textbox","id":"sh/cr65svi9","slide":9,"text":"Plan selection","textPreview":"Plan selection","textChars":14,"textLines":1,"bbox":[170,180,360,30]}
+{"kind":"textbox","id":"sh/dsf6l0je","slide":9,"text":"The owner chooses an available plan based on business needs.","textPreview":"The owner chooses an available plan based on business needs.","textChars":60,"textLines":1,"bbox":[170,216,420,58]}
+{"kind":"shape","id":"sh/al872p07","slide":9,"bbox":[98,318,54,54]}
+{"kind":"textbox","id":"sh/vmhova1s","slide":9,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[98,329,54,28]}
+{"kind":"textbox","id":"sh/zm5w7a18","slide":9,"text":"Payment handling","textPreview":"Payment handling","textChars":16,"textLines":1,"bbox":[170,314,360,30]}
+{"kind":"textbox","id":"sh/elcfy50n","slide":9,"text":"Payment gateway integration can later connect Chapa, Santim Pay, or Telebirr-backed providers.","textPreview":"Payment gateway integration can later connect Chapa, Santim Pay, or Telebirr-backed providers.","textChars":94,"textLines":1,"bbox":[170,350,420,58]}
+{"kind":"shape","id":"sh/1one90jy","slide":9,"bbox":[688,184,54,54]}
+{"kind":"textbox","id":"sh/0nex0vid","slide":9,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[688,195,54,28]}
+{"kind":"textbox","id":"sh/nq5wba14","slide":9,"text":"Activation","textPreview":"Activation","textChars":10,"textLines":1,"bbox":[760,180,360,30]}
+{"kind":"textbox","id":"sh/mpwf250j","slide":9,"text":"An active plan unlocks subscribed limits and protected modules.","textPreview":"An active plan unlocks subscribed limits and protected modules.","textChars":63,"textLines":1,"bbox":[760,216,420,58]}
+{"kind":"shape","id":"sh/9snedkja","slide":9,"bbox":[688,318,54,54]}
+{"kind":"textbox","id":"sh/orex4fip","slide":9,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[688,329,54,28]}
+{"kind":"textbox","id":"sh/bepwfuhg","slide":9,"text":"Renewal or restriction","textPreview":"Renewal or restriction","textChars":22,"textLines":1,"bbox":[760,314,360,30]}
+{"kind":"textbox","id":"sh/adgf6p0v","slide":9,"text":"Expired or inactive plans can trigger notices, renewal flows, and access limits.","textPreview":"Expired or inactive plans can trigger notices, renewal flows, and access limits.","textChars":80,"textLines":1,"bbox":[760,350,420,58]}
+{"kind":"textbox","id":"sh/690zetk3","slide":9,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/7a907elo","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/xwn9az","slide":9,"text":"[Sources]\nPrepared from BizTrack subscription design and planned Ethiopian payment gateway integration path."}
+{"kind":"slide","id":"sl/etmwee","slide":10,"title":"DATABASE","textShapes":12}
+{"kind":"textbox","id":"sh/bmxkj6xo","slide":10,"text":"DATABASE","textPreview":"DATABASE","textChars":8,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/cn61sbe9","slide":10,"text":"The database separates BizTrack business data from Laravel system support","textPreview":"The database separates BizTrack business data from Laravel system support","textChars":73,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/dof2lgfu","slide":10,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/2h4jm1w7","slide":10,"bbox":[92,178,246,118]}
+{"kind":"textbox","id":"sh/3idkf6xc","slide":10,"text":"36","textPreview":"36","textChars":2,"textLines":1,"bbox":[114,200,190,38]}
+{"kind":"textbox","id":"sh/ojm1obex","slide":10,"text":"Total database tables","textPreview":"Total database tables","textChars":21,"textLines":1,"bbox":[114,246,198,30]}
+{"kind":"shape","id":"sh/pkv2hgfi","slide":10,"bbox":[374,178,246,118]}
+{"kind":"textbox","id":"sh/edkjihwv","slide":10,"text":"27","textPreview":"27","textChars":2,"textLines":1,"bbox":[396,200,190,38]}
+{"kind":"textbox","id":"sh/fedkbmxg","slide":10,"text":"BizTrack application tables","textPreview":"BizTrack application tables","textChars":27,"textLines":1,"bbox":[396,246,198,30]}
+{"kind":"shape","id":"sh/3adsnut8","slide":10,"bbox":[656,178,246,118]}
+{"kind":"textbox","id":"sh/i9kbupsn","slide":10,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[678,200,190,38]}
+{"kind":"textbox","id":"sh/5cvup4by","slide":10,"text":"Laravel/system tables","textPreview":"Laravel/system tables","textChars":21,"textLines":1,"bbox":[678,246,198,30]}
+{"kind":"shape","id":"sh/4bmtwzat","slide":10,"bbox":[92,350,1096,166]}
+{"kind":"textbox","id":"sh/redcrut4","slide":10,"text":"BizTrack tables store business identity, products, inventory, customers, sales, payments, credits, expenses, reports, notifications, audit logs, verification, permissions, service fees, and product insights.","textPreview":"BizTrack tables store business identity, products, inventory, customers, sales, payments, credits, expenses, reports, notifications, audi...","textChars":207,"textLines":1,"bbox":[126,384,1018,52]}
+{"kind":"textbox","id":"sh/qd4by9sj","slide":10,"text":"Laravel tables support framework operations such as sessions, password resets, passkeys, jobs, cache, failed jobs, batches, and migration history.","textPreview":"Laravel tables support framework operations such as sessions, password resets, passkeys, jobs, cache, failed jobs, batches, and migration...","textChars":146,"textLines":1,"bbox":[126,450,1018,42]}
+{"kind":"textbox","id":"sh/dgvut4ba","slide":10,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/sfmt0zap","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/etmwee","slide":10,"text":"[Sources]\nPrepared from the current database table list supplied for BizTrack."}
+{"kind":"slide","id":"sl/u9e6qv","slide":11,"title":"BIZTRACK TABLES","textShapes":8}
+{"kind":"textbox","id":"sh/4ri9wfqh","slide":11,"text":"BIZTRACK TABLES","textPreview":"BIZTRACK TABLES","textChars":15,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/jq9s3a9c","slide":11,"text":"The 27 BizTrack tables cover the real business domain","textPreview":"The 27 BizTrack tables cover the real business domain","textChars":53,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/ip0ru58r","slide":11,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/hora10r6","slide":11,"bbox":[88,178,522,386]}
+{"kind":"textbox","id":"sh/wni9svql","slide":11,"text":"Operational tables","textPreview":"Operational tables","textChars":18,"textLines":1,"bbox":[122,214,410,34]}
+{"kind":"textbox","id":"sh/v29szq90","slide":11,"text":"users, businesses, subscriptions, categories, products, inventory, inventory_transactions, customers, sales, sale_items, payments, customer_credits, expense_categories, expenses","textPreview":"users, businesses, subscriptions, categories, products, inventory, inventory_transactions, customers, sales, sale_items, payments, custom...","textChars":177,"textLines":1,"bbox":[122,276,440,224]}
+{"kind":"shape","id":"sh/u10rql8f","slide":11,"bbox":[670,178,522,386]}
+{"kind":"textbox","id":"sh/1kvad47a","slide":11,"text":"Governance and intelligence","textPreview":"Governance and intelligence","textChars":27,"textLines":1,"bbox":[704,214,420,34]}
+{"kind":"textbox","id":"sh/0jmt4zqp","slide":11,"text":"reports, notifications, audit_logs, business_verification_documents, business_verification_reviews, business_permissions, business_roles, business_permission_business_role, security_questions, user_security_questions, service_fee_settings, service_fees, product_movement_insights","textPreview":"reports, notifications, audit_logs, business_verification_documents, business_verification_reviews, business_permissions, business_roles,...","textChars":279,"textLines":1,"bbox":[704,276,440,224]}
+{"kind":"textbox","id":"sh/a10vmlw3","slide":11,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/b29wvqxo","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/u9e6qv","slide":11,"text":"[Sources]\nPrepared from the current BizTrack database table list. Table names are shown as implemented/planned database objects."}
+{"kind":"slide","id":"sl/ojhb0e","slide":12,"title":"CUSTOMER WORKFLOW","textShapes":16}
+{"kind":"textbox","id":"sh/apwnax07","slide":12,"text":"CUSTOMER WORKFLOW","textPreview":"CUSTOMER WORKFLOW","textChars":17,"textLines":1,"bbox":[72,38,230,24]}
+{"kind":"textbox","id":"sh/xsn65szy","slide":12,"text":"Customer logic connects sales, payments, credit, and follow-up","textPreview":"Customer logic connects sales, payments, credit, and follow-up","textChars":62,"textLines":1,"bbox":[72,70,900,54]}
+{"kind":"shape","id":"sh/cre5c7yd","slide":12,"bbox":[72,133,1136,0]}
+{"kind":"shape","id":"sh/jupo72ho","slide":12,"bbox":[94,182,54,54]}
+{"kind":"textbox","id":"sh/ytwnexgj","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[94,193,54,28]}
+{"kind":"textbox","id":"sh/lg769czu","slide":12,"text":"Customer record","textPreview":"Customer record","textChars":15,"textLines":1,"bbox":[166,178,360,30]}
+{"kind":"textbox","id":"sh/kvy5g7y9","slide":12,"text":"The business stores customer identity and contact information.","textPreview":"The business stores customer identity and contact information.","textChars":62,"textLines":1,"bbox":[166,214,420,58]}
+{"kind":"shape","id":"sh/7ipobmh0","slide":12,"bbox":[94,316,54,54]}
+{"kind":"textbox","id":"sh/6hgnihgf","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[94,327,54,28]}
+{"kind":"textbox","id":"sh/cf6tg7yt","slide":12,"text":"Sale is recorded","textPreview":"Sale is recorded","textChars":16,"textLines":1,"bbox":[166,312,360,30]}
+{"kind":"textbox","id":"sh/dgzupcze","slide":12,"text":"Items, quantities, prices, discounts, and totals are attached to the sale.","textPreview":"Items, quantities, prices, discounts, and totals are attached to the sale.","textChars":74,"textLines":1,"bbox":[166,348,420,58]}
+{"kind":"shape","id":"sh/qdobexg3","slide":12,"bbox":[686,182,54,54]}
+{"kind":"textbox","id":"sh/rexcn2ho","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[686,193,54,28]}
+{"kind":"textbox","id":"sh/03qtkry5","slide":12,"text":"Payment or credit","textPreview":"Payment or credit","textChars":17,"textLines":1,"bbox":[758,178,360,30]}
+{"kind":"textbox","id":"sh/14zutczq","slide":12,"text":"Full payment completes the sale; unpaid balance creates customer credit.","textPreview":"Full payment completes the sale; unpaid balance creates customer credit.","textChars":72,"textLines":1,"bbox":[758,214,420,58]}
+{"kind":"shape","id":"sh/eh8bihgz","slide":12,"bbox":[686,316,54,54]}
+{"kind":"textbox","id":"sh/zihcrmhk","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[686,327,54,28]}
+{"kind":"textbox","id":"sh/87atory1","slide":12,"text":"Reports and reminders","textPreview":"Reports and reminders","textChars":21,"textLines":1,"bbox":[758,312,360,30]}
+{"kind":"textbox","id":"sh/98juhwzm","slide":12,"text":"Credit balances become visible in dashboards, reports, and notifications.","textPreview":"Credit balances become visible in dashboards, reports, and notifications.","textChars":73,"textLines":1,"bbox":[758,348,420,58]}
+{"kind":"textbox","id":"sh/hofu1wrq","slide":12,"text":"BizTrack Business Management System","textPreview":"BizTrack Business Management System","textChars":35,"textLines":1,"bbox":[72,674,420,20]}
+{"kind":"textbox","id":"sh/wn6t8rq5","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1166,672,42,22]}
+{"kind":"notes","id":"nt/ojhb0e","slide":12,"text":"[Sources]\nPrepared from implemented customer, sale, payment, customer credit, report, and notification modules."}
+{"kind":"slide","id":"sl/5uapb4","slide":13,"title":"BizTrack is ready to move from product build to market readiness","textShapes":3}
+{"kind":"shape","id":"sh/etw3e9of","slide":13,"bbox":[680,0,600,720]}
+{"kind":"textbox","id":"sh/srulcz69","slide":13,"text":"BizTrack is ready to move from product build to market readiness","textPreview":"BizTrack is ready to move from product build to market readiness","textChars":64,"textLines":1,"bbox":[72,205,570,150]}
+{"kind":"textbox","id":"sh/ts32547u","slide":13,"text":"Next priorities: real Ethiopian payment gateway integration, subscription enforcement, production deployment, security hardening, and onboarding support for early businesses.","textPreview":"Next priorities: real Ethiopian payment gateway integration, subscription enforcement, production deployment, security hardening, and onb...","textChars":174,"textLines":1,"bbox":[76,386,550,100]}
+{"kind":"textbox","id":"sh/65c3a9oj","slide":13,"text":"A scalable foundation for verified business operations, recurring revenue, and data-driven owner decisions.","textPreview":"A scalable foundation for verified business operations, recurring revenue, and data-driven owner decisions.","textChars":107,"textLines":1,"bbox":[76,550,560,62]}
+{"kind":"image","id":"im/o3a90rq5","slide":13,"name":"","alt":"Modern business operations background","bbox":[680,0,600,720]}
+{"kind":"image","id":"im/m187yh8z","slide":13,"name":"","alt":"BizTrack logo","bbox":[72,72,230,72]}
+{"kind":"notes","id":"nt/5uapb4","slide":13,"text":"[Sources]\nPrepared from BizTrack project status and planned commercialization direction."}

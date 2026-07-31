@@ -29,8 +29,12 @@ const getStoredAppearance = (): Appearance => {
     return (localStorage.getItem('appearance') as Appearance) || 'light';
 };
 
-const isDarkMode = (_appearance: Appearance): boolean => {
-    return false;
+const isDarkMode = (appearance: Appearance): boolean => {
+    if (appearance === 'system') {
+        return mediaQuery()?.matches ?? false;
+    }
+
+    return appearance === 'dark';
 };
 
 const applyTheme = (appearance: Appearance): void => {
@@ -41,7 +45,7 @@ const applyTheme = (appearance: Appearance): void => {
     const isDark = isDarkMode(appearance);
 
     document.documentElement.classList.toggle('dark', isDark);
-    document.documentElement.style.colorScheme = 'light';
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 };
 
 const subscribe = (callback: () => void) => {
