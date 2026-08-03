@@ -24,7 +24,7 @@ class ProductController extends Controller
     {
         $this->authorize('viewAny', Product::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $search = $request->string('search')->toString() ?: null;
         $categoryId = $request->integer('category_id') ?: null;
         $status = $request->string('status')->toString() ?: null;
@@ -55,7 +55,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
 
         if (! $business) {
             Inertia::flash('toast', [

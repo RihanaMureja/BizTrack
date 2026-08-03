@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminSubscriptionController;
 use App\Http\Controllers\AdminBusinessVerificationController;
 use App\Http\Controllers\AdminServiceFeeController;
 use App\Http\Controllers\BusinessManagementController;
+use App\Http\Controllers\BusinessLogoController;
+use App\Http\Controllers\BusinessVerificationDocumentController;
 use App\Http\Controllers\BusinessRoleController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
@@ -33,8 +35,14 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('businesses/{business}/logo', [BusinessLogoController::class, 'show'])
+        ->name('businesses.logo');
+
+    Route::get('business-verification-documents/{document}', [BusinessVerificationDocumentController::class, 'show'])
+        ->name('business-verification-documents.show');
+
     Route::get('dashboard', DashboardController::class)
-        ->middleware(['business.approved', 'business.permission:view_dashboard'])
+        ->middleware(['business.approved'])
         ->name('dashboard');
     Route::get('admin/audit-logs', [AuditLogController::class, 'index'])->middleware('role:super_admin,owner')->name('admin.audit-logs.index');
 

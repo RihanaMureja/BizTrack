@@ -23,7 +23,7 @@ class InventoryController extends Controller
     {
         $this->authorize('viewAny', Inventory::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $search = $request->string('search')->toString() ?: null;
         $status = $request->string('status')->toString() ?: null;
 

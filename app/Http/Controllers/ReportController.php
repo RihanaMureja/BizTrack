@@ -20,7 +20,7 @@ class ReportController extends Controller
     {
         $this->authorize('viewAny', Report::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $type = $request->string('type')->toString() ?: 'profit';
         [$from, $to] = DateHelper::range(
             $request->string('date_from')->toString() ?: null,
@@ -61,7 +61,7 @@ class ReportController extends Controller
     public function store(GenerateReportRequest $request): RedirectResponse
     {
         $this->authorize('create', Report::class);
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         abort_unless($business, 403);
 
         $report = $this->reportService->generate($business, $request->user(), $request->validated());

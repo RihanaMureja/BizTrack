@@ -19,7 +19,7 @@ class BusinessRoleController extends Controller
     {
         $this->authorize('viewAny', BusinessRole::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $search = $request->string('search')->toString() ?: null;
 
         if ($business) {
@@ -35,7 +35,7 @@ class BusinessRoleController extends Controller
 
     public function store(BusinessRoleRequest $request): RedirectResponse
     {
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         abort_unless($business, 422);
 
         $this->authorize('create', BusinessRole::class);

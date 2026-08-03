@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Role;
+use App\Enums\BusinessPermissionKey;
 use App\Models\Business;
 use App\Models\Category;
 use App\Models\Customer;
@@ -67,6 +68,19 @@ class DashboardService
      */
     private function cashierDashboard(User $user): array
     {
+        if (! $user->hasBusinessPermission(BusinessPermissionKey::ViewDashboard)) {
+            return [
+                'role' => Role::Cashier->value,
+                'business' => $user->business,
+                'stats' => [],
+                'chart' => $this->emptySeries(),
+                'queue' => [
+                    'Use the sidebar to open the modules your business owner assigned to you.',
+                    'Ask the owner for dashboard access if you need daily business summaries.',
+                ],
+            ];
+        }
+
         return [
             'role' => Role::Cashier->value,
             'business' => $user->business,

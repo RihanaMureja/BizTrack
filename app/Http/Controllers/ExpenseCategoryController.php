@@ -15,7 +15,7 @@ class ExpenseCategoryController extends Controller
 
     public function store(StoreExpenseCategoryRequest $request): RedirectResponse
     {
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         abort_unless($business, 403);
 
         $category = $this->expenseService->createCategory($business, $request->validated());
@@ -27,7 +27,8 @@ class ExpenseCategoryController extends Controller
 
     public function update(StoreExpenseCategoryRequest $request, ExpenseCategory $expenseCategory): RedirectResponse
     {
-        abort_unless($expenseCategory->business_id === $request->user()->ownedBusiness?->id, 403);
+        $businessId = $request->user()->ownedBusiness?->id ?? $request->user()->business_id;
+        abort_unless($expenseCategory->business_id === $businessId, 403);
 
         $category = $this->expenseService->updateCategory($expenseCategory, $request->validated());
 
@@ -38,7 +39,8 @@ class ExpenseCategoryController extends Controller
 
     public function destroy(Request $request, ExpenseCategory $expenseCategory): RedirectResponse
     {
-        abort_unless($expenseCategory->business_id === $request->user()->ownedBusiness?->id, 403);
+        $businessId = $request->user()->ownedBusiness?->id ?? $request->user()->business_id;
+        abort_unless($expenseCategory->business_id === $businessId, 403);
 
         $this->expenseService->deleteCategory($expenseCategory);
 

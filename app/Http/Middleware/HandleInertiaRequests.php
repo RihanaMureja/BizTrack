@@ -37,18 +37,27 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user()?->loadMissing('business', 'ownedBusiness');
+        $business = $user?->ownedBusiness ?? $user?->business;
+        $businessLogo = $business?->logo ? route('businesses.logo', $business) : null;
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user()?->loadMissing('business', 'ownedBusiness'),
+                'user' => $user ? [
+                    ...$user->toArray(),
+                    'avatar' => $businessLogo,
+                    'business_logo' => $businessLogo,
+                    'display_business_name' => $business?->business_name,
+                ] : null,
             ],
-            'navigation' => $request->user()
-                ? app(RBACService::class)->navigationFor($request->user())
+            'navigation' => $user
+                ? app(RBACService::class)->navigationFor($user)
                 : [],
             'notificationSummary' => [
-                'unreadCount' => app(NotificationService::class)->unreadCountForUser($request->user()),
-                'recent' => app(NotificationService::class)->recentForUser($request->user()),
+                'unreadCount' => app(NotificationService::class)->unreadCountForUser($user),
+                'recent' => app(NotificationService::class)->recentForUser($user),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

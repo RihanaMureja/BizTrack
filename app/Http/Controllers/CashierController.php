@@ -23,7 +23,7 @@ class CashierController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $search = $request->string('search')->toString() ?: null;
 
         return Inertia::render('cashiers/index', [
@@ -41,7 +41,7 @@ class CashierController extends Controller
 
     public function store(StoreCashierRequest $request): RedirectResponse
     {
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
 
         if (! $business) {
             Inertia::flash('toast', ['type' => 'error', 'message' => 'Create your business profile before adding employees.']);

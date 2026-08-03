@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Head, router, useForm } from '@inertiajs/react';
-import { Minus, Plus, ScanBarcode, ShoppingCart } from 'lucide-react';
+import { Head, useForm } from '@inertiajs/react';
+import { Minus, Plus, ScanBarcode, ShoppingCart, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 type Product = { id: number; name: string; barcode: string | null; selling_price: string; unit: string | null; inventory: { available_stock: number } | null };
@@ -21,7 +21,9 @@ export default function Pos({ products, customers }: Props) {
         if (existing) return items.map((item) => item.id === product.id ? { ...item, quantity: Math.min((product.inventory?.available_stock ?? 0), item.quantity + 1) } : item);
         return [...items, { ...product, quantity: 1 }];
     });
-    const changeQty = (id: number, delta: number) => setCart((items) => items.map((item) => item.id === id ? { ...item, quantity: Math.max(1, Math.min(item.inventory?.available_stock ?? 0, item.quantity + delta)) } : item).filter((item) => item.quantity > 0));
+    const changeQty = (id: number, delta: number) => setCart((items) => items.map((item) => item.id === id ? { ...item, quantity: Math.max(1, Math.min(item.inventory?.available_stock ?? 0, item.quantity + delta)) } : item));
+    const removeItem = (id: number) => setCart((items) => items.filter((item) => item.id !== id));
+    const clearCart = () => setCart([]);
     const submit = () => {
         form.transform((data) => ({ ...data, customer_id: data.customer_id || null, items: cart.map((item) => ({ product_id: item.id, quantity: item.quantity })) }));
         form.post('/sales');
@@ -46,10 +48,52 @@ export default function Pos({ products, customers }: Props) {
                     </div>
                 </section>
                 <aside className="flex flex-col gap-4 rounded-md border bg-card p-4 shadow-sm">
-                    <div className="flex items-center gap-2"><ShoppingCart className="size-5 text-primary" /><h2 className="font-semibold">Cart</h2></div>
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2"><ShoppingCart className="size-5 text-primary" /><h2 className="font-semibold">Cart</h2></div>
+                        {cart.length > 0 && (
+                            <Button type="button" variant="ghost" size="sm" onClick={clearCart} className="text-muted-foreground hover:text-destructive">
+                                <Trash2 className="size-4" />
+                                Clear
+                            </Button>
+                        )}
+                    </div>
                     <select value={form.data.customer_id} onChange={(event) => form.setData('customer_id', event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm"><option value="">Walk-in customer</option>{customers.map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>)}</select>
                     <div className="flex-1 space-y-3">
-                        {cart.map((item) => <div key={item.id} className="rounded-md border p-3"><div className="flex justify-between gap-3"><p className="font-medium">{item.name}</p><p>{Number(item.selling_price) * item.quantity} ETB</p></div><div className="mt-2 flex items-center gap-2"><Button size="icon" variant="outline" onClick={() => changeQty(item.id, -1)}><Minus className="size-4" /></Button><span className="w-8 text-center">{item.quantity}</span><Button size="icon" variant="outline" onClick={() => changeQty(item.id, 1)}><Plus className="size-4" /></Button></div></div>)}
+                        {cart.length === 0 && (
+                            <div className="rounded-md border border-dashed bg-background/60 p-5 text-center text-sm text-muted-foreground">
+                                Add products to start a sale.
+                            </div>
+                        )}
+                        {cart.map((item) => (
+                            <div key={item.id} className="rounded-md border bg-background/70 p-3">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="truncate font-medium">{item.name}</p>
+                                        <p className="mt-1 text-xs text-muted-foreground">{Number(item.selling_price).toFixed(2)} ETB each</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-semibold">{(Number(item.selling_price) * item.quantity).toFixed(2)} ETB</p>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => removeItem(item.id)}
+                                            className="mt-1 h-7 px-2 text-muted-foreground hover:text-destructive"
+                                            aria-label={`Remove ${item.name} from cart`}
+                                            title={`Remove ${item.name}`}
+                                        >
+                                            <Trash2 className="size-4" />
+                                            Remove
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="mt-3 flex items-center gap-2">
+                                    <Button type="button" size="icon" variant="outline" onClick={() => changeQty(item.id, -1)} disabled={item.quantity <= 1}><Minus className="size-4" /></Button>
+                                    <span className="w-9 text-center text-sm font-semibold">{item.quantity}</span>
+                                    <Button type="button" size="icon" variant="outline" onClick={() => changeQty(item.id, 1)} disabled={item.quantity >= (item.inventory?.available_stock ?? 0)}><Plus className="size-4" /></Button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                     <input value={form.data.tax_amount} onChange={(e) => form.setData('tax_amount', e.target.value)} type="number" min="0" step="0.01" placeholder="Tax" className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
                     <input value={form.data.discount_amount} onChange={(e) => form.setData('discount_amount', e.target.value)} type="number" min="0" step="0.01" placeholder="Discount" className="border-input bg-background h-10 rounded-md border px-3 text-sm" />

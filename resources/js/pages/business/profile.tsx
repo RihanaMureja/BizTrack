@@ -1,6 +1,6 @@
 import { BusinessForm } from '@/components/forms/business-form';
 import { Head } from '@inertiajs/react';
-import { Building2, Clock3, ShieldCheck } from 'lucide-react';
+import { Building2, Clock3, Eye, ShieldCheck } from 'lucide-react';
 import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
 
 type Props = {
@@ -63,6 +63,15 @@ export default function BusinessProfile({ business, subscriptions }: Props) {
                                                 <span className="capitalize text-muted-foreground">{document.status.replace(/_/g, ' ')}</span>
                                             </div>
                                             {document.notes && <p className="mt-1 text-muted-foreground">{document.notes}</p>}
+                                            <a
+                                                href={`/business-verification-documents/${document.id}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="mt-2 inline-flex items-center gap-1 font-medium text-primary transition hover:text-primary/80"
+                                            >
+                                                <Eye className="size-3.5" />
+                                                Preview document
+                                            </a>
                                         </div>
                                     ))}
                                 </div>

@@ -12,6 +12,7 @@ use App\Notifications\BusinessApprovedNotification;
 use App\Notifications\BusinessVerificationRejectedNotification;
 use App\Notifications\BusinessVerificationResubmissionRequestedNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BusinessVerificationService
 {
@@ -44,26 +45,40 @@ class BusinessVerificationService
         }
     }
 
-    public function approve(Business $business, User $reviewer, ?string $reason = null): Business
+    /**
+     * @param  array<int, array<string, mixed>>  $documentReviews
+     */
+    public function approve(Business $business, User $reviewer, ?string $reason = null, array $documentReviews = []): Business
     {
-        return $this->review($business, $reviewer, BusinessVerificationDecision::Approved, RecordStatus::Active, $reason);
+        return $this->review($business, $reviewer, BusinessVerificationDecision::Approved, RecordStatus::Active, $reason, $documentReviews);
     }
 
-    public function reject(Business $business, User $reviewer, string $reason): Business
+    /**
+     * @param  array<int, array<string, mixed>>  $documentReviews
+     */
+    public function reject(Business $business, User $reviewer, string $reason, array $documentReviews = []): Business
     {
-        return $this->review($business, $reviewer, BusinessVerificationDecision::Rejected, RecordStatus::Rejected, $reason);
+        return $this->review($business, $reviewer, BusinessVerificationDecision::Rejected, RecordStatus::Rejected, $reason, $documentReviews);
     }
 
-    public function requestResubmission(Business $business, User $reviewer, string $reason): Business
+    /**
+     * @param  array<int, array<string, mixed>>  $documentReviews
+     */
+    public function requestResubmission(Business $business, User $reviewer, string $reason, array $documentReviews = []): Business
     {
-        return $this->review($business, $reviewer, BusinessVerificationDecision::ResubmissionRequired, RecordStatus::ResubmissionRequired, $reason);
+        return $this->review($business, $reviewer, BusinessVerificationDecision::ResubmissionRequired, RecordStatus::ResubmissionRequired, $reason, $documentReviews);
     }
 
-    private function review(Business $business, User $reviewer, BusinessVerificationDecision $decision, RecordStatus $statusAfter, ?string $reason): Business
+    /**
+     * @param  array<int, array<string, mixed>>  $documentReviews
+     */
+    private function review(Business $business, User $reviewer, BusinessVerificationDecision $decision, RecordStatus $statusAfter, ?string $reason, array $documentReviews): Business
     {
-        return DB::transaction(function () use ($business, $reviewer, $decision, $statusAfter, $reason): Business {
+        return DB::transaction(function () use ($business, $reviewer, $decision, $statusAfter, $reason, $documentReviews): Business {
             $business = Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
+            $business->load('verificationDocuments');
             $statusBefore = $business->status;
+            $documentReviewSnapshot = $this->normalizeDocumentReviews($business, $documentReviews);
 
             $business->forceFill(['status' => $statusAfter])->save();
 
@@ -72,17 +87,36 @@ class BusinessVerificationService
                 'reviewed_by' => $reviewer->id,
                 'decision' => $decision->value,
                 'reason' => $reason,
+                'document_reviews' => $documentReviewSnapshot,
                 'status_before' => $statusBefore?->value,
                 'status_after' => $statusAfter->value,
                 'reviewed_at' => now(),
             ]);
 
-            $business->verificationDocuments()->update([
-                'status' => $statusAfter->value,
-                'notes' => $reason,
-                'reviewed_at' => now(),
-                'reviewed_by' => $reviewer->id,
-            ]);
+            if ($decision === BusinessVerificationDecision::Approved) {
+                foreach ($documentReviewSnapshot as $documentReview) {
+                    $business->verificationDocuments()
+                        ->whereKey($documentReview['document_id'])
+                        ->update([
+                            'status' => RecordStatus::Active->value,
+                            'notes' => $documentReview['notes'],
+                            'reviewed_at' => now(),
+                            'reviewed_by' => $reviewer->id,
+                        ]);
+                }
+            } else {
+                foreach ($documentReviewSnapshot as $documentReview) {
+                    $business->verificationDocuments()
+                        ->whereKey($documentReview['document_id'])
+                        ->update([
+                            'status' => $documentReview['decision'],
+                            'notes' => $documentReview['notes'],
+                            'reviewed_at' => now(),
+                            'reviewed_by' => $reviewer->id,
+                        ]);
+                }
+                $this->deleteSubmittedDocuments($business);
+            }
 
             match ($decision) {
                 BusinessVerificationDecision::Approved => $business->owner?->notify(new BusinessApprovedNotification($business)),
@@ -95,12 +129,56 @@ class BusinessVerificationService
                 auditable: $review,
                 business: $business,
                 oldValues: ['status' => $statusBefore],
-                newValues: ['status' => $statusAfter, 'reason' => $reason],
+                newValues: ['status' => $statusAfter, 'reason' => $reason, 'document_reviews' => $documentReviewSnapshot],
                 user: $reviewer,
             );
 
             return $business->refresh();
         });
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $documentReviews
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeDocumentReviews(Business $business, array $documentReviews): array
+    {
+        $reviewsByDocument = collect($documentReviews)->keyBy(fn (array $review): int => (int) $review['document_id']);
+
+        return $business->verificationDocuments
+            ->map(function ($document) use ($reviewsByDocument): array {
+                $review = $reviewsByDocument->get($document->id, []);
+
+                return [
+                    'document_id' => $document->id,
+                    'type' => $document->type?->value ?? (string) $document->type,
+                    'label' => $document->label,
+                    'decision' => $review['decision'] ?? BusinessVerificationDecision::Approved->value,
+                    'notes' => $review['notes'] ?? null,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function deleteSubmittedDocuments(Business $business): void
+    {
+        $documents = $business->verificationDocuments()->get();
+
+        foreach ($documents as $document) {
+            Storage::disk('public')->delete($document->path);
+        }
+
+        $business->verificationDocuments()->delete();
+
+        $business->forceFill([
+            'national_id_photo_path' => null,
+            'trade_license_path' => null,
+            'tin_certificate_path' => null,
+            'vat_certificate_path' => null,
+            'rental_agreement_path' => null,
+            'submitted_for_review_at' => null,
+        ])->save();
     }
 
     /**

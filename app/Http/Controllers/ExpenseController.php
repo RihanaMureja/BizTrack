@@ -20,7 +20,7 @@ class ExpenseController extends Controller
     {
         $this->authorize('viewAny', Expense::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $filters = [
             'search' => $request->string('search')->toString() ?: null,
             'category_id' => $request->integer('category_id') ?: null,
@@ -43,7 +43,7 @@ class ExpenseController extends Controller
     public function store(StoreExpenseRequest $request): RedirectResponse
     {
         $this->authorize('create', Expense::class);
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         abort_unless($business, 403);
 
         $expense = $this->expenseService->create($business, $request->user(), $request->validated());

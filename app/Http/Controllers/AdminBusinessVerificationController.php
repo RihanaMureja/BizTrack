@@ -32,11 +32,12 @@ class AdminBusinessVerificationController extends Controller
     {
         $decision = BusinessVerificationDecision::from($request->validated('decision'));
         $reason = $request->validated('reason');
+        $documentReviews = $request->validated('document_reviews') ?? [];
 
         match ($decision) {
-            BusinessVerificationDecision::Approved => $this->businessVerificationService->approve($business, $request->user(), $reason),
-            BusinessVerificationDecision::Rejected => $this->businessVerificationService->reject($business, $request->user(), (string) $reason),
-            BusinessVerificationDecision::ResubmissionRequired => $this->businessVerificationService->requestResubmission($business, $request->user(), (string) $reason),
+            BusinessVerificationDecision::Approved => $this->businessVerificationService->approve($business, $request->user(), $reason, $documentReviews),
+            BusinessVerificationDecision::Rejected => $this->businessVerificationService->reject($business, $request->user(), (string) $reason, $documentReviews),
+            BusinessVerificationDecision::ResubmissionRequired => $this->businessVerificationService->requestResubmission($business, $request->user(), (string) $reason, $documentReviews),
         };
 
         return to_route('admin.business-verifications.show', $business)

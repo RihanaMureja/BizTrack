@@ -10,6 +10,8 @@ export type User = {
     role_label: string;
     status: 'active' | 'inactive';
     avatar?: string;
+    business_logo?: string | null;
+    display_business_name?: string | null;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     created_at: string;

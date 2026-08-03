@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\BusinessPermissionKey;
 use App\Models\Inventory;
 use App\Models\User;
 
@@ -9,16 +10,19 @@ class InventoryPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isOwner();
+        return $user->hasBusinessPermission(BusinessPermissionKey::ManageInventory);
     }
 
     public function view(User $user, Inventory $inventory): bool
     {
-        return $inventory->product?->business_id === $user->ownedBusiness?->id;
+        $businessId = $user->ownedBusiness?->id ?? $user->business_id;
+
+        return $user->hasBusinessPermission(BusinessPermissionKey::ManageInventory)
+            && $inventory->product?->business_id === $businessId;
     }
 
     public function update(User $user, Inventory $inventory): bool
     {
-        return $user->isOwner() && $this->view($user, $inventory);
+        return $this->view($user, $inventory);
     }
 }

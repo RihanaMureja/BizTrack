@@ -5,6 +5,8 @@ use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Events\InventoryLow;
 use App\Models\Business;
+use App\Models\BusinessPermission;
+use App\Models\BusinessRole;
 use App\Models\Category;
 use App\Models\Notification;
 use App\Models\Product;
@@ -42,6 +44,72 @@ test('cashiers cannot manage inventory', function () {
 
     $this->actingAs($cashier)
         ->get(route('inventory.index'))
+        ->assertForbidden();
+});
+
+test('employee with inventory permission can view inventory list', function () {
+    [, $business] = inventoryOwnerWithBusiness();
+    $permission = BusinessPermission::query()->firstOrCreate([
+        'key' => 'manage_inventory',
+    ], [
+        'name' => 'Manage Inventory',
+        'group' => 'Inventory',
+    ]);
+    $role = BusinessRole::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Inventory Manager',
+    ]);
+    $role->permissions()->sync([$permission->id]);
+    $employee = User::factory()->create([
+        'role' => Role::Cashier,
+        'business_id' => $business->id,
+        'business_role_id' => $role->id,
+    ]);
+    productWithInventory($business);
+
+    $this->actingAs($employee)
+        ->get(route('inventory.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('inventory/index')
+            ->where('inventory.total', 1)
+        );
+});
+
+test('employee with inventory permission can restock own business inventory only', function () {
+    [, $business] = inventoryOwnerWithBusiness();
+    $permission = BusinessPermission::query()->firstOrCreate([
+        'key' => 'manage_inventory',
+    ], [
+        'name' => 'Manage Inventory',
+        'group' => 'Inventory',
+    ]);
+    $role = BusinessRole::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Inventory Manager',
+    ]);
+    $role->permissions()->sync([$permission->id]);
+    $employee = User::factory()->create([
+        'role' => Role::Cashier,
+        'business_id' => $business->id,
+        'business_role_id' => $role->id,
+    ]);
+    $product = productWithInventory($business);
+    $otherProduct = Product::factory()->create();
+
+    $this->actingAs($employee)
+        ->post(route('inventory.restock', $product->inventory), [
+            'quantity' => 8,
+            'notes' => 'Shelf count',
+        ])
+        ->assertRedirect();
+
+    expect($product->inventory->refresh()->available_stock)->toBe(8);
+
+    $this->actingAs($employee)
+        ->post(route('inventory.restock', $otherProduct->inventory), [
+            'quantity' => 8,
+        ])
         ->assertForbidden();
 });
 
