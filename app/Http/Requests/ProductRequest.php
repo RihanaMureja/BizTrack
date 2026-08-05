@@ -24,7 +24,7 @@ class ProductRequest extends FormRequest
 
         return [
             'category_id' => [
-                'nullable',
+                'required',
                 'integer',
                 Rule::exists('categories', 'id')
                     ->where(fn ($query) => $query->where('business_id', $businessId)),

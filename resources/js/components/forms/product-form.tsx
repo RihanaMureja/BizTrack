@@ -57,7 +57,7 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
             },
         };
 
-        form.transform((data) => ({ ...data, category_id: data.category_id || null }));
+        form.transform((data) => ({ ...data, category_id: Number(data.category_id), }));
 
         if (isEditing && product?.id) {
             form.put(`/products/${product.id}`, options);
@@ -85,11 +85,12 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <Label htmlFor="category_id">Category</Label>
                     <select
                         id="category_id"
+                         required
                         value={form.data.category_id}
                         onChange={(event) => form.setData('category_id', event.target.value)}
                         className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     >
-                        <option value="">Uncategorized</option>
+                        <option value="">Select a category</option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.id}>
                                 {category.name}
