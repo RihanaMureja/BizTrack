@@ -1,0 +1,870 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/njwjcb",
+    "id": "njwjcb",
+    "slide": 2,
+    "layoutId": "3eae2f1f-bfc2-415c-95ad-d5e9fc38482f",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "f8b1ca13-7e83-4172-b932-3f9057f75a8a",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FFFFFF",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "3eae2f1f-bfc2-415c-95ad-d5e9fc38482f",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "f8b1ca13-7e83-4172-b932-3f9057f75a8a",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "f8b1ca13-7e83-4172-b932-3f9057f75a8a",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ep0ja1cb",
+      "id": "1",
+      "bbox": [
+        72,
+        38,
+        230,
+        24
+      ],
+      "geometry": "rect",
+      "text": "SYSTEM PURPOSE",
+      "textPreview": "SYSTEM PURPOSE",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "+mn-lt",
+        "color": "#0F766E",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SYSTEM PURPOSE"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SYSTEM PURPOSE",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "color": "#0F766E",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SYSTEM PURPOSE",
+              "fontSize": 13,
+              "color": "#0F766E",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1sb2lwbm",
+      "id": "2",
+      "bbox": [
+        72,
+        70,
+        900,
+        54
+      ],
+      "geometry": "rect",
+      "text": "BizTrack brings daily business operations into one controlled workflow",
+      "textPreview": "BizTrack brings daily business operations into one controlled workflow",
+      "resolvedFontSize": 36,
+      "resolvedTextStyle": {
+        "fontSize": 36,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack brings daily business operations into one"
+          },
+          {
+            "index": 2,
+            "text": "controlled workflow"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack brings daily business operations into one controlled workflow",
+          "resolvedTextStyle": {
+            "fontSize": 36,
+            "color": "#102033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack brings daily business operations into one controlled workflow",
+              "fontSize": 36,
+              "color": "#102033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0ri1cru1",
+      "id": "3",
+      "bbox": [
+        72,
+        133,
+        1136,
+        0
+      ],
+      "geometry": "line",
+      "lineColor": "#E2E8F0",
+      "lineWidth": 1
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nutkn6ts",
+      "id": "4",
+      "bbox": [
+        72,
+        166,
+        840,
+        70
+      ],
+      "geometry": "rect",
+      "text": "The platform replaces disconnected notebooks, spreadsheets, manual receipts, and informal employee controls with a verified, role-aware digital operating system.",
+      "textPreview": "The platform replaces disconnected notebooks, spreadsheets, manual receipts, and informal employee controls with a verified, role-aware d...",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#64748B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "The platform replaces disconnected notebooks, spreadsheets, manual receipts, and"
+          },
+          {
+            "index": 2,
+            "text": "informal employee controls with a verified, role-aware digital operating system."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "The platform replaces disconnected notebooks, spreadsheets, manual receipts, and informal employee controls with a verified, role-aware digital operating system.",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#64748B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "The platform replaces disconnected notebooks, spreadsheets, manual receipts, and informal employee controls with a verified, role-aware digital operating system.",
+              "fontSize": 24,
+              "color": "#64748B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mtkje1c7",
+      "id": "5",
+      "bbox": [
+        96,
+        289,
+        10,
+        10
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#0F766E",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9wb2pgby",
+      "id": "6",
+      "bbox": [
+        122,
+        282,
+        870,
+        54
+      ],
+      "geometry": "rect",
+      "text": "Owners see performance, cash movement, credit exposure, expenses, and stock health.",
+      "textPreview": "Owners see performance, cash movement, credit exposure, expenses, and stock health.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Owners see performance, cash movement, credit exposure, expenses, and stock"
+          },
+          {
+            "index": 2,
+            "text": "health."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Owners see performance, cash movement, credit exposure, expenses, and stock health.",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#102033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Owners see performance, cash movement, credit exposure, expenses, and stock health.",
+              "fontSize": 24,
+              "color": "#102033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ov2lgbud",
+      "id": "7",
+      "bbox": [
+        96,
+        347,
+        10,
+        10
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#0F766E",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bytkr6to",
+      "id": "8",
+      "bbox": [
+        122,
+        340,
+        870,
+        54
+      ],
+      "geometry": "rect",
+      "text": "Employees work only inside the permissions assigned by the owner.",
+      "textPreview": "Employees work only inside the permissions assigned by the owner.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Employees work only inside the permissions assigned by the owner."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Employees work only inside the permissions assigned by the owner.",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#102033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Employees work only inside the permissions assigned by the owner.",
+              "fontSize": 24,
+              "color": "#102033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/axk3ilc3",
+      "id": "9",
+      "bbox": [
+        96,
+        405,
+        10,
+        10
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#0F766E",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wrm5crml",
+      "id": "10",
+      "bbox": [
+        122,
+        398,
+        870,
+        54
+      ],
+      "geometry": "rect",
+      "text": "Super admins protect platform quality through verification, subscriptions, and oversight.",
+      "textPreview": "Super admins protect platform quality through verification, subscriptions, and oversight.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Super admins protect platform quality through verification, subscriptions, and"
+          },
+          {
+            "index": 2,
+            "text": "oversight."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Super admins protect platform quality through verification, subscriptions, and oversight.",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#102033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Super admins protect platform quality through verification, subscriptions, and oversight.",
+              "fontSize": 24,
+              "color": "#102033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xsvmlw36",
+      "id": "11",
+      "bbox": [
+        96,
+        463,
+        10,
+        10
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#0F766E",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/apkna14f",
+      "id": "12",
+      "bbox": [
+        122,
+        456,
+        870,
+        54
+      ],
+      "geometry": "rect",
+      "text": "Audit logs and notifications create traceability across sensitive actions.",
+      "textPreview": "Audit logs and notifications create traceability across sensitive actions.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Audit logs and notifications create traceability across sensitive actions."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Audit logs and notifications create traceability across sensitive actions.",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#102033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Audit logs and notifications create traceability across sensitive actions.",
+              "fontSize": 24,
+              "color": "#102033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bqt4j6l0",
+      "id": "13",
+      "bbox": [
+        946,
+        170,
+        262,
+        398
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#CCFBF1",
+      "lineColor": "#99F6E4",
+      "lineWidth": 1
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kvm5gbmx",
+      "id": "14",
+      "bbox": [
+        978,
+        210,
+        200,
+        32
+      ],
+      "geometry": "rect",
+      "text": "Core promise",
+      "textPreview": "Core promise",
+      "resolvedFontSize": 25,
+      "resolvedTextStyle": {
+        "fontSize": 25,
+        "typeface": "+mn-lt",
+        "color": "#0F766E",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Core promise"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Core promise",
+          "resolvedTextStyle": {
+            "fontSize": 25,
+            "color": "#0F766E",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Core promise",
+              "fontSize": 25,
+              "color": "#0F766E",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lgvmpg32",
+      "id": "15",
+      "bbox": [
+        978,
+        266,
+        198,
+        160
+      ],
+      "geometry": "rect",
+      "text": "Make small and medium businesses easier to run, easier to monitor, and safer to scale.",
+      "textPreview": "Make small and medium businesses easier to run, easier to monitor, and safer to scale.",
+      "resolvedFontSize": 25,
+      "resolvedTextStyle": {
+        "fontSize": 25,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 6,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Make small and"
+          },
+          {
+            "index": 2,
+            "text": "medium"
+          },
+          {
+            "index": 3,
+            "text": "businesses easier"
+          },
+          {
+            "index": 4,
+            "text": "to run, easier to"
+          },
+          {
+            "index": 5,
+            "text": "monitor, and"
+          },
+          {
+            "index": 6,
+            "text": "safer to scale."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Make small and medium businesses easier to run, easier to monitor, and safer to scale.",
+          "resolvedTextStyle": {
+            "fontSize": 25,
+            "color": "#102033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Make small and medium businesses easier to run, easier to monitor, and safer to scale.",
+              "fontSize": 25,
+              "color": "#102033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/yt4ne14r",
+      "id": "16",
+      "bbox": [
+        72,
+        674,
+        420,
+        20
+      ],
+      "geometry": "rect",
+      "text": "BizTrack Business Management System",
+      "textPreview": "BizTrack Business Management System",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#64748B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack Business Management System"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack Business Management System",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#64748B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack Business Management System",
+              "fontSize": 11,
+              "color": "#64748B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jud4n6lc",
+      "id": "17",
+      "bbox": [
+        1166,
+        672,
+        42,
+        22
+      ],
+      "geometry": "rect",
+      "text": "02",
+      "textPreview": "02",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#0F766E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "02"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "02",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#0F766E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "02",
+              "fontSize": 12,
+              "color": "#0F766E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

@@ -1,0 +1,955 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/tnve36",
+    "id": "tnve36",
+    "slide": 5,
+    "layoutId": "3eae2f1f-bfc2-415c-95ad-d5e9fc38482f",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "f8b1ca13-7e83-4172-b932-3f9057f75a8a",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#F8FAFC",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "3eae2f1f-bfc2-415c-95ad-d5e9fc38482f",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "f8b1ca13-7e83-4172-b932-3f9057f75a8a",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "f8b1ca13-7e83-4172-b932-3f9057f75a8a",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ori5w7q1",
+      "id": "1",
+      "bbox": [
+        72,
+        38,
+        230,
+        24
+      ],
+      "geometry": "rect",
+      "text": "ROLES",
+      "textPreview": "ROLES",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "+mn-lt",
+        "color": "#0F766E",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "ROLES"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "ROLES",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "color": "#0F766E",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "ROLES",
+              "fontSize": 13,
+              "color": "#0F766E",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3q9o32pg",
+      "id": "2",
+      "bbox": [
+        72,
+        70,
+        900,
+        54
+      ],
+      "geometry": "rect",
+      "text": "Three primary roles separate platform control from business work",
+      "textPreview": "Three primary roles separate platform control from business work",
+      "resolvedFontSize": 36,
+      "resolvedTextStyle": {
+        "fontSize": 36,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Three primary roles separate platform control from"
+          },
+          {
+            "index": 2,
+            "text": "business work"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Three primary roles separate platform control from business work",
+          "resolvedTextStyle": {
+            "fontSize": 36,
+            "color": "#102033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Three primary roles separate platform control from business work",
+              "fontSize": 36,
+              "color": "#102033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2pgnuh8v",
+      "id": "3",
+      "bbox": [
+        72,
+        133,
+        1136,
+        0
+      ],
+      "geometry": "line",
+      "lineColor": "#E2E8F0",
+      "lineWidth": 1
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dgr69w7i",
+      "id": "4",
+      "bbox": [
+        86,
+        191,
+        76,
+        76
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#0F766E",
+      "lineColor": "#0F766E",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cfip0rqx",
+      "id": "5",
+      "bbox": [
+        86,
+        210,
+        76,
+        32
+      ],
+      "geometry": "rect",
+      "text": "1",
+      "textPreview": "1",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "1"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "1",
+          "resolvedTextStyle": {
+            "fontSize": 26,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "1",
+              "fontSize": 26,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bu9o7mpc",
+      "id": "6",
+      "bbox": [
+        194,
+        184,
+        330,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Super Admin",
+      "textPreview": "Super Admin",
+      "resolvedFontSize": 30,
+      "resolvedTextStyle": {
+        "fontSize": 30,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Super Admin"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Super Admin",
+          "resolvedTextStyle": {
+            "fontSize": 30,
+            "color": "#102033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Super Admin",
+              "fontSize": 30,
+              "color": "#102033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qt0nyh87",
+      "id": "7",
+      "bbox": [
+        196,
+        230,
+        830,
+        52
+      ],
+      "geometry": "rect",
+      "text": "Owns platform oversight: verification review, business status, subscriptions, service fees, users, and platform reports.",
+      "textPreview": "Owns platform oversight: verification review, business status, subscriptions, service fees, users, and platform reports.",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "+mn-lt",
+        "color": "#64748B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Owns platform oversight: verification review, business status, subscriptions, service fees, users, and"
+          },
+          {
+            "index": 2,
+            "text": "platform reports."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Owns platform oversight: verification review, business status, subscriptions, service fees, users, and platform reports.",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#64748B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Owns platform oversight: verification review, business status, subscriptions, service fees, users, and platform reports.",
+              "fontSize": 20,
+              "color": "#64748B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lkb6dw7u",
+      "id": "8",
+      "bbox": [
+        86,
+        333,
+        76,
+        76
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#2563EB",
+      "lineColor": "#2563EB",
+      "lineWidth": 1
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0j2p4rq9",
+      "id": "9",
+      "bbox": [
+        86,
+        352,
+        76,
+        32
+      ],
+      "geometry": "rect",
+      "text": "2",
+      "textPreview": "2",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2",
+          "resolvedTextStyle": {
+            "fontSize": 26,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2",
+              "fontSize": 26,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ydszelw7",
+      "id": "10",
+      "bbox": [
+        194,
+        326,
+        330,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Business Owner",
+      "textPreview": "Business Owner",
+      "resolvedFontSize": 30,
+      "resolvedTextStyle": {
+        "fontSize": 30,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Business Owner"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Business Owner",
+          "resolvedTextStyle": {
+            "fontSize": 30,
+            "color": "#102033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Business Owner",
+              "fontSize": 30,
+              "color": "#102033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ze10nqxs",
+      "id": "11",
+      "bbox": [
+        196,
+        372,
+        830,
+        52
+      ],
+      "geometry": "rect",
+      "text": "Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports, notifications, and settings.",
+      "textPreview": "Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports, notifications, and settings.",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "+mn-lt",
+        "color": "#64748B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports,"
+          },
+          {
+            "index": 2,
+            "text": "notifications, and settings."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports, notifications, and settings.",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#64748B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Runs the business: profile, products, inventory, employees, sales, payments, expenses, reports, notifications, and settings.",
+              "fontSize": 20,
+              "color": "#64748B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0fahgbed",
+      "id": "12",
+      "bbox": [
+        86,
+        475,
+        76,
+        76
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#F59E0B",
+      "lineColor": "#F59E0B",
+      "lineWidth": 1
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lgjipgfy",
+      "id": "13",
+      "bbox": [
+        86,
+        494,
+        76,
+        32
+      ],
+      "geometry": "rect",
+      "text": "3",
+      "textPreview": "3",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "3"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "3",
+          "resolvedTextStyle": {
+            "fontSize": 26,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "3",
+              "fontSize": 26,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mhszilw3",
+      "id": "14",
+      "bbox": [
+        194,
+        468,
+        330,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Employee",
+      "textPreview": "Employee",
+      "resolvedFontSize": 30,
+      "resolvedTextStyle": {
+        "fontSize": 30,
+        "typeface": "+mn-lt",
+        "color": "#102033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Employee"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Employee",
+          "resolvedTextStyle": {
+            "fontSize": 30,
+            "color": "#102033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Employee",
+              "fontSize": 30,
+              "color": "#102033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ni10rqxo",
+      "id": "15",
+      "bbox": [
+        196,
+        514,
+        830,
+        52
+      ],
+      "geometry": "rect",
+      "text": "Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer, or another custom role.",
+      "textPreview": "Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer, or another custom role.",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "+mn-lt",
+        "color": "#64748B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer,"
+          },
+          {
+            "index": 2,
+            "text": "or another custom role."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer, or another custom role.",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#64748B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Works inside owner-assigned permissions. The role name can be cashier, manager, inventory officer, or another custom role.",
+              "fontSize": 20,
+              "color": "#64748B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8juhkve9",
+      "id": "16",
+      "bbox": [
+        72,
+        674,
+        420,
+        20
+      ],
+      "geometry": "rect",
+      "text": "BizTrack Business Management System",
+      "textPreview": "BizTrack Business Management System",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#64748B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack Business Management System"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack Business Management System",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#64748B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack Business Management System",
+              "fontSize": 11,
+              "color": "#64748B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9k3it0fu",
+      "id": "17",
+      "bbox": [
+        1166,
+        672,
+        42,
+        22
+      ],
+      "geometry": "rect",
+      "text": "05",
+      "textPreview": "05",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#0F766E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "05"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "05",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#0F766E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "05",
+              "fontSize": 12,
+              "color": "#0F766E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

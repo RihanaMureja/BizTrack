@@ -5,10 +5,10 @@ import {
     Building2,
     CheckCircle2,
     CreditCard,
+    Lightbulb,
     Package,
     Receipt,
     ShoppingCart,
-    Sparkles,
     TrendingUp,
     Users,
     WalletCards,
@@ -35,6 +35,7 @@ type DashboardData = {
     stats: DashboardStat[];
     chart: Array<{ label: string; value: number }>;
     lowStock?: Array<{ name: string; stock: number; reorder: number }>;
+    stagnantProducts?: Array<{ id: number; name: string; days_without_sale: number; stock_on_hand: number; suggested_action: string | null }>;
     topProducts?: Array<{ name: string; quantity: number }>;
     nextSteps?: string[];
     queue?: string[];
@@ -104,9 +105,15 @@ function OwnerDashboard({ dashboard: data }: Props) {
                 </div>
 
                 <DashboardList
-                    title="Quick setup path"
-                    empty="No setup tasks remaining"
-                    emptyIcon={Sparkles}
+                    title="Stagnant product alerts"
+                    empty="No stagnant products detected."
+                    items={(data.stagnantProducts ?? []).map((item) => `${item.name}: ${item.days_without_sale} days without sale, ${item.stock_on_hand} in stock`)}
+                    icon={Lightbulb}
+                />
+
+                <DashboardList
+                    title="Recommended setup path"
+                    empty="No setup tasks."
                     items={data.nextSteps ?? []}
                     icon={TrendingUp}
                     tone="emerald"
@@ -277,4 +284,3 @@ Dashboard.layout = {
         },
     ],
 };
-

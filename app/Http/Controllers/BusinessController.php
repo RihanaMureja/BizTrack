@@ -21,7 +21,11 @@ class BusinessController extends Controller
     public function show(Request $request): Response
     {
         return Inertia::render('business/profile', [
-            'business' => $request->user()->ownedBusiness?->load('subscription'),
+            'business' => $request->user()->ownedBusiness?->load([
+                'subscription',
+                'verificationDocuments',
+                'verificationReviews.reviewer:id,first_name,last_name,email,role,status',
+            ]),
             'subscriptions' => $this->subscriptionService->activePlans(),
         ]);
     }

@@ -798,127 +798,585 @@ Barcode helpers
 Report helpers
 ```
 
-## Phase 19: Database Seeders And Factories
+Below is a clean 5-phase plan for improving BizTrack professionally. These phases build on the current system without rushing implementation.
 
-This phase creates fake and default data for development, testing, and demos.
+# Phase 19: Platform Service Fee Module
 
-Files created or updated:
+## Purpose
 
-```text
-database/seeders/DatabaseSeeder.php
-database/seeders/RoleSeeder.php
-database/seeders/PermissionSeeder.php
-database/seeders/SubscriptionSeeder.php
-database/seeders/SuperAdminSeeder.php
-database/seeders/BusinessSeeder.php
-database/seeders/UserSeeder.php
-database/seeders/CategorySeeder.php
-database/seeders/ProductSeeder.php
-database/seeders/CustomerSeeder.php
-database/seeders/ExpenseSeeder.php
+This phase adds a new BizTrack revenue stream besides subscriptions.
 
-database/factories/BusinessFactory.php
-database/factories/ProductFactory.php
-database/factories/CategoryFactory.php
-database/factories/CustomerFactory.php
-database/factories/SaleFactory.php
-database/factories/ExpenseFactory.php
-database/factories/UserFactory.php
-```
+When a business records a payment, BizTrack calculates a service fee based on that business’s agreed fee rate. For example, if a payment of `5,000 ETB` is recorded and the service fee rate is `1%`, BizTrack records `50 ETB` as a service fee owed to the platform.
 
-Implements:
+This should be dynamic per business because different business owners may agree to different service fee percentages.
+
+## Creates
 
 ```text
-Default roles
-Default permissions
-Default subscriptions
-Default super admin account
-Sample business data
-Sample users
-Sample categories
-Sample products
-Sample customers
-Sample expenses
-Factory data for tests
+app/Models/ServiceFee.php
+app/Models/ServiceFeeSetting.php
+
+app/Enums/ServiceFeeStatus.php
+
+app/Http/Controllers/ServiceFeeController.php
+app/Http/Controllers/AdminServiceFeeController.php
+
+app/Http/Requests/UpdateServiceFeeSettingRequest.php
+app/Http/Requests/PayServiceFeeRequest.php
+
+app/Services/ServiceFeeService.php
+
+app/Policies/ServiceFeePolicy.php
+
+database/migrations/create_service_fee_settings_table.php
+database/migrations/create_service_fees_table.php
+
+database/factories/ServiceFeeFactory.php
+database/factories/ServiceFeeSettingFactory.php
+
+tests/Feature/ServiceFeeTest.php
+
+resources/js/pages/service-fees/index.tsx
+resources/js/pages/admin/service-fees/index.tsx
+
+resources/js/components/service-fees/service-fee-summary.tsx
+resources/js/components/service-fees/service-fee-table.tsx
+resources/js/components/service-fees/service-fee-status-badge.tsx
 ```
 
-## Phase 20: Testing, Optimization, And Deployment Preparation
-
-This phase stabilizes the system. After all core features are built, the app is tested, optimized, and prepared for deployment.
-
-Files created or updated:
+## Updates
 
 ```text
-tests/Feature/Auth/
-tests/Feature/Business/
-tests/Feature/Categories/
-tests/Feature/Products/
-tests/Feature/Inventory/
-tests/Feature/Customers/
-tests/Feature/Cashiers/
-tests/Feature/Sales/
-tests/Feature/Payments/
-tests/Feature/Expenses/
-tests/Feature/Reports/
-tests/Feature/Admin/
+app/Models/Business.php
+app/Models/Payment.php
 
-README.md
-docs/testing-checklist.md
-docs/deployment.md
-.env.example
+app/Services/PaymentService.php
+app/Services/RBACService.php
+app/Services/DashboardService.php
+
+routes/web.php
+
+resources/js/components/app-sidebar.tsx
+resources/js/types/navigation.ts
 ```
 
-Implements:
+## Implements
 
 ```text
-Feature tests
-Authorization tests
-Validation tests
-Business ownership tests
-Sales workflow tests
-Inventory update tests
-Payment tests
-Report tests
-Seeder testing
-Performance checks
-Pagination checks
-Query optimization
-Deployment documentation
-Environment setup documentation
+Dynamic service fee percentage per business
+Automatic service fee creation when payment is completed
+Service fee dashboard page for business owner
+Service fee total owed
+Service fee paid/unpaid tracking
+Service fee calculation explanation
+Search and filtering by date, status, payment number, amount
+Admin view of all business service fees
+Pay service fee button
+Audit logging for service fee payment
 ```
 
-Recommended build order:
+## Workflow
 
 ```text
-1. Foundation, Authentication, RBAC
-2. Business Registration And Subscription Setup
-3. Dashboard
-4. Categories
-5. Products
-6. Inventory
-7. Customers
-8. Cashiers
-9. Sales And POS
-10. Payments
-11. Customer Credit
-12. Expenses
-13. Reports
-14. Notifications
-15. Audit Logs
-16. Super Admin
-17. Settings/Profile
-18. UI Components And Helpers
-19. Seeders And Factories
-20. Testing, Optimization, Deployment
+Business records payment
+        ↓
+Payment becomes completed
+        ↓
+System checks business service fee setting
+        ↓
+System calculates fee percentage
+        ↓
+Service fee record is created
+        ↓
+Owner sees total service fee owed
+        ↓
+Owner pays service fee
+        ↓
+Fee status becomes paid
 ```
 
+---
 
-on the design direction: no obvious Laravel starter-kit feel. For the UI I’ll build BizTrack as its own product, including:
-Custom BizTrack logo/identity
-Custom sidebar styling and navigation behavior
-Professional dashboard layout
-Consistent buttons, cards, tables, forms, badges, modals, loaders, and empty states
-Clean business-app visual language, not generic Laravel/Breeze defaults
-Role-aware UI that feels intentionally designed for owners, cashiers, and super admins
-Custom loading states/spinners instead of default-looking starter components
-Responsive layouts that feel polished on desktop and mobile
+# Phase 20: Dynamic Employee Roles And Permissions
+
+## Purpose
+
+This phase replaces hard-coded employee access with business-controlled roles and permissions.
+
+Instead of only having `cashier`, each business owner can create roles like:
+
+```text
+Cashier
+Manager
+Inventory Staff
+Accountant
+Sales Clerk
+Branch Supervisor
+```
+
+Each role can have custom permissions selected by the owner.
+
+This allows one business owner to give a trusted employee more access while another owner keeps employee access limited.
+
+## Creates
+
+```text
+app/Models/BusinessRole.php
+app/Models/BusinessPermission.php
+app/Models/BusinessRolePermission.php
+
+app/Enums/PermissionGroup.php
+
+app/Http/Controllers/EmployeeController.php
+app/Http/Controllers/BusinessRoleController.php
+app/Http/Controllers/BusinessPermissionController.php
+
+app/Http/Requests/StoreEmployeeRequest.php
+app/Http/Requests/UpdateEmployeeRequest.php
+app/Http/Requests/StoreBusinessRoleRequest.php
+app/Http/Requests/UpdateBusinessRoleRequest.php
+app/Http/Requests/AssignRolePermissionsRequest.php
+
+app/Services/EmployeeService.php
+app/Services/BusinessPermissionService.php
+app/Services/BusinessRoleService.php
+
+app/Policies/EmployeePolicy.php
+app/Policies/BusinessRolePolicy.php
+
+app/Http/Middleware/EnsureBusinessPermission.php
+
+database/migrations/create_business_permissions_table.php
+database/migrations/create_business_roles_table.php
+database/migrations/create_business_role_permission_table.php
+database/migrations/add_business_role_id_to_users_table.php
+
+database/seeders/BusinessPermissionSeeder.php
+
+database/factories/BusinessRoleFactory.php
+
+tests/Feature/EmployeePermissionTest.php
+tests/Feature/BusinessRoleTest.php
+
+resources/js/pages/employees/index.tsx
+resources/js/pages/roles/index.tsx
+resources/js/pages/roles/show.tsx
+
+resources/js/components/employees/employee-form.tsx
+resources/js/components/roles/role-form.tsx
+resources/js/components/roles/permission-matrix.tsx
+```
+
+## Updates
+
+```text
+app/Models/User.php
+app/Enums/Role.php
+
+app/Services/RBACService.php
+app/Http/Middleware/RoleMiddleware.php
+
+routes/web.php
+
+resources/js/components/app-sidebar.tsx
+resources/js/types/navigation.ts
+```
+
+## Implements
+
+```text
+Business-defined employee roles
+Custom role names
+Permission matrix
+Owner assigns permissions when creating employee
+Owner can update employee permissions later
+Dynamic sidebar based on employee permissions
+Backend route protection based on permissions
+Cashier becomes one possible employee role instead of the only employee type
+```
+
+## Example Permissions
+
+```text
+view_dashboard
+manage_products
+manage_categories
+manage_inventory
+view_customers
+manage_customers
+create_sales
+view_sales
+manage_payments
+manage_expenses
+view_reports
+manage_cashiers
+view_notifications
+```
+
+## Workflow
+
+```text
+Owner creates business role
+        ↓
+Owner selects permissions
+        ↓
+Owner creates employee
+        ↓
+Owner assigns role to employee
+        ↓
+Employee logs in
+        ↓
+Sidebar shows only allowed modules
+        ↓
+Backend allows only permitted actions
+```
+
+---
+
+# Phase 21: Stagnant Product Detection And Smart Notifications
+
+## Purpose
+
+This phase helps business owners detect products that are not selling.
+
+The system checks products that have not been sold for a configurable number of days and notifies the owner to take action, such as discounting, promoting, restocking differently, or discontinuing the product.
+
+This improves dashboard intelligence beyond low-stock alerts.
+
+## Creates
+
+```text
+app/Models/ProductMovementInsight.php
+
+app/Enums/ProductInsightType.php
+app/Enums/ProductInsightStatus.php
+
+app/Console/Commands/DetectStagnantProducts.php
+
+app/Services/ProductInsightService.php
+
+app/Notifications/StagnantProductNotification.php
+
+database/migrations/create_product_movement_insights_table.php
+
+database/factories/ProductMovementInsightFactory.php
+
+tests/Feature/StagnantProductTest.php
+
+resources/js/components/dashboard/stagnant-products-card.tsx
+resources/js/pages/products/insights.tsx
+```
+
+## Updates
+
+```text
+app/Models/Product.php
+app/Models/Business.php
+app/Models/Notification.php
+
+app/Services/DashboardService.php
+app/Services/NotificationService.php
+app/Services/ProductService.php
+
+app/Http/Controllers/DashboardController.php
+app/Http/Controllers/ProductController.php
+app/Http/Controllers/SettingsController.php
+
+routes/web.php
+routes/console.php
+
+resources/js/pages/dashboard.tsx
+resources/js/pages/settings/preferences.tsx
+resources/js/pages/notifications/index.tsx
+```
+
+## Implements
+
+```text
+Detect products not sold for X days
+Business-level stagnant product preference
+Owner notification for stagnant products
+Dashboard stagnant product preview
+Product insights page
+Dismiss/resolved insight status
+Suggested action text
+Search/filter stagnant products
+```
+
+## Preference Options
+
+```text
+Enable stagnant product alerts
+Days without sale threshold
+Minimum stock quantity to consider stagnant
+Notification frequency
+```
+
+## Workflow
+
+```text
+Scheduled command runs daily
+        ↓
+System checks product last sold date
+        ↓
+Product has stock but no sales for configured days
+        ↓
+Insight record is created
+        ↓
+Owner receives notification
+        ↓
+Dashboard shows stagnant product warning
+        ↓
+Owner discounts, promotes, or resolves insight
+```
+
+---
+
+# Phase 22: Strong Passwords, Temporary Passwords, And Security Questions
+
+## Purpose
+
+This phase improves account security.
+
+Business owners must use strong passwords during signup. When an owner creates an employee, the owner gives a temporary password. On first login, the employee must reset the password before accessing the system.
+
+Security questions are added as an extra account recovery/security layer.
+
+## Creates
+
+```text
+app/Models/SecurityQuestion.php
+app/Models/UserSecurityQuestion.php
+
+app/Http/Controllers/Auth/ForcePasswordResetController.php
+app/Http/Controllers/SecurityQuestionController.php
+
+app/Http/Requests/ForcePasswordResetRequest.php
+app/Http/Requests/StoreSecurityQuestionRequest.php
+app/Http/Requests/VerifySecurityQuestionRequest.php
+
+app/Services/SecurityQuestionService.php
+app/Services/PasswordSecurityService.php
+
+app/Http/Middleware/EnsurePasswordIsNotTemporary.php
+
+database/migrations/create_security_questions_table.php
+database/migrations/create_user_security_questions_table.php
+database/migrations/add_password_security_fields_to_users_table.php
+
+database/seeders/SecurityQuestionSeeder.php
+
+tests/Feature/PasswordSecurityTest.php
+tests/Feature/SecurityQuestionTest.php
+
+resources/js/pages/auth/force-password-reset.tsx
+resources/js/pages/settings/security-questions.tsx
+resources/js/components/forms/security-question-form.tsx
+```
+
+## Updates
+
+```text
+app/Models/User.php
+
+app/Http/Controllers/Auth/RegisteredUserController.php
+app/Http/Requests/RegisterRequest.php
+app/Http/Requests/StoreCashierRequest.php
+app/Http/Requests/StoreEmployeeRequest.php
+
+app/Services/AuthService.php
+app/Services/CashierService.php
+app/Services/EmployeeService.php
+
+routes/auth.php
+routes/settings.php
+routes/web.php
+
+resources/js/pages/auth/register.tsx
+resources/js/pages/cashiers/index.tsx
+resources/js/pages/employees/index.tsx
+resources/js/pages/settings/profile.tsx
+resources/js/pages/settings/security.tsx
+```
+
+## Implements
+
+```text
+Strong password rules for owner signup
+Temporary password flag for employees
+Force password reset on first employee login
+Password changed timestamp
+Security questions
+Security question setup page
+Security question verification flow
+Audit logs for password/security changes
+```
+
+## Strong Password Requirements
+
+```text
+Minimum 12 characters
+Uppercase letter
+Lowercase letter
+Number
+Symbol
+Not commonly compromised
+```
+
+## User Fields To Add
+
+```text
+must_reset_password
+password_changed_at
+temporary_password_expires_at
+```
+
+## Workflow
+
+```text
+Owner creates employee
+        ↓
+Owner sets temporary password
+        ↓
+Employee logs in
+        ↓
+System detects must_reset_password = true
+        ↓
+Employee is redirected to reset password page
+        ↓
+Employee creates strong password
+        ↓
+must_reset_password becomes false
+        ↓
+Employee sets security question
+        ↓
+Employee can access allowed modules
+```
+
+---
+
+# Phase 23: Business Verification Review And Resubmission
+
+## Purpose
+
+This phase makes business verification professional and traceable.
+
+Currently approval is simple. This phase allows the super admin to review uploaded documents, reject with a reason, request resubmission, and track verification history.
+
+## Creates
+
+```text
+app/Models/BusinessVerificationReview.php
+app/Models/BusinessVerificationDocument.php
+
+app/Enums/BusinessVerificationStatus.php
+app/Enums/BusinessVerificationDocumentType.php
+
+app/Http/Controllers/BusinessVerificationController.php
+app/Http/Controllers/AdminBusinessVerificationController.php
+
+app/Http/Requests/SubmitBusinessVerificationRequest.php
+app/Http/Requests/ReviewBusinessVerificationRequest.php
+
+app/Services/BusinessVerificationService.php
+
+app/Policies/BusinessVerificationPolicy.php
+
+app/Notifications/BusinessVerificationApprovedNotification.php
+app/Notifications/BusinessVerificationRejectedNotification.php
+app/Notifications/BusinessVerificationResubmissionRequestedNotification.php
+
+database/migrations/create_business_verification_documents_table.php
+database/migrations/create_business_verification_reviews_table.php
+
+database/factories/BusinessVerificationDocumentFactory.php
+database/factories/BusinessVerificationReviewFactory.php
+
+tests/Feature/BusinessVerificationReviewTest.php
+
+resources/js/pages/business/verification.tsx
+resources/js/pages/admin/business-verifications/index.tsx
+resources/js/pages/admin/business-verifications/show.tsx
+
+resources/js/components/business-verification/document-viewer.tsx
+resources/js/components/business-verification/review-timeline.tsx
+resources/js/components/business-verification/review-action-form.tsx
+resources/js/components/business-verification/verification-status-badge.tsx
+```
+
+## Updates
+
+```text
+app/Models/Business.php
+app/Models/User.php
+
+app/Http/Controllers/BusinessController.php
+app/Http/Controllers/BusinessManagementController.php
+
+app/Http/Requests/BusinessProfileRequest.php
+
+app/Services/BusinessService.php
+app/Services/RBACService.php
+app/Services/DashboardService.php
+
+app/Http/Middleware/EnsureBusinessIsApproved.php
+
+routes/web.php
+
+resources/js/pages/business/profile.tsx
+resources/js/pages/admin/businesses/index.tsx
+resources/js/components/forms/business-form.tsx
+```
+
+## Implements
+
+```text
+Document-by-document verification
+Secure uploaded document viewing
+Super admin review page
+Approve verification
+Reject verification with reason
+Request resubmission
+Owner resubmission flow
+Verification timeline/history
+Verification status badge
+Owner notification after review
+Audit logs for review actions
+```
+
+## Verification Statuses
+
+```text
+not_submitted
+pending_review
+approved
+rejected
+resubmission_required
+```
+
+## Workflow
+
+```text
+Owner submits verification documents
+        ↓
+Documents are stored as verification document records
+        ↓
+Business status becomes pending_review
+        ↓
+Super admin opens verification review page
+        ↓
+Super admin views each document
+        ↓
+Super admin approves, rejects, or requests resubmission
+        ↓
+System records review decision and reason
+        ↓
+Owner receives notification
+        ↓
+If approved, business becomes active
+        ↓
+If rejected or resubmission required, owner updates documents
+```
+
+---
+

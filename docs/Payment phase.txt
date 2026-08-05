@@ -1,0 +1,533 @@
+You need a real subscription payment system so business owners pay BizTrack before or while using the system. Chapa or SantimPay would act as the payment gateway. BizTrack should create the subscription invoice, send owner to payment, receive callback/webhook, verify payment, then activate/extend the business subscription.
+
+I’ll describe it using Chapa because its docs are public and clear. SantimPay would follow the same architecture: initialize payment, redirect user, receive callback/webhook, verify payment, update subscription.
+
+Sources checked:
+- [Chapa verify payments](https://developer.chapa.co/integrations/verify-payments)
+- [Chapa webhooks](https://developer.chapa.co/integrations/webhooks)
+- [Chapa developer docs](https://developer.chapa.co/)
+
+**How Payment Should Work**
+1. Super admin creates subscription plans.
+2. Business owner chooses a plan.
+3. BizTrack creates a local subscription payment record.
+4. BizTrack calls Chapa/SantimPay API to initialize payment.
+5. Gateway returns checkout URL.
+6. Owner is redirected to gateway checkout.
+7. Owner pays with Telebirr/card/bank/mobile money depending on gateway.
+8. Gateway redirects owner back to BizTrack callback URL.
+9. Gateway also sends webhook/IPN to BizTrack.
+10. BizTrack verifies the payment with the gateway API.
+11. If verified:
+   - Mark payment as completed.
+   - Activate or extend business subscription.
+   - Save gateway reference.
+   - Notify owner.
+   - Log audit event.
+12. If failed/cancelled:
+   - Mark payment failed.
+   - Keep business unpaid/pending.
+
+**Important Rule**
+Never trust only the browser redirect.
+
+The browser callback is useful for showing “Payment pending/successful,” but the real activation must happen after server-side verification or webhook verification.
+
+**Recommended Architecture**
+Create a separate payment flow for platform subscriptions. Do not mix it with the existing `payments` table used for customer sale payments.
+
+Current `payments` table is for business sales/POS payments.
+
+For BizTrack subscription payments, create a new table.
+
+**New BizTrack Table**
+Create:
+
+```text
+subscription_payments
+```
+
+Purpose:
+Tracks payments made by business owners to BizTrack for subscription plans.
+
+Recommended columns:
+
+```text
+id
+business_id
+subscription_id
+user_id
+gateway
+tx_ref
+gateway_reference
+amount
+currency
+status
+checkout_url
+paid_at
+verified_at
+expires_at
+raw_response
+created_at
+updated_at
+```
+
+Example statuses:
+
+```text
+pending
+completed
+failed
+cancelled
+expired
+```
+
+Example gateways:
+
+```text
+chapa
+santimpay
+```
+
+**Files To Create**
+Backend files:
+
+```text
+app/Models/SubscriptionPayment.php
+
+app/Enums/SubscriptionPaymentStatus.php
+app/Enums/PaymentGateway.php
+
+app/Services/SubscriptionPaymentService.php
+app/Services/PaymentGateways/PaymentGatewayInterface.php
+app/Services/PaymentGateways/ChapaGateway.php
+app/Services/PaymentGateways/SantimPayGateway.php
+
+app/Http/Controllers/SubscriptionPaymentController.php
+app/Http/Controllers/Webhooks/ChapaWebhookController.php
+app/Http/Controllers/Webhooks/SantimPayWebhookController.php
+
+app/Http/Requests/StartSubscriptionPaymentRequest.php
+
+database/migrations/xxxx_xx_xx_xxxxxx_create_subscription_payments_table.php
+
+tests/Feature/SubscriptionPaymentTest.php
+tests/Feature/PaymentWebhookTest.php
+```
+
+Frontend files:
+
+```text
+resources/js/pages/business/subscription-payments/index.tsx
+resources/js/pages/business/subscription-payments/show.tsx
+resources/js/components/subscriptions/subscription-payment-card.tsx
+resources/js/components/subscriptions/payment-status-badge.tsx
+```
+
+Optional admin files:
+
+```text
+resources/js/pages/admin/subscription-payments/index.tsx
+app/Http/Controllers/AdminSubscriptionPaymentController.php
+```
+
+**Files To Update**
+Update these existing files:
+
+```text
+routes/web.php
+routes/api.php
+config/services.php
+.env
+app/Models/Business.php
+app/Models/Subscription.php
+app/Models/User.php
+app/Services/SubscriptionService.php
+app/Http/Controllers/SubscriptionController.php
+resources/js/pages/business/subscriptions.tsx
+resources/js/components/app-sidebar.tsx
+resources/js/types/navigation.ts
+```
+
+Maybe update:
+
+```text
+app/Services/DashboardService.php
+app/Http/Middleware/EnsureSubscriptionIsActive.php
+app/Notifications/
+app/Services/AuditLogService.php
+```
+
+**Environment Variables**
+Add gateway credentials to `.env`.
+
+For Chapa:
+
+```env
+CHAPA_SECRET_KEY=
+CHAPA_PUBLIC_KEY=
+CHAPA_WEBHOOK_SECRET=
+CHAPA_BASE_URL=https://api.chapa.co/v1
+CHAPA_CALLBACK_URL="${APP_URL}/subscription-payments/chapa/callback"
+CHAPA_RETURN_URL="${APP_URL}/business/subscriptions"
+```
+
+For SantimPay, use their official credential names once you get merchant access:
+
+```env
+SANTIMPAY_MERCHANT_ID=
+SANTIMPAY_API_KEY=
+SANTIMPAY_SECRET_KEY=
+SANTIMPAY_BASE_URL=
+SANTIMPAY_WEBHOOK_SECRET=
+```
+
+Then add them to:
+
+```text
+config/services.php
+```
+
+**Routes To Add**
+Authenticated owner routes:
+
+```php
+Route::middleware(['auth', 'verified', 'role:owner'])->group(function () {
+    Route::post('business/subscription-payments', [SubscriptionPaymentController::class, 'store'])
+        ->name('subscription-payments.store');
+
+    Route::get('subscription-payments/chapa/callback', [SubscriptionPaymentController::class, 'chapaCallback'])
+        ->name('subscription-payments.chapa.callback');
+
+    Route::get('business/subscription-payments/{subscriptionPayment}', [SubscriptionPaymentController::class, 'show'])
+        ->name('subscription-payments.show');
+});
+```
+
+Webhook routes should not require auth:
+
+```php
+Route::post('webhooks/chapa', ChapaWebhookController::class)
+    ->name('webhooks.chapa');
+
+Route::post('webhooks/santimpay', SantimPayWebhookController::class)
+    ->name('webhooks.santimpay');
+```
+
+Usually webhooks go in `routes/api.php`.
+
+**Chapa Integration Flow**
+Chapa has two important operations:
+
+1. Initialize transaction.
+2. Verify transaction.
+
+Chapa verify endpoint:
+
+```text
+GET https://api.chapa.co/v1/transaction/verify/{tx_ref}
+```
+
+Header:
+
+```text
+Authorization: Bearer CHAPA_SECRET_KEY
+```
+
+When starting payment, BizTrack should send:
+- amount
+- currency
+- email
+- first_name
+- last_name
+- phone_number
+- tx_ref
+- callback_url
+- return_url
+- customization title/description
+
+`tx_ref` must be generated by BizTrack and must be unique.
+
+Example:
+
+```text
+BT-SUB-{business_id}-{timestamp}
+```
+
+**SubscriptionPaymentService Responsibilities**
+This service should:
+
+```text
+startPayment()
+verifyPayment()
+markCompleted()
+markFailed()
+activateBusinessSubscription()
+extendSubscription()
+```
+
+When payment is completed, it should:
+- update `subscription_payments.status`
+- update `businesses.subscription_id`
+- set subscription period fields if you add them
+- send notification
+- write audit log
+
+**Business Subscription Dates**
+Right now your `businesses` table links to `subscription_id`, but does not fully track paid subscription period.
+
+You should add fields to `businesses`:
+
+```text
+subscription_started_at
+subscription_expires_at
+subscription_status
+```
+
+Or create a separate table:
+
+```text
+business_subscriptions
+```
+
+Better long-term structure:
+
+```text
+business_subscriptions
+```
+
+Columns:
+
+```text
+id
+business_id
+subscription_id
+subscription_payment_id
+starts_at
+expires_at
+status
+created_at
+updated_at
+```
+
+But for simpler implementation now, you can add fields directly to `businesses`.
+
+Recommended for your system: create `business_subscriptions` because it gives payment history and renewal history.
+
+**Best Database Design**
+Add two new tables:
+
+```text
+subscription_payments
+business_subscriptions
+```
+
+`subscription_payments` tracks money.
+
+`business_subscriptions` tracks access period.
+
+This is cleaner than only storing `subscription_id` on `businesses`.
+
+**How Activation Should Work**
+When owner pays successfully:
+
+```text
+subscription_payments.status = completed
+business_subscriptions.status = active
+business_subscriptions.starts_at = now()
+business_subscriptions.expires_at = now() + subscription.duration_months
+businesses.subscription_id = selected subscription
+```
+
+Then `EnsureSubscriptionIsActive` middleware checks:
+
+```text
+Does this business have an active subscription that has not expired?
+```
+
+If yes, allow access.
+
+If no, redirect owner to subscription payment page.
+
+**Approval vs Payment**
+You need two gates:
+
+1. Business verification approval.
+2. Active paid subscription.
+
+Recommended access logic:
+
+```text
+Owner signs up
+    ↓
+Submits business verification
+    ↓
+Super admin approves business
+    ↓
+Owner selects subscription and pays
+    ↓
+Payment verified
+    ↓
+System modules unlock
+```
+
+Or if you want payment before approval:
+
+```text
+Owner signs up
+    ↓
+Submits verification
+    ↓
+Selects plan and pays
+    ↓
+Super admin approves business
+    ↓
+System modules unlock
+```
+
+I recommend approval first, payment second, because you avoid taking money from rejected businesses.
+
+**Middleware Logic**
+You already have:
+
+```text
+EnsureBusinessIsApproved
+EnsureSubscriptionIsActive
+```
+
+Use both for core modules:
+
+```php
+Route::middleware(['business.approved', 'subscription.active'])->group(function () {
+    // products, inventory, sales, reports, etc.
+});
+```
+
+Business Profile and Subscription Payment pages should remain accessible before subscription is active.
+
+**Webhook Logic**
+Webhook controller should:
+
+1. Receive gateway payload.
+2. Verify signature.
+3. Find local payment by `tx_ref`.
+4. Call gateway verify API again.
+5. Compare:
+   - amount
+   - currency
+   - tx_ref
+   - status
+6. If valid and not already completed:
+   - mark payment completed
+   - activate subscription
+   - notify owner
+   - audit log
+7. Return HTTP 200.
+
+This must be idempotent, meaning repeated webhook calls should not duplicate subscription periods or duplicate records.
+
+**Security Rules**
+Do not:
+- trust frontend payment success
+- store API secret in frontend
+- activate subscription from callback only
+- allow amount from browser without checking subscription price
+- process same webhook twice
+- skip signature verification
+
+Do:
+- generate `tx_ref` server-side
+- calculate amount from subscription table
+- verify payment server-side
+- store raw gateway response
+- compare amount/currency/status
+- make webhook idempotent
+- log all payment state changes
+
+**Admin Screens**
+Super admin should be able to view:
+
+```text
+All subscription payments
+Business
+Owner
+Plan
+Amount
+Gateway
+Status
+Transaction reference
+Paid date
+```
+
+Optional actions:
+- manually verify payment
+- mark suspicious
+- export payment report
+
+**Owner Screens**
+Owner should see:
+- current plan
+- expiry date
+- payment status
+- available plans
+- pay/renew button
+- payment history
+
+**Recommended Implementation Phases**
+Phase A: Database
+- Create `subscription_payments`
+- Create `business_subscriptions`
+- Add subscription date/status fields if needed
+- Add enums
+
+Phase B: Gateway Abstraction
+- Create `PaymentGatewayInterface`
+- Create `ChapaGateway`
+- Create placeholder `SantimPayGateway`
+- Add config values
+
+Phase C: Owner Payment Flow
+- Owner selects plan
+- System creates pending payment
+- Gateway checkout URL is returned
+- Owner redirects to gateway
+
+Phase D: Verification And Webhooks
+- Add Chapa callback
+- Add Chapa webhook
+- Verify payment using Chapa API
+- Mark payment completed
+- Activate subscription
+
+Phase E: Access Enforcement
+- Update `EnsureSubscriptionIsActive`
+- Protect core modules with both approval and subscription middleware
+
+Phase F: UI
+- Subscription page shows plans
+- Payment status page
+- Payment history
+- Renewal button
+- Admin payment monitoring page
+
+Phase G: Tests
+Test:
+- owner can start payment
+- amount comes from subscription, not request
+- pending payment is created
+- checkout URL redirects
+- webhook completes payment
+- duplicate webhook does not duplicate subscription
+- failed payment does not activate subscription
+- unpaid owner cannot access modules
+- paid owner can access modules
+
+**Best Choice**
+Use Chapa first.
+
+Reason:
+- It supports Ethiopian payment methods including Telebirr.
+- It has clear transaction initialization, verification, and webhook flow.
+- It is suitable for SaaS subscription payment collection.
+
+SantimPay can be added later using the same `PaymentGatewayInterface`, so the rest of BizTrack does not need to change.

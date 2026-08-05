@@ -2,109 +2,76 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseStatus;
+use App\Http\Requests\StoreExpenseRequest;
+use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
+use App\Services\ExpenseService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ExpenseController extends Controller
 {
+    public function __construct(private readonly ExpenseService $expenseService) {}
 
-    // Get all expenses
-    public function index()
+    public function index(Request $request): Response
     {
-        return response()->json(
-            Expense::with('category')->get()
-        );
-    }
+        $this->authorize('viewAny', Expense::class);
 
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
+        $filters = [
+            'search' => $request->string('search')->toString() ?: null,
+            'category_id' => $request->integer('category_id') ?: null,
+            'date_from' => $request->string('date_from')->toString() ?: null,
+            'date_to' => $request->string('date_to')->toString() ?: null,
+        ];
 
-    // Create expense
-    public function store(Request $request)
-    {
-        $request->validate([
-
-            'business_id' => 'required|exists:businesses,id',
-
-            'category_id' => 'required|exists:expense_categories,id',
-
-            'amount' => 'required|numeric|min:0',
-
-            'description' => 'nullable|string',
-
-            'date' => 'required|date',
-
-        ]);
-
-
-        $expense = Expense::create([
-
-            'business_id' => $request->business_id,
-
-            'category_id' => $request->category_id,
-
-            'amount' => $request->amount,
-
-            'description' => $request->description,
-
-            'date' => $request->date,
-
-        ]);
-
-
-        return response()->json([
-            'message' => 'Expense created successfully',
-            'expense' => $expense->load('category')
-        ], 201);
-    }
-
-
-
-    // Show one expense
-    public function show(Expense $expense)
-    {
-        return response()->json(
-            $expense->load('category')
-        );
-    }
-
-
-
-    // Update expense
-    public function update(Request $request, Expense $expense)
-    {
-
-        $request->validate([
-
-            'category_id' => 'exists:expense_categories,id',
-
-            'amount' => 'numeric|min:0',
-
-            'description' => 'nullable|string',
-
-            'date' => 'date',
-
-        ]);
-
-
-        $expense->update($request->all());
-
-
-        return response()->json([
-            'message' => 'Expense updated successfully',
-            'expense' => $expense
+        return Inertia::render('expenses/index', [
+            'expenses' => $business ? $this->expenseService->paginateForBusiness($business, $filters) : null,
+            'categories' => $business ? $this->expenseService->categoriesForBusiness($business) : [],
+            'statuses' => collect(ExpenseStatus::cases())->map(fn (ExpenseStatus $status): array => [
+                'value' => $status->value,
+                'label' => $status->label(),
+            ])->values(),
+            'total' => $business ? number_format($this->expenseService->totalForBusiness($business, $filters), 2) : '0.00',
+            'filters' => $filters,
         ]);
     }
 
-
-
-
-    // Delete expense
-    public function destroy(Expense $expense)
+    public function store(StoreExpenseRequest $request): RedirectResponse
     {
-        $expense->delete();
+        $this->authorize('create', Expense::class);
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
+        abort_unless($business, 403);
 
+        $expense = $this->expenseService->create($business, $request->user(), $request->validated());
 
-        return response()->json([
-            'message' => 'Expense deleted successfully'
-        ]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $expense->title.' expense recorded.']);
+
+        return back();
+    }
+
+    public function update(UpdateExpenseRequest $request, Expense $expense): RedirectResponse
+    {
+        $this->authorize('update', $expense);
+
+        $expense = $this->expenseService->update($expense, $request->validated());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $expense->title.' expense updated.']);
+
+        return back();
+    }
+
+    public function destroy(Request $request, Expense $expense): RedirectResponse
+    {
+        $this->authorize('delete', $expense);
+
+        $this->expenseService->delete($expense);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Expense deleted.']);
+
+        return back();
     }
 }

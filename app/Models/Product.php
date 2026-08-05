@@ -43,4 +43,9 @@ class Product extends Model
     {
         return $this->hasMany(InventoryTransaction::class);
     }
+
+    public function movementInsights(): HasMany
+    {
+        return $this->hasMany(ProductMovementInsight::class);
+    }
 }

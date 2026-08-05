@@ -22,7 +22,7 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $search = $request->string('search')->toString() ?: null;
 
         return Inertia::render('categories/index', [
@@ -37,7 +37,7 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
-        $business = $request->user()->ownedBusiness;
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
 
         if (! $business) {
             Inertia::flash('toast', [

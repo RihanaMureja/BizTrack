@@ -1,14 +1,20 @@
 import { Head } from '@inertiajs/react';
-import { Building2, ShieldCheck } from 'lucide-react';
 import { BusinessForm } from '@/components/forms/business-form';
+import { Building2, Clock3, Eye, ShieldCheck } from 'lucide-react';
 import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
 
 type Props = {
-    business: BusinessFormBusiness | null;
+    business: (BusinessFormBusiness & {
+        verification_documents?: Array<{ id: number; label: string; status: string; notes: string | null }>;
+        verification_reviews?: Array<{ id: number; decision: string; reason: string | null; reviewed_at: string; status_after: string }>;
+    }) | null;
     subscriptions: BusinessFormSubscription[];
 };
 
 export default function BusinessProfile({ business, subscriptions }: Props) {
+    const statusLabel = business?.status ? business.status.replace(/_/g, ' ') : 'not submitted';
+    const isActive = business?.status === 'active';
+
     return (
         <>
             <Head title="Business Profile" />
@@ -32,14 +38,61 @@ export default function BusinessProfile({ business, subscriptions }: Props) {
 
                     <aside className="h-fit rounded-md border bg-card p-5 shadow-sm">
                         <div className="flex items-center gap-2">
-                            <ShieldCheck className="size-5 text-primary" />
-                            <h2 className="font-semibold">Business access</h2>
+                            {isActive ? <ShieldCheck className="size-5 text-primary" /> : <Clock3 className="size-5 text-amber-600" />}
+                            <h2 className="font-semibold">Verification status</h2>
+                        </div>
+                        <div className="mt-4 inline-flex rounded-full border bg-background px-3 py-1 text-xs font-semibold capitalize text-foreground">
+                            {statusLabel}
                         </div>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                            This profile becomes the owner workspace for products, inventory, cashiers,
-                            customers, sales, expenses, and reports. Cashiers created later will inherit this
-                            business scope automatically.
+                            Submit your National ID, FAN number, trade license, and TIN certificate for review.
+                            VAT and rental documents are only required when they apply to your business.
                         </p>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                            Products, inventory, cashiers, customers, sales, expenses, and reports unlock after a
+                            super admin approves this business.
+                        </p>
+                        {business?.verification_documents && business.verification_documents.length > 0 && (
+                            <div className="mt-5 border-t pt-4">
+                                <h3 className="text-sm font-semibold">Submitted documents</h3>
+                                <div className="mt-3 grid gap-2">
+                                    {business.verification_documents.map((document) => (
+                                        <div key={document.id} className="rounded-md border bg-background px-3 py-2 text-xs">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium">{document.label}</span>
+                                                <span className="capitalize text-muted-foreground">{document.status.replace(/_/g, ' ')}</span>
+                                            </div>
+                                            {document.notes && <p className="mt-1 text-muted-foreground">{document.notes}</p>}
+                                            <a
+                                                href={`/business-verification-documents/${document.id}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="mt-2 inline-flex items-center gap-1 font-medium text-primary transition hover:text-primary/80"
+                                            >
+                                                <Eye className="size-3.5" />
+                                                Preview document
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {business?.verification_reviews && business.verification_reviews.length > 0 && (
+                            <div className="mt-5 border-t pt-4">
+                                <h3 className="text-sm font-semibold">Review history</h3>
+                                <div className="mt-3 grid gap-2">
+                                    {business.verification_reviews.map((review) => (
+                                        <div key={review.id} className="rounded-md border bg-background px-3 py-2 text-xs">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium capitalize">{review.decision.replace(/_/g, ' ')}</span>
+                                                <span className="text-muted-foreground">{new Date(review.reviewed_at).toLocaleDateString()}</span>
+                                            </div>
+                                            {review.reason && <p className="mt-1 text-muted-foreground">{review.reason}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </aside>
                 </div>
             </div>

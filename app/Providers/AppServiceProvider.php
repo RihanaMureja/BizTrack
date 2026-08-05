@@ -4,16 +4,25 @@ namespace App\Providers;
 
 use App\Events\BusinessRegistered;
 use App\Events\InventoryLow;
+use App\Events\PaymentCompleted;
 use App\Events\SaleCompleted;
 use App\Listeners\CalculateRevenue;
 use App\Listeners\CreateAuditLog;
 use App\Listeners\GenerateReceipt;
-use App\Listeners\SendBusinessApprovedNotification;
 use App\Listeners\SendLowStockNotification;
+use App\Listeners\SendPaymentNotification;
 use App\Listeners\UpdateInventory;
+use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Expense;
+use App\Models\Sale;
+use App\Observers\ExpenseObserver;
+use App\Observers\PaymentObserver;
 use App\Observers\ProductObserver;
+use App\Observers\SaleObserver;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -41,10 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerEvents(): void
     {
-        Event::listen(
-            BusinessRegistered::class,
-            SendBusinessApprovedNotification::class,
-        );
+        Event::listen(BusinessRegistered::class, CreateAuditLog::class);
 
         Event::listen(
             InventoryLow::class,
@@ -55,8 +61,14 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(SaleCompleted::class, GenerateReceipt::class);
         Event::listen(SaleCompleted::class, CalculateRevenue::class);
         Event::listen(SaleCompleted::class, CreateAuditLog::class);
+        Event::listen(PaymentCompleted::class, SendPaymentNotification::class);
 
         Product::observe(ProductObserver::class);
+        Payment::observe(PaymentObserver::class);
+        Expense::observe(ExpenseObserver::class);
+        Sale::observe(SaleObserver::class);
+        Event::listen(Login::class, CreateAuditLog::class);
+        Event::listen(Logout::class, CreateAuditLog::class);
     }
 
     /**
@@ -70,14 +82,13 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
+        Password::defaults(fn (): Password => tap(
+            Password::min(12)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
-        );
+                ->symbols(),
+            fn (Password $password) => app()->isProduction() ? $password->uncompromised() : null,
+        ));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\BusinessPermissionKey;
 use App\Enums\RecordStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -10,7 +11,7 @@ class ProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isOwner() ?? false;
+        return $this->user()?->hasBusinessPermission(BusinessPermissionKey::ManageProducts) ?? false;
     }
 
     /**
@@ -18,7 +19,7 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $business = $this->user()?->ownedBusiness;
+        $businessId = $this->user()?->ownedBusiness?->id ?? $this->user()?->business_id;
         $product = $this->route('product');
 
         return [
@@ -26,7 +27,7 @@ class ProductRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::exists('categories', 'id')
-                    ->where(fn ($query) => $query->where('business_id', $business?->id)),
+                    ->where(fn ($query) => $query->where('business_id', $businessId)),
             ],
             'name' => ['required', 'string', 'max:150'],
             'barcode' => [
@@ -34,7 +35,7 @@ class ProductRequest extends FormRequest
                 'string',
                 'max:100',
                 Rule::unique('products', 'barcode')
-                    ->where(fn ($query) => $query->where('business_id', $business?->id))
+                    ->where(fn ($query) => $query->where('business_id', $businessId))
                     ->ignore($product),
             ],
             'description' => ['nullable', 'string', 'max:1000'],

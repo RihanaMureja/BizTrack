@@ -3,18 +3,24 @@
 namespace App\Services;
 
 use App\Enums\Role;
+use App\Enums\BusinessPermissionKey;
 use App\Models\Business;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Expense;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardService
 {
-    public function __construct(private readonly RevenueService $revenueService) {}
+    public function __construct(
+        private readonly RevenueService $revenueService,
+        private readonly ProductInsightService $productInsightService,
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -39,13 +45,14 @@ class DashboardService
             'role' => Role::Owner->value,
             'business' => $business,
             'stats' => [
-                ['label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Sales module pending'],
-                ['label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'Ready after POS phase'],
-                ['label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Catalog coverage'],
-                ['label' => 'Customers', 'value' => (string) $this->businessCount(Customer::class, $business), 'trend' => 'Customer base'],
+                ['label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Completed sales'],
+                ['label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'POS activity'],
+                ['label' => 'Expenses today', 'value' => $this->money($this->revenueService->todayExpenses($business)), 'trend' => 'Recorded costs'],
+                ['label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Active catalog items'],
             ],
             'chart' => $this->emptySeries(),
             'lowStock' => $this->lowStock($business),
+            'stagnantProducts' => $this->productInsightService->previewForBusiness($business),
             'topProducts' => [],
             'nextSteps' => [
                 'Complete product categories',
@@ -60,18 +67,31 @@ class DashboardService
      */
     private function cashierDashboard(User $user): array
     {
+        if (! $user->hasBusinessPermission(BusinessPermissionKey::ViewDashboard)) {
+            return [
+                'role' => Role::Cashier->value,
+                'business' => $user->business,
+                'stats' => [],
+                'chart' => $this->emptySeries(),
+                'queue' => [
+                    'Use the sidebar to open the modules your business owner assigned to you.',
+                    'Ask the owner for dashboard access if you need daily business summaries.',
+                ],
+            ];
+        }
+
         return [
             'role' => Role::Cashier->value,
             'business' => $user->business,
             'stats' => [
-                ['label' => 'Today sales', 'value' => '0', 'trend' => 'POS module pending'],
-                ['label' => 'Transactions', 'value' => '0', 'trend' => 'No transactions yet'],
+                ['label' => 'Today sales', 'value' => (string) $this->todaySalesCount($user->business), 'trend' => 'POS activity'],
+                ['label' => 'Transactions', 'value' => (string) $this->todaySalesCount($user->business), 'trend' => 'Completed today'],
                 ['label' => 'Customers', 'value' => (string) $this->businessCount(Customer::class, $user->business), 'trend' => 'Available customers'],
-                ['label' => 'Receipts', 'value' => '0', 'trend' => 'Receipt module pending'],
+                ['label' => 'Receipts', 'value' => (string) $this->todaySalesCount($user->business), 'trend' => 'Ready to view'],
             ],
             'chart' => $this->emptySeries(),
             'queue' => [
-                'Open POS when sales module is available',
+                'Open POS for the next customer',
                 'Register walk-in customers',
                 'Review pending payments',
             ],
@@ -89,7 +109,7 @@ class DashboardService
                 ['label' => 'Businesses', 'value' => (string) Business::count(), 'trend' => 'Registered workspaces'],
                 ['label' => 'Users', 'value' => (string) User::count(), 'trend' => 'Platform accounts'],
                 ['label' => 'Subscriptions', 'value' => (string) Subscription::count(), 'trend' => 'Available plans'],
-                ['label' => 'Revenue', 'value' => $this->money(0), 'trend' => 'Payments module pending'],
+                ['label' => 'Sales', 'value' => (string) Sale::count(), 'trend' => 'Recorded transactions'],
             ],
             'chart' => $this->emptySeries(),
             'recentBusinesses' => Business::query()
@@ -114,7 +134,10 @@ class DashboardService
             return 0;
         }
 
-        return 0;
+        return Sale::query()
+            ->where('business_id', $business->id)
+            ->whereDate('sold_at', today())
+            ->count();
     }
 
     /**

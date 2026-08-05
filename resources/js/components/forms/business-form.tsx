@@ -22,6 +22,15 @@ export type BusinessFormBusiness = {
     email?: string | null;
     phone?: string | null;
     address?: string | null;
+    status?: string;
+    national_id_fan_number?: string | null;
+    national_id_photo_path?: string | null;
+    trade_license_path?: string | null;
+    tin_certificate_path?: string | null;
+    is_vat_registered?: boolean;
+    vat_certificate_path?: string | null;
+    has_physical_shop?: boolean;
+    rental_agreement_path?: string | null;
 };
 
 export type BusinessFormSubscription = {
@@ -46,6 +55,14 @@ export function BusinessForm({ business, subscriptions }: Props) {
         email: business?.email ?? '',
         phone: business?.phone ?? '',
         address: business?.address ?? '',
+        national_id_fan_number: business?.national_id_fan_number ?? '',
+        national_id_photo: null as File | null,
+        trade_license: null as File | null,
+        tin_certificate: null as File | null,
+        is_vat_registered: business?.is_vat_registered ?? false,
+        vat_certificate: null as File | null,
+        has_physical_shop: business?.has_physical_shop ?? false,
+        rental_agreement: null as File | null,
         logo: null as File | null,
         _method: business?.id ? 'put' : 'post',
     });
@@ -143,10 +160,133 @@ export function BusinessForm({ business, subscriptions }: Props) {
                 <InputError message={form.errors.logo} />
             </div>
 
+            <div className="rounded-md border bg-background p-4">
+                <h2 className="font-semibold">Owner verification</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    These documents are required before BizTrack unlocks products, inventory, sales, and reports.
+                </p>
+
+                <div className="mt-4 grid gap-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="national_id_fan_number">National ID FAN number</Label>
+                        <Input
+                            id="national_id_fan_number"
+                            value={form.data.national_id_fan_number}
+                            onChange={(event) => form.setData('national_id_fan_number', event.target.value)}
+                            required
+                        />
+                        <InputError message={form.errors.national_id_fan_number} />
+                    </div>
+
+                    <DocumentInput
+                        id="national_id_photo"
+                        label="National ID photo"
+                        existing={business?.national_id_photo_path}
+                        required={!business?.national_id_photo_path}
+                        error={form.errors.national_id_photo}
+                        onChange={(file) => form.setData('national_id_photo', file)}
+                    />
+
+                    <DocumentInput
+                        id="trade_license"
+                        label="Business license / trade license"
+                        existing={business?.trade_license_path}
+                        required={!business?.trade_license_path}
+                        error={form.errors.trade_license}
+                        onChange={(file) => form.setData('trade_license', file)}
+                    />
+
+                    <DocumentInput
+                        id="tin_certificate"
+                        label="Tax certificate / TIN"
+                        existing={business?.tin_certificate_path}
+                        required={!business?.tin_certificate_path}
+                        error={form.errors.tin_certificate}
+                        onChange={(file) => form.setData('tin_certificate', file)}
+                    />
+                </div>
+            </div>
+
+            <div className="rounded-md border bg-background p-4">
+                <h2 className="font-semibold">Conditional documents</h2>
+                <div className="mt-4 grid gap-4">
+                    <label className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
+                        <span>VAT registered business</span>
+                        <input
+                            type="checkbox"
+                            checked={form.data.is_vat_registered}
+                            onChange={(event) => form.setData('is_vat_registered', event.target.checked)}
+                            className="size-4 accent-primary"
+                        />
+                    </label>
+                    {form.data.is_vat_registered && (
+                        <DocumentInput
+                            id="vat_certificate"
+                            label="VAT certificate"
+                            existing={business?.vat_certificate_path}
+                            required={!business?.vat_certificate_path}
+                            error={form.errors.vat_certificate}
+                            onChange={(file) => form.setData('vat_certificate', file)}
+                        />
+                    )}
+
+                    <label className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
+                        <span>Business has a physical shop</span>
+                        <input
+                            type="checkbox"
+                            checked={form.data.has_physical_shop}
+                            onChange={(event) => form.setData('has_physical_shop', event.target.checked)}
+                            className="size-4 accent-primary"
+                        />
+                    </label>
+                    {form.data.has_physical_shop && (
+                        <DocumentInput
+                            id="rental_agreement"
+                            label="Rental agreement / shop ownership proof"
+                            existing={business?.rental_agreement_path}
+                            required={!business?.rental_agreement_path}
+                            error={form.errors.rental_agreement}
+                            onChange={(file) => form.setData('rental_agreement', file)}
+                        />
+                    )}
+                </div>
+            </div>
+
             <Button type="submit" className="w-fit" disabled={form.processing}>
                 {form.processing ? <Spinner /> : <Save className="size-4" />}
                 Save business
             </Button>
         </form>
+    );
+}
+
+function DocumentInput({
+    id,
+    label,
+    existing,
+    required,
+    error,
+    onChange,
+}: {
+    id: string;
+    label: string;
+    existing?: string | null;
+    required?: boolean;
+    error?: string;
+    onChange: (file: File | null) => void;
+}) {
+    return (
+        <div className="grid gap-2">
+            <Label htmlFor={id}>{label}</Label>
+            {existing && <p className="text-xs text-muted-foreground">Uploaded document on file. Upload a new file only if you need to replace it.</p>}
+            <Input
+                id={id}
+                type="file"
+                accept=".jpg,.jpeg,.png,.pdf"
+                required={required}
+                onChange={(event) => onChange(event.target.files?.[0] ?? null)}
+            />
+            <InputError message={error} />
+        </div>
     );
 }

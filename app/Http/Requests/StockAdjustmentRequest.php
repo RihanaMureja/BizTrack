@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\BusinessPermissionKey;
 use App\Enums\InventoryTransactionType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -10,7 +11,7 @@ class StockAdjustmentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isOwner() ?? false;
+        return $this->user()?->hasBusinessPermission(BusinessPermissionKey::ManageInventory) ?? false;
     }
 
     /**

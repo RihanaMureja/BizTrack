@@ -3,6 +3,7 @@
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\Business;
+use App\Models\BusinessRole;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
@@ -33,8 +34,8 @@ function validCashierPayload(array $overrides = []): array
         'email' => 'liya.cashier@biztrack.test',
         'phone' => '0911555666',
         'status' => RecordStatus::Active->value,
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'StrongTemp#123',
+        'password_confirmation' => 'StrongTemp#123',
         ...$overrides,
     ];
 }
@@ -83,7 +84,9 @@ test('owner can create cashier and role is assigned', function () {
 
     expect($cashier->business_id)->toBe($business->id)
         ->and($cashier->role)->toBe(Role::Cashier)
-        ->and($cashier->status)->toBe(RecordStatus::Active);
+        ->and($cashier->status)->toBe(RecordStatus::Active)
+        ->and($cashier->must_reset_password)->toBeTrue()
+        ->and($cashier->temporary_password_expires_at)->not->toBeNull();
 
     Event::assertDispatched(CashierCreated::class);
 });
@@ -117,6 +120,34 @@ test('owner can update their cashier', function () {
         ->assertRedirect();
 
     expect($cashier->refresh()->name)->toBe('Updated Cashier');
+});
+
+test('owner can change an existing employee custom role', function () {
+    [$owner, $business] = cashierOwnerWithBusiness();
+    $oldRole = BusinessRole::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Cashier',
+    ]);
+    $newRole = BusinessRole::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Inventory Tracker',
+    ]);
+    $cashier = User::factory()->create([
+        'business_id' => $business->id,
+        'business_role_id' => $oldRole->id,
+        'role' => Role::Cashier,
+    ]);
+
+    $this->actingAs($owner)
+        ->put(route('cashiers.update', $cashier), validCashierPayload([
+            'email' => $cashier->email,
+            'business_role_id' => $newRole->id,
+            'password' => null,
+            'password_confirmation' => null,
+        ]))
+        ->assertRedirect();
+
+    expect($cashier->refresh()->business_role_id)->toBe($newRole->id);
 });
 
 test('owner cannot update another business cashier', function () {
@@ -192,10 +223,11 @@ test('cashier navigation stays restricted', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->where('navigation.0.title', 'Dashboard')
-            ->where('navigation.1.title', 'Sales')
-            ->where('navigation.2.title', 'Customers')
+            ->where('navigation.1.title', 'Customers')
+            ->where('navigation.2.title', 'Sales')
             ->where('navigation.3.title', 'Payments')
-            ->where('navigation.4.title', 'Profile')
-            ->missing('navigation.5.title')
+            ->where('navigation.4.title', 'Notifications')
+            ->where('navigation.5.title', 'Profile')
+            ->missing('navigation.6.title')
         );
 });

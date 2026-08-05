@@ -1,0 +1,1 @@
+Bug no1: Reviewing documents -> Uploads folder inside the project folder.

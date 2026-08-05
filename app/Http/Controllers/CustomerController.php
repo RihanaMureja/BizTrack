@@ -40,8 +40,12 @@ class CustomerController extends Controller
         $this->authorize('view', $customer);
 
         return Inertia::render('customers/show', [
-            'customer' => $customer,
-            'purchaseHistory' => [],
+            'customer' => $customer->load(['credits.sale']),
+            'purchaseHistory' => $customer->credits()
+                ->with('sale')
+                ->latest()
+                ->take(10)
+                ->get(),
         ]);
     }
 

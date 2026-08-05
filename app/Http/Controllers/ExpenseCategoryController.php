@@ -2,76 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreExpenseCategoryRequest;
 use App\Models\ExpenseCategory;
+use App\Services\ExpenseService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ExpenseCategoryController extends Controller
 {
-    // Get all expense categories
-    public function index()
+    public function __construct(private readonly ExpenseService $expenseService) {}
+
+    public function store(StoreExpenseCategoryRequest $request): RedirectResponse
     {
-        return response()->json(
-            ExpenseCategory::all()
-        );
+        $business = $request->user()->ownedBusiness ?? $request->user()->business;
+        abort_unless($business, 403);
+
+        $category = $this->expenseService->createCategory($business, $request->validated());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $category->name.' expense category created.']);
+
+        return back();
     }
 
-
-    // Create expense category
-    public function store(Request $request)
+    public function update(StoreExpenseCategoryRequest $request, ExpenseCategory $expenseCategory): RedirectResponse
     {
-        $request->validate([
-            'business_id' => 'required|exists:businesses,id',
-            'name' => 'required|string|max:255',
-        ]);
+        $businessId = $request->user()->ownedBusiness?->id ?? $request->user()->business_id;
+        abort_unless($expenseCategory->business_id === $businessId, 403);
 
+        $category = $this->expenseService->updateCategory($expenseCategory, $request->validated());
 
-        $category = ExpenseCategory::create([
-            'business_id' => $request->business_id,
-            'name' => $request->name,
-        ]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $category->name.' expense category updated.']);
 
-
-        return response()->json([
-            'message' => 'Expense category created successfully',
-            'category' => $category
-        ], 201);
+        return back();
     }
 
-
-    // Show one category
-    public function show(ExpenseCategory $expenseCategory)
+    public function destroy(Request $request, ExpenseCategory $expenseCategory): RedirectResponse
     {
-        return response()->json($expenseCategory);
+        $businessId = $request->user()->ownedBusiness?->id ?? $request->user()->business_id;
+        abort_unless($expenseCategory->business_id === $businessId, 403);
+
+        $this->expenseService->deleteCategory($expenseCategory);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Expense category deleted.']);
+
+        return back();
     }
-
-
-    // Update category
-    public function update(Request $request, ExpenseCategory $expenseCategory)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-
-        $expenseCategory->update([
-            'name' => $request->name
-        ]);
-
-
-        return response()->json([
-            'message' => 'Expense category updated successfully',
-            'category' => $expenseCategory
-        ]);
-    }
-
-
-   // Delete category
-public function destroy(ExpenseCategory $expenseCategory)
-{
-    $expenseCategory->delete();
-
-    return response()->json([
-        'message' => 'Expense category deleted successfully'
-    ]);
-}
 }

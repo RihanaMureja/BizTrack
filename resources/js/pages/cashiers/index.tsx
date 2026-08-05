@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 type Cashier = {
     id: number;
+    business_role_id: number | null;
     first_name: string | null;
     last_name: string | null;
     name: string;
@@ -22,7 +23,9 @@ type Cashier = {
     phone: string | null;
     status: 'active' | 'inactive';
     created_at: string;
+    business_role: { id: number; name: string } | null;
 };
+type BusinessRole = { id: number; name: string; is_default: boolean };
 
 type Paginated<T> = {
     data: T[];
@@ -36,9 +39,11 @@ type Props = {
     cashiers: Paginated<Cashier> | null;
     filters: { search: string | null };
     cashierLimit: number;
+    passwordRules: string;
+    businessRoles: BusinessRole[];
 };
 
-export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props) {
+export default function CashiersIndex({ cashiers, filters, cashierLimit, passwordRules, businessRoles }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingCashier, setEditingCashier] = useState<Cashier | null>(null);
     const [deletingCashier, setDeletingCashier] = useState<Cashier | null>(null);
@@ -71,11 +76,12 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
     const columns: DataTableColumn<Cashier>[] = [
         {
             key: 'name',
-            header: 'Cashier',
+            header: 'Employee',
             render: (cashier) => (
                 <div>
                     <p className="font-medium">{cashier.name}</p>
                     <p className="text-xs text-muted-foreground">{cashier.email} | {cashier.phone || 'No phone'}</p>
+                    <p className="text-xs text-muted-foreground">{cashier.business_role?.name ?? 'Default role'}</p>
                 </div>
             ),
         },
@@ -109,7 +115,7 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
 
     return (
         <>
-            <Head title="Cashiers" />
+            <Head title="Employees" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -117,14 +123,14 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
                             <UserRoundCog className="size-5" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-semibold">Cashiers</h1>
-                            <p className="text-sm text-muted-foreground">Manage cashier accounts, access, and temporary password resets.</p>
+                            <h1 className="text-xl font-semibold">Employees</h1>
+                            <p className="text-sm text-muted-foreground">Manage employee accounts, access roles, status, and temporary password resets.</p>
                         </div>
                     </div>
                     {cashiers && (
                         <Button type="button" onClick={() => setCreateOpen(true)} disabled={cashierLimit > 0 && cashiers.total >= cashierLimit}>
                             <Plus className="size-4" />
-                            New cashier
+                            New employee
                         </Button>
                     )}
                 </div>
@@ -132,8 +138,8 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
                 {cashiers && cashierLimit > 0 && cashiers.total >= cashierLimit && (
                     <Alert>
                         <AlertTriangle />
-                        <AlertTitle>Cashier limit reached</AlertTitle>
-                        <AlertDescription>Your current subscription allows {cashierLimit} cashier account(s).</AlertDescription>
+                        <AlertTitle>Employee limit reached</AlertTitle>
+                        <AlertDescription>Your current subscription allows {cashierLimit} employee account(s).</AlertDescription>
                     </Alert>
                 )}
 
@@ -141,12 +147,12 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
                     <Alert variant="destructive">
                         <AlertTriangle />
                         <AlertTitle>Business profile required</AlertTitle>
-                        <AlertDescription>Create your business profile before adding cashiers.</AlertDescription>
+                        <AlertDescription>Create your business profile before adding employees.</AlertDescription>
                     </Alert>
                 ) : (
                     <div className="flex flex-col gap-4">
-                        <SearchBox defaultValue={filters.search ?? ''} placeholder="Search cashiers..." onSearch={handleSearch} />
-                        <DataTable columns={columns} data={cashiers.data} rowKey={(cashier) => cashier.id} emptyMessage="No cashiers yet. Create one before the POS rollout." />
+                        <SearchBox defaultValue={filters.search ?? ''} placeholder="Search employees..." onSearch={handleSearch} />
+                        <DataTable columns={columns} data={cashiers.data} rowKey={(cashier) => cashier.id} emptyMessage="No employees yet. Create one before assigning operational access." />
                         <Pagination links={cashiers.links} from={cashiers.from} to={cashiers.to} total={cashiers.total} />
                     </div>
                 )}
@@ -154,22 +160,22 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
 
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogContent className="max-w-2xl">
-                    <DialogHeader><DialogTitle>New cashier</DialogTitle></DialogHeader>
-                    <CashierForm cashier={null} onSuccess={() => setCreateOpen(false)} />
+                    <DialogHeader><DialogTitle>New employee</DialogTitle></DialogHeader>
+                    <CashierForm cashier={null} onSuccess={() => setCreateOpen(false)} passwordRules={passwordRules} businessRoles={businessRoles} />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={Boolean(editingCashier)} onOpenChange={(open) => !open && setEditingCashier(null)}>
                 <DialogContent className="max-w-2xl">
-                    <DialogHeader><DialogTitle>Edit cashier</DialogTitle></DialogHeader>
-                    <CashierForm cashier={editingCashier} onSuccess={() => setEditingCashier(null)} />
+                    <DialogHeader><DialogTitle>Edit employee</DialogTitle></DialogHeader>
+                    <CashierForm cashier={editingCashier} onSuccess={() => setEditingCashier(null)} passwordRules={passwordRules} businessRoles={businessRoles} />
                 </DialogContent>
             </Dialog>
 
             <DeleteDialog
                 open={Boolean(deletingCashier)}
                 onOpenChange={(open) => !open && setDeletingCashier(null)}
-                itemLabel={deletingCashier?.name ?? 'this cashier'}
+                itemLabel={deletingCashier?.name ?? 'this employee'}
                 onConfirm={confirmDelete}
                 processing={processingId === deletingCashier?.id}
             />
@@ -180,6 +186,6 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit }: Props
 CashiersIndex.layout = {
     breadcrumbs: [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Cashiers', href: '/cashiers' },
+        { title: 'Employees', href: '/cashiers' },
     ],
 };

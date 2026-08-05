@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\BusinessPermissionKey;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RestockRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isOwner() ?? false;
+        return $this->user()?->hasBusinessPermission(BusinessPermissionKey::ManageInventory) ?? false;
     }
 
     /**

@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         Business::query()->each(function (Business $business): void {
             $email = $business->id === 1
                 ? 'cashier@biztrack.test'
-                : 'cashier'.$business->id.'@biztrack.test';
+                : 'cashier' . $business->id . '@biztrack.test';
 
             User::updateOrCreate(
                 ['email' => $email],
