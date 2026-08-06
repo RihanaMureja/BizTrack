@@ -13,6 +13,7 @@ type Props<T> = {
     data: T[];
     rowKey: (row: T) => string | number;
     emptyMessage?: string;
+    rowClassName?: (row: T) => string;
 };
 
 export function DataTable<T extends Record<string, unknown>>({
@@ -20,6 +21,7 @@ export function DataTable<T extends Record<string, unknown>>({
     data,
     rowKey,
     emptyMessage = 'No records found.',
+    rowClassName,
 }: Props<T>) {
     return (
         <div className="overflow-hidden rounded-md border">
@@ -42,7 +44,7 @@ export function DataTable<T extends Record<string, unknown>>({
                         </tr>
                     ) : (
                         data.map((row) => (
-                            <tr key={rowKey(row)} className="hover:bg-muted/30">
+                            <tr key={rowKey(row)} className={cn('hover:bg-muted/30', rowClassName?.(row))}>
                                 {columns.map((column) => (
                                     <td key={column.key} className={cn('px-4 py-3 align-middle', column.className)}>
                                         {column.render ? column.render(row) : String(row[column.key] ?? '')}

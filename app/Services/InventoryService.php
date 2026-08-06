@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\ExpenseStatus;
 use App\Enums\InventoryTransactionType;
 use App\Events\InventoryLow;
 use App\Models\Business;
+use App\Models\ExpenseCategory;
 use App\Models\Inventory;
 use App\Models\InventoryTransaction;
 use App\Models\User;
@@ -14,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class InventoryService
 {
+    public function __construct(private readonly ExpenseService $expenseService) {}
+
     public function paginateForBusiness(Business $business, ?string $search = null, ?string $status = null, int $perPage = 10): LengthAwarePaginator
     {
         return Inventory::query()
@@ -24,12 +28,12 @@ class InventoryService
                     ->when($search, function ($query) use ($search): void {
                         $query->where(function ($query) use ($search): void {
                             $query
-                                ->where('name', 'like', '%'.$search.'%')
-                                ->orWhere('barcode', 'like', '%'.$search.'%');
+                                ->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('barcode', 'like', '%' . $search . '%');
                         });
                     })
-                    ->when($status === 'low', fn ($query) => $query->whereColumn('products.reorder_level', '>=', 'inventory.available_stock'))
-                    ->when($status === 'out', fn ($query) => $query->where('inventory.available_stock', '<=', 0));
+                    ->when($status === 'low', fn($query) => $query->whereColumn('products.reorder_level', '>=', 'inventory.available_stock'))
+                    ->when($status === 'out', fn($query) => $query->where('inventory.available_stock', '<=', 0));
             })
             ->orderBy('available_stock')
             ->paginate($perPage)
@@ -74,7 +78,26 @@ class InventoryService
                 ]);
             }
 
-            return $this->record($locked, $type, $delta, $before, $after, $notes, $user);
+            $transaction = $this->record($locked, $type, $delta, $before, $after, $notes, $user);
+
+            if ($type === InventoryTransactionType::Restock && $delta > 0) {
+                $product = $locked->product;
+                $category = ExpenseCategory::query()->firstOrCreate(
+                    ['business_id' => $product->business_id, 'name' => 'Inventory Restocking'],
+                    ['description' => 'Automatically generated from stock restocks.'],
+                );
+
+                $this->expenseService->create($product->business, $user, [
+                    'expense_category_id' => $category->id,
+                    'title' => 'Restock: ' . $product->name . ' (+' . $delta . ')',
+                    'amount' => (float) $product->buy_price * $delta,
+                    'expense_date' => today()->toDateString(),
+                    'status' => ExpenseStatus::Approved,
+                    'notes' => 'Auto-generated from stock restock on ' . $product->name . '.',
+                ]);
+            }
+
+            return $transaction;
         });
     }
 

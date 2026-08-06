@@ -29,6 +29,8 @@ class PreferencesUpdateRequest extends FormRequest
             'stagnant_product_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
             'stagnant_product_minimum_stock' => ['sometimes', 'integer', 'min:0', 'max:999999'],
             'stagnant_product_notification_frequency' => ['sometimes', 'integer', 'min:1', 'max:90'],
+            'expiry_alert_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
+            'expiry_notification_frequency' => ['sometimes', 'integer', 'min:1', 'max:90'],
             'compact_sidebar' => ['boolean'],
         ];
     }

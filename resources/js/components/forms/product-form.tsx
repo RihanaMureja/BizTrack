@@ -22,6 +22,7 @@ export type ProductFormProduct = {
     selling_price?: string | number;
     unit?: string | null;
     reorder_level?: number;
+    expire_date?: string | null;
     status?: string;
 };
 
@@ -43,6 +44,7 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
         selling_price: String(product?.selling_price ?? ''),
         unit: product?.unit ?? '',
         reorder_level: String(product?.reorder_level ?? 0),
+        expire_date: product?.expire_date ?? '',
         status: product?.status ?? 'active',
     });
 
@@ -57,7 +59,10 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
             },
         };
 
-        form.transform((data) => ({ ...data, category_id: data.category_id || null }));
+        form.transform((data) => ({
+            ...data,
+            category_id: data.category_id || null,
+        }));
 
         if (isEditing && product?.id) {
             form.put(`/products/${product.id}`, options);
@@ -74,7 +79,9 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <Input
                         id="name"
                         value={form.data.name}
-                        onChange={(event) => form.setData('name', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('name', event.target.value)
+                        }
                         required
                         autoFocus
                     />
@@ -86,8 +93,10 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <select
                         id="category_id"
                         value={form.data.category_id}
-                        onChange={(event) => form.setData('category_id', event.target.value)}
-                        className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        onChange={(event) =>
+                            form.setData('category_id', event.target.value)
+                        }
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs ring-offset-background transition outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                         <option value="">Uncategorized</option>
                         {categories.map((category) => (
@@ -104,7 +113,9 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <Input
                         id="barcode"
                         value={form.data.barcode}
-                        onChange={(event) => form.setData('barcode', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('barcode', event.target.value)
+                        }
                         placeholder="Optional"
                     />
                     <InputError message={form.errors.barcode} />
@@ -118,7 +129,9 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                         min="0"
                         step="0.01"
                         value={form.data.buy_price}
-                        onChange={(event) => form.setData('buy_price', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('buy_price', event.target.value)
+                        }
                         required
                     />
                     <InputError message={form.errors.buy_price} />
@@ -132,7 +145,9 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                         min="0"
                         step="0.01"
                         value={form.data.selling_price}
-                        onChange={(event) => form.setData('selling_price', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('selling_price', event.target.value)
+                        }
                         required
                     />
                     <InputError message={form.errors.selling_price} />
@@ -143,7 +158,9 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <Input
                         id="unit"
                         value={form.data.unit}
-                        onChange={(event) => form.setData('unit', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('unit', event.target.value)
+                        }
                         placeholder="pcs, box, kg"
                     />
                     <InputError message={form.errors.unit} />
@@ -156,10 +173,25 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                         type="number"
                         min="0"
                         value={form.data.reorder_level}
-                        onChange={(event) => form.setData('reorder_level', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('reorder_level', event.target.value)
+                        }
                         required
                     />
                     <InputError message={form.errors.reorder_level} />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="expire_date">Expiry date</Label>
+                    <Input
+                        id="expire_date"
+                        type="date"
+                        value={form.data.expire_date}
+                        onChange={(event) =>
+                            form.setData('expire_date', event.target.value)
+                        }
+                    />
+                    <InputError message={form.errors.expire_date} />
                 </div>
 
                 <div className="grid gap-2 md:col-span-2">
@@ -167,8 +199,10 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <select
                         id="status"
                         value={form.data.status}
-                        onChange={(event) => form.setData('status', event.target.value)}
-                        className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        onChange={(event) =>
+                            form.setData('status', event.target.value)
+                        }
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs ring-offset-background transition outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -181,7 +215,9 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                     <Input
                         id="description"
                         value={form.data.description}
-                        onChange={(event) => form.setData('description', event.target.value)}
+                        onChange={(event) =>
+                            form.setData('description', event.target.value)
+                        }
                         placeholder="Optional"
                     />
                     <InputError message={form.errors.description} />

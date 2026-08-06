@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\DateHelper;
 use App\Helpers\ReportHelper;
 use App\Http\Requests\GenerateReportRequest;
+use App\Models\Product;
 use App\Models\Report;
 use App\Services\ReportService;
 use Illuminate\Http\RedirectResponse;
@@ -22,13 +23,17 @@ class ReportController extends Controller
 
         $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $type = $request->string('type')->toString() ?: 'profit';
+        $productId = $request->integer('product_id') ?: null;
         [$from, $to] = DateHelper::range(
             $request->string('date_from')->toString() ?: null,
             $request->string('date_to')->toString() ?: null,
         );
         $data = $business
-            ? $this->reportService->data($business, $type, $from, $to)
+            ? $this->reportService->data($business, $type, $from, $to, ['product_id' => $productId])
             : ['summary' => [], 'chart' => [], 'rows' => []];
+        $products = $business
+            ? Product::query()->where('business_id', $business->id)->select('id', 'name')->orderBy('name')->get()
+            : collect();
 
         return Inertia::render('reports/index', [
             'report' => [
@@ -41,6 +46,7 @@ class ReportController extends Controller
                 'chart' => $data['chart'],
                 'rows' => $data['rows'],
                 'topProducts' => $data['topProducts'] ?? [],
+                'product' => $data['product'] ?? null,
             ],
             'recentReports' => $business ? $this->reportService->latestForBusiness($business) : [],
             'types' => [
@@ -49,12 +55,15 @@ class ReportController extends Controller
                 ['value' => 'profit', 'label' => 'Profit'],
                 ['value' => 'inventory', 'label' => 'Inventory'],
                 ['value' => 'tax', 'label' => 'Tax'],
+                ['value' => 'products', 'label' => 'Products'],
             ],
             'filters' => [
                 'type' => $type,
                 'date_from' => $from->toDateString(),
                 'date_to' => $to->toDateString(),
+                'product_id' => $productId,
             ],
+            'products' => $products->map(fn(Product $product) => ['id' => $product->id, 'name' => $product->name])->values(),
         ]);
     }
 
@@ -70,6 +79,7 @@ class ReportController extends Controller
             'type' => $report->type,
             'date_from' => $report->date_from?->toDateString(),
             'date_to' => $report->date_to?->toDateString(),
-        ])->with('success', $report->title.' generated.');
+            'product_id' => $request->validated('product_id'),
+        ])->with('success', $report->title . ' generated.');
     }
 }

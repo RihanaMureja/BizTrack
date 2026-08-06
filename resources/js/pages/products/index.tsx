@@ -1,5 +1,12 @@
 import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, Boxes, Pencil, Plus, Power, ScanBarcode } from 'lucide-react';
+import {
+    AlertTriangle,
+    Boxes,
+    Pencil,
+    Plus,
+    Power,
+    ScanBarcode,
+} from 'lucide-react';
 import { useState } from 'react';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
@@ -12,7 +19,12 @@ import { SearchBox } from '@/components/search-box/search-box';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 type Category = {
     id: number;
@@ -29,6 +41,7 @@ type Product = {
     selling_price: string;
     unit: string | null;
     reorder_level: number;
+    expire_date: string | null;
     status: string;
     category: Category | null;
     inventory: {
@@ -56,10 +69,46 @@ type Props = {
     statuses: Array<{ value: string; label: string }>;
 };
 
-export default function ProductsIndex({ products, categories, filters, statuses }: Props) {
+const getExpiryState = (expireDate: string | null) => {
+    if (!expireDate) {
+        return null;
+    }
+
+    const today = new Date();
+    const expiry = new Date(expireDate);
+    const diffDays = Math.ceil(
+        (expiry.getTime() - today.setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24),
+    );
+
+    if (diffDays < 0) {
+        return {
+            label: 'Expired',
+            variant: 'destructive' as const,
+            className: 'bg-rose-600 text-white',
+        };
+    }
+
+    if (diffDays <= 30) {
+        return {
+            label: `${new Date(expireDate).toLocaleDateString()} • ${diffDays}d`,
+            variant: 'outline' as const,
+            className: 'border-amber-500 text-amber-700 dark:text-amber-400',
+        };
+    }
+
+    return null;
+};
+
+export default function ProductsIndex({
+    products,
+    categories,
+    filters,
+    statuses,
+}: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [deactivatingProduct, setDeactivatingProduct] = useState<Product | null>(null);
+    const [deactivatingProduct, setDeactivatingProduct] =
+        useState<Product | null>(null);
     const [deactivating, setDeactivating] = useState(false);
 
     const updateFilters = (next: Partial<Props['filters']>) => {
@@ -99,7 +148,9 @@ export default function ProductsIndex({ products, categories, filters, statuses 
             render: (product) => (
                 <div>
                     <p className="font-medium">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">{product.category?.name ?? 'Uncategorized'}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {product.category?.name ?? 'Uncategorized'}
+                    </p>
                 </div>
             ),
         },
@@ -119,7 +170,9 @@ export default function ProductsIndex({ products, categories, filters, statuses 
             render: (product) => (
                 <div className="text-sm">
                     <p>{product.selling_price} ETB</p>
-                    <p className="text-xs text-muted-foreground">Buy {product.buy_price} ETB</p>
+                    <p className="text-xs text-muted-foreground">
+                        Buy {product.buy_price} ETB
+                    </p>
                 </div>
             ),
         },
@@ -128,15 +181,46 @@ export default function ProductsIndex({ products, categories, filters, statuses 
             header: 'Stock',
             render: (product) => (
                 <div className="text-sm">
-                    <p>{product.inventory?.available_stock ?? 0} {product.unit ?? 'units'}</p>
-                    <p className="text-xs text-muted-foreground">Reorder at {product.reorder_level}</p>
+                    <p>
+                        {product.inventory?.available_stock ?? 0}{' '}
+                        {product.unit ?? 'units'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        Reorder at {product.reorder_level}
+                    </p>
                 </div>
             ),
         },
         {
             key: 'status',
             header: 'Status',
-            render: (product) => <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>{product.status}</Badge>,
+            render: (product) => {
+                const expiryState = product.expire_date
+                    ? getExpiryState(product.expire_date)
+                    : null;
+
+                return (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                            variant={
+                                product.status === 'active'
+                                    ? 'default'
+                                    : 'secondary'
+                            }
+                        >
+                            {product.status}
+                        </Badge>
+                        {expiryState && (
+                            <Badge
+                                variant={expiryState.variant}
+                                className={expiryState.className}
+                            >
+                                {expiryState.label}
+                            </Badge>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             key: 'actions',
@@ -144,10 +228,22 @@ export default function ProductsIndex({ products, categories, filters, statuses 
             className: 'text-right',
             render: (product) => (
                 <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" size="icon" onClick={() => setEditingProduct(product)} aria-label={`Edit ${product.name}`}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setEditingProduct(product)}
+                        aria-label={`Edit ${product.name}`}
+                    >
                         <Pencil className="size-4" />
                     </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => setDeactivatingProduct(product)} aria-label={`Deactivate ${product.name}`}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setDeactivatingProduct(product)}
+                        aria-label={`Deactivate ${product.name}`}
+                    >
                         <Power className="size-4" />
                     </Button>
                 </div>
@@ -167,13 +263,17 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                         <div>
                             <h1 className="text-xl font-semibold">Products</h1>
                             <p className="text-sm text-muted-foreground">
-                                Manage catalog items, barcodes, pricing, and reorder settings.
+                                Manage catalog items, barcodes, pricing, and
+                                reorder settings.
                             </p>
                         </div>
                     </div>
 
                     {products && (
-                        <Button type="button" onClick={() => setCreateOpen(true)}>
+                        <Button
+                            type="button"
+                            onClick={() => setCreateOpen(true)}
+                        >
                             <Plus className="size-4" />
                             New product
                         </Button>
@@ -185,7 +285,8 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                         <AlertTriangle />
                         <AlertTitle>Business profile required</AlertTitle>
                         <AlertDescription>
-                            Set up your business profile before creating products.
+                            Set up your business profile before creating
+                            products.
                         </AlertDescription>
                     </Alert>
                 ) : (
@@ -194,33 +295,60 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                             <SearchBox
                                 defaultValue={filters.search ?? ''}
                                 placeholder="Search products or barcodes..."
-                                onSearch={(search) => updateFilters({ search: search || undefined })}
+                                onSearch={(search) =>
+                                    updateFilters({
+                                        search: search || undefined,
+                                    })
+                                }
                             />
                             <select
                                 value={filters.category_id ?? ''}
-                                onChange={(event) => updateFilters({ category_id: event.target.value ? Number(event.target.value) : undefined })}
-                                className="border-input bg-background flex h-10 rounded-md border px-3 text-sm shadow-xs"
+                                onChange={(event) =>
+                                    updateFilters({
+                                        category_id: event.target.value
+                                            ? Number(event.target.value)
+                                            : undefined,
+                                    })
+                                }
+                                className="flex h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs"
                             >
                                 <option value="">All categories</option>
                                 {categories.map((category) => (
-                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                    <option
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.name}
+                                    </option>
                                 ))}
                             </select>
                             <select
                                 value={filters.status ?? ''}
-                                onChange={(event) => updateFilters({ status: event.target.value || undefined })}
-                                className="border-input bg-background flex h-10 rounded-md border px-3 text-sm shadow-xs"
+                                onChange={(event) =>
+                                    updateFilters({
+                                        status: event.target.value || undefined,
+                                    })
+                                }
+                                className="flex h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs"
                             >
                                 <option value="">All statuses</option>
                                 {statuses.map((status) => (
-                                    <option key={status.value} value={status.value}>{status.label}</option>
+                                    <option
+                                        key={status.value}
+                                        value={status.value}
+                                    >
+                                        {status.label}
+                                    </option>
                                 ))}
                             </select>
                         </div>
 
                         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                             {products.data.slice(0, 4).map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                />
                             ))}
                         </div>
 
@@ -231,7 +359,12 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                             emptyMessage="No products yet. Add the first product to start building your catalog."
                         />
 
-                        <Pagination links={products.links} from={products.from} to={products.to} total={products.total} />
+                        <Pagination
+                            links={products.links}
+                            from={products.from}
+                            to={products.to}
+                            total={products.total}
+                        />
                     </div>
                 )}
             </div>
@@ -241,16 +374,27 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                     <DialogHeader>
                         <DialogTitle>New product</DialogTitle>
                     </DialogHeader>
-                    <ProductForm categories={categories} product={null} onSuccess={() => setCreateOpen(false)} />
+                    <ProductForm
+                        categories={categories}
+                        product={null}
+                        onSuccess={() => setCreateOpen(false)}
+                    />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={Boolean(editingProduct)} onOpenChange={(open) => !open && setEditingProduct(null)}>
+            <Dialog
+                open={Boolean(editingProduct)}
+                onOpenChange={(open) => !open && setEditingProduct(null)}
+            >
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>Edit product</DialogTitle>
                     </DialogHeader>
-                    <ProductForm categories={categories} product={editingProduct} onSuccess={() => setEditingProduct(null)} />
+                    <ProductForm
+                        categories={categories}
+                        product={editingProduct}
+                        onSuccess={() => setEditingProduct(null)}
+                    />
                 </DialogContent>
             </Dialog>
 

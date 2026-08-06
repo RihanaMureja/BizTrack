@@ -35,7 +35,22 @@ type DashboardData = {
     stats: DashboardStat[];
     chart: Array<{ label: string; value: number }>;
     lowStock?: Array<{ name: string; stock: number; reorder: number }>;
-    stagnantProducts?: Array<{ id: number; name: string; days_without_sale: number; stock_on_hand: number; suggested_action: string | null }>;
+    stagnantProducts?: Array<{
+        id: number;
+        name: string;
+        days_without_sale: number;
+        stock_on_hand: number;
+        suggested_action: string | null;
+        type?: string;
+    }>;
+    expiringProducts?: Array<{
+        id: number;
+        name: string;
+        days_without_sale: number;
+        stock_on_hand: number;
+        suggested_action: string | null;
+        type?: string;
+    }>;
     topProducts?: Array<{ name: string; quantity: number }>;
     nextSteps?: string[];
     queue?: string[];
@@ -97,19 +112,35 @@ function OwnerDashboard({ dashboard: data }: Props) {
                         empty="All products are well-stocked"
                         emptyIcon={CheckCircle2}
                         items={(data.lowStock ?? []).map(
-                            (item) => `${item.name}: ${item.stock} left (reorder at ${item.reorder})`,
+                            (item) =>
+                                `${item.name}: ${item.stock} left (reorder at ${item.reorder})`,
                         )}
                         icon={AlertTriangle}
                         tone="amber"
                     />
                 </div>
 
-                <DashboardList
-                    title="Stagnant product alerts"
-                    empty="No stagnant products detected."
-                    items={(data.stagnantProducts ?? []).map((item) => `${item.name}: ${item.days_without_sale} days without sale, ${item.stock_on_hand} in stock`)}
-                    icon={Lightbulb}
-                />
+                <div className="grid gap-6 xl:grid-cols-2">
+                    <DashboardList
+                        title="Stagnant product alerts"
+                        empty="No stagnant products detected."
+                        items={(data.stagnantProducts ?? []).map(
+                            (item) =>
+                                `${item.name}: ${item.days_without_sale} days without sale, ${item.stock_on_hand} in stock`,
+                        )}
+                        icon={Lightbulb}
+                    />
+                    <DashboardList
+                        title="Expiring soon"
+                        empty="No expiring products detected."
+                        items={(data.expiringProducts ?? []).map(
+                            (item) =>
+                                `${item.name}: ${item.days_without_sale} days left, ${item.stock_on_hand} in stock`,
+                        )}
+                        icon={AlertTriangle}
+                        tone="amber"
+                    />
+                </div>
 
                 <DashboardList
                     title="Recommended setup path"
@@ -137,7 +168,11 @@ function CashierDashboard({ dashboard: data }: Props) {
                         <StatCard
                             key={stat.label}
                             {...stat}
-                            icon={[ShoppingCart, Receipt, Users, CreditCard][index] ?? Receipt}
+                            icon={
+                                [ShoppingCart, Receipt, Users, CreditCard][
+                                    index
+                                ] ?? Receipt
+                            }
                             tone={statTones[index] ?? 'emerald'}
                         />
                     ))}
@@ -176,7 +211,11 @@ function SuperAdminDashboard({ dashboard: data }: Props) {
                         <StatCard
                             key={stat.label}
                             {...stat}
-                            icon={[Building2, Users, CreditCard, WalletCards][index] ?? Building2}
+                            icon={
+                                [Building2, Users, CreditCard, WalletCards][
+                                    index
+                                ] ?? Building2
+                            }
                             tone={statTones[index] ?? 'emerald'}
                         />
                     ))}
@@ -193,7 +232,8 @@ function SuperAdminDashboard({ dashboard: data }: Props) {
                         empty="No businesses registered yet"
                         emptyIcon={Building2}
                         items={(data.recentBusinesses ?? []).map(
-                            (b) => `${b.business_name}${b.business_type ? ` (${b.business_type})` : ''}`,
+                            (b) =>
+                                `${b.business_name}${b.business_type ? ` (${b.business_type})` : ''}`,
                         )}
                         icon={Building2}
                         tone="emerald"
@@ -243,8 +283,12 @@ function DashboardList({
             <div className="mt-5 grid gap-2.5">
                 {items.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-8 text-center">
-                        {EmptyIcon && <EmptyIcon className="size-8 text-muted-foreground/30" />}
-                        <p className="text-sm text-muted-foreground/60">{empty}</p>
+                        {EmptyIcon && (
+                            <EmptyIcon className="size-8 text-muted-foreground/30" />
+                        )}
+                        <p className="text-sm text-muted-foreground/60">
+                            {empty}
+                        </p>
                     </div>
                 ) : (
                     items.map((item, i) => (
@@ -256,15 +300,19 @@ function DashboardList({
                             )}
                         >
                             {numbered && (
-                                <span className={cn(
-                                    'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                                    toneIcon[tone],
-                                    'bg-muted',
-                                )}>
+                                <span
+                                    className={cn(
+                                        'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                                        toneIcon[tone],
+                                        'bg-muted',
+                                    )}
+                                >
                                     {i + 1}
                                 </span>
                             )}
-                            <span className="flex-1 leading-relaxed">{item}</span>
+                            <span className="flex-1 leading-relaxed">
+                                {item}
+                            </span>
                             {numbered && (
                                 <ArrowRight className="mt-0.5 size-4 shrink-0 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground/60" />
                             )}

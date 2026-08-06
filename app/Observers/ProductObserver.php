@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Product;
 use App\Services\AuditLogService;
+use App\Services\ProductInsightService;
 
 class ProductObserver
 {
@@ -14,6 +15,8 @@ class ProductObserver
             'available_stock' => 0,
             'updated_at' => now(),
         ]);
+
+        app(ProductInsightService::class)->detectExpiringForProduct($product);
 
         app(AuditLogService::class)->log(
             action: 'product.created',
@@ -28,6 +31,10 @@ class ProductObserver
 
         if ($changes->isEmpty()) {
             return;
+        }
+
+        if ($product->wasChanged('expire_date') || $product->wasChanged('status') || $product->wasChanged('business_id')) {
+            app(ProductInsightService::class)->detectExpiringForProduct($product);
         }
 
         app(AuditLogService::class)->log(

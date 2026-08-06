@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ProductInsightType;
 use App\Enums\Role;
 use App\Enums\BusinessPermissionKey;
 use App\Models\Business;
@@ -52,7 +53,8 @@ class DashboardService
             ],
             'chart' => $this->emptySeries(),
             'lowStock' => $this->lowStock($business),
-            'stagnantProducts' => $this->productInsightService->previewForBusiness($business),
+            'stagnantProducts' => $this->productInsightService->previewForBusiness($business, 5, ProductInsightType::Stagnant),
+            'expiringProducts' => $this->productInsightService->previewForBusiness($business, 5, ProductInsightType::Expiring),
             'topProducts' => [],
             'nextSteps' => [
                 'Complete product categories',
@@ -152,10 +154,10 @@ class DashboardService
         return Product::query()
             ->with('inventory')
             ->where('business_id', $business->id)
-            ->whereHas('inventory', fn ($query) => $query->whereColumn('available_stock', '<=', 'products.reorder_level'))
+            ->whereHas('inventory', fn($query) => $query->whereColumn('available_stock', '<=', 'products.reorder_level'))
             ->take(5)
             ->get()
-            ->map(fn (Product $product): array => [
+            ->map(fn(Product $product): array => [
                 'name' => $product->name,
                 'stock' => (int) ($product->inventory?->available_stock ?? 0),
                 'reorder' => (int) $product->reorder_level,
@@ -181,6 +183,6 @@ class DashboardService
 
     private function money(float $amount): string
     {
-        return number_format($amount, 2).' ETB';
+        return number_format($amount, 2) . ' ETB';
     }
 }

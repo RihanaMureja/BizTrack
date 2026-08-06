@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProductInsightStatus;
+use App\Enums\ProductInsightType;
 use App\Models\ProductMovementInsight;
 use App\Services\ProductInsightService;
 use Illuminate\Http\RedirectResponse;
@@ -19,11 +20,16 @@ class ProductInsightController extends Controller
         $business = $request->user()->ownedBusiness;
         abort_unless($business, 403);
 
+        $tab = $request->string('tab')->toString() ?: 'stagnant';
         $filters = $request->only(['search', 'status']);
 
+        $stagnantInsights = $this->productInsightService->paginateForType($business, ProductInsightType::Stagnant, $filters);
+        $expiringInsights = $this->productInsightService->paginateForType($business, ProductInsightType::Expiring, $filters);
+
         return Inertia::render('products/insights', [
-            'insights' => $this->productInsightService->paginateForBusiness($business, $filters),
-            'statuses' => collect(ProductInsightStatus::cases())->map(fn (ProductInsightStatus $status): array => [
+            'stagnantInsights' => $stagnantInsights,
+            'expiringInsights' => $expiringInsights,
+            'statuses' => collect(ProductInsightStatus::cases())->map(fn(ProductInsightStatus $status): array => [
                 'value' => $status->value,
                 'label' => $status->label(),
             ])->values(),
@@ -31,6 +37,7 @@ class ProductInsightController extends Controller
             'filters' => [
                 'search' => $filters['search'] ?? null,
                 'status' => $filters['status'] ?? null,
+                'tab' => in_array($tab, ['stagnant', 'expiring'], true) ? $tab : 'stagnant',
             ],
         ]);
     }

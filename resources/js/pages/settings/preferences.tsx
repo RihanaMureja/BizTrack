@@ -20,6 +20,8 @@ type Preferences = {
     stagnant_product_days: number;
     stagnant_product_minimum_stock: number;
     stagnant_product_notification_frequency: number;
+    expiry_alert_days: number;
+    expiry_notification_frequency: number;
     compact_sidebar: boolean;
 };
 type Props = {
@@ -42,8 +44,16 @@ export default function Preferences({ preferences, options }: Props) {
         notify_credit_reminders: preferences.notify_credit_reminders,
         notify_stagnant_products: preferences.notify_stagnant_products,
         stagnant_product_days: String(preferences.stagnant_product_days),
-        stagnant_product_minimum_stock: String(preferences.stagnant_product_minimum_stock),
-        stagnant_product_notification_frequency: String(preferences.stagnant_product_notification_frequency),
+        stagnant_product_minimum_stock: String(
+            preferences.stagnant_product_minimum_stock,
+        ),
+        stagnant_product_notification_frequency: String(
+            preferences.stagnant_product_notification_frequency,
+        ),
+        expiry_alert_days: String(preferences.expiry_alert_days),
+        expiry_notification_frequency: String(
+            preferences.expiry_notification_frequency,
+        ),
         compact_sidebar: preferences.compact_sidebar,
     });
 
@@ -68,33 +78,60 @@ export default function Preferences({ preferences, options }: Props) {
                     <div className="rounded-md border bg-card p-4 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
                             <SlidersHorizontal className="size-5 text-primary" />
-                            <h2 className="font-semibold">Workspace defaults</h2>
+                            <h2 className="font-semibold">
+                                Workspace defaults
+                            </h2>
                         </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="default_landing_page">Default landing page</Label>
+                                <Label htmlFor="default_landing_page">
+                                    Default landing page
+                                </Label>
                                 <select
                                     id="default_landing_page"
                                     value={form.data.default_landing_page}
-                                    onChange={(event) => form.setData('default_landing_page', event.target.value)}
-                                    className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'default_landing_page',
+                                            event.target.value,
+                                        )
+                                    }
+                                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                                 >
-                                    {options.landingPages.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                                    {options.landingPages.map((option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ))}
                                 </select>
-                                <InputError message={form.errors.default_landing_page} />
+                                <InputError
+                                    message={form.errors.default_landing_page}
+                                />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="records_per_page">Records per page</Label>
+                                <Label htmlFor="records_per_page">
+                                    Records per page
+                                </Label>
                                 <Input
                                     id="records_per_page"
                                     type="number"
                                     min="10"
                                     max="100"
                                     value={form.data.records_per_page}
-                                    onChange={(event) => form.setData('records_per_page', event.target.value)}
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'records_per_page',
+                                            event.target.value,
+                                        )
+                                    }
                                 />
-                                <InputError message={form.errors.records_per_page} />
+                                <InputError
+                                    message={form.errors.records_per_page}
+                                />
                             </div>
 
                             <div className="grid gap-2">
@@ -102,10 +139,22 @@ export default function Preferences({ preferences, options }: Props) {
                                 <select
                                     id="date_format"
                                     value={form.data.date_format}
-                                    onChange={(event) => form.setData('date_format', event.target.value)}
-                                    className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'date_format',
+                                            event.target.value,
+                                        )
+                                    }
+                                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                                 >
-                                    {options.dateFormats.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                                    {options.dateFormats.map((option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ))}
                                 </select>
                                 <InputError message={form.errors.date_format} />
                             </div>
@@ -115,10 +164,22 @@ export default function Preferences({ preferences, options }: Props) {
                                 <select
                                     id="currency"
                                     value={form.data.currency}
-                                    onChange={(event) => form.setData('currency', event.target.value)}
-                                    className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'currency',
+                                            event.target.value,
+                                        )
+                                    }
+                                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                                 >
-                                    {options.currencies.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                                    {options.currencies.map((option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ))}
                                 </select>
                                 <InputError message={form.errors.currency} />
                             </div>
@@ -126,54 +187,185 @@ export default function Preferences({ preferences, options }: Props) {
                     </div>
 
                     <div className="rounded-md border bg-card p-4 shadow-sm">
-                        <h2 className="font-semibold">Notification preferences</h2>
+                        <h2 className="font-semibold">
+                            Notification preferences
+                        </h2>
                         <div className="mt-4 grid gap-3">
-                            <PreferenceToggle label="Low stock alerts" checked={form.data.notify_low_stock} onChange={(checked) => form.setData('notify_low_stock', checked)} />
-                            <PreferenceToggle label="Payment notifications" checked={form.data.notify_payments} onChange={(checked) => form.setData('notify_payments', checked)} />
-                            <PreferenceToggle label="Credit reminders" checked={form.data.notify_credit_reminders} onChange={(checked) => form.setData('notify_credit_reminders', checked)} />
-                            <PreferenceToggle label="Stagnant product alerts" checked={form.data.notify_stagnant_products} onChange={(checked) => form.setData('notify_stagnant_products', checked)} />
-                            <PreferenceToggle label="Compact sidebar" checked={form.data.compact_sidebar} onChange={(checked) => form.setData('compact_sidebar', checked)} />
+                            <PreferenceToggle
+                                label="Low stock alerts"
+                                checked={form.data.notify_low_stock}
+                                onChange={(checked) =>
+                                    form.setData('notify_low_stock', checked)
+                                }
+                            />
+                            <PreferenceToggle
+                                label="Payment notifications"
+                                checked={form.data.notify_payments}
+                                onChange={(checked) =>
+                                    form.setData('notify_payments', checked)
+                                }
+                            />
+                            <PreferenceToggle
+                                label="Credit reminders"
+                                checked={form.data.notify_credit_reminders}
+                                onChange={(checked) =>
+                                    form.setData(
+                                        'notify_credit_reminders',
+                                        checked,
+                                    )
+                                }
+                            />
+                            <PreferenceToggle
+                                label="Stagnant product alerts"
+                                checked={form.data.notify_stagnant_products}
+                                onChange={(checked) =>
+                                    form.setData(
+                                        'notify_stagnant_products',
+                                        checked,
+                                    )
+                                }
+                            />
+                            <PreferenceToggle
+                                label="Compact sidebar"
+                                checked={form.data.compact_sidebar}
+                                onChange={(checked) =>
+                                    form.setData('compact_sidebar', checked)
+                                }
+                            />
                         </div>
                     </div>
 
                     <div className="rounded-md border bg-card p-4 shadow-sm">
-                        <h2 className="font-semibold">Stagnant product detection</h2>
+                        <h2 className="font-semibold">
+                            Stagnant product detection
+                        </h2>
                         <div className="mt-4 grid gap-4 md:grid-cols-3">
                             <div className="grid gap-2">
-                                <Label htmlFor="stagnant_product_days">Days without sale</Label>
+                                <Label htmlFor="stagnant_product_days">
+                                    Days without sale
+                                </Label>
                                 <Input
                                     id="stagnant_product_days"
                                     type="number"
                                     min="1"
                                     max="365"
                                     value={form.data.stagnant_product_days}
-                                    onChange={(event) => form.setData('stagnant_product_days', event.target.value)}
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'stagnant_product_days',
+                                            event.target.value,
+                                        )
+                                    }
                                 />
-                                <InputError message={form.errors.stagnant_product_days} />
+                                <InputError
+                                    message={form.errors.stagnant_product_days}
+                                />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="stagnant_product_minimum_stock">Minimum stock</Label>
+                                <Label htmlFor="stagnant_product_minimum_stock">
+                                    Minimum stock
+                                </Label>
                                 <Input
                                     id="stagnant_product_minimum_stock"
                                     type="number"
                                     min="0"
                                     max="999999"
-                                    value={form.data.stagnant_product_minimum_stock}
-                                    onChange={(event) => form.setData('stagnant_product_minimum_stock', event.target.value)}
+                                    value={
+                                        form.data.stagnant_product_minimum_stock
+                                    }
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'stagnant_product_minimum_stock',
+                                            event.target.value,
+                                        )
+                                    }
                                 />
-                                <InputError message={form.errors.stagnant_product_minimum_stock} />
+                                <InputError
+                                    message={
+                                        form.errors
+                                            .stagnant_product_minimum_stock
+                                    }
+                                />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="stagnant_product_notification_frequency">Reminder frequency days</Label>
+                                <Label htmlFor="stagnant_product_notification_frequency">
+                                    Reminder frequency days
+                                </Label>
                                 <Input
                                     id="stagnant_product_notification_frequency"
                                     type="number"
                                     min="1"
                                     max="90"
-                                    value={form.data.stagnant_product_notification_frequency}
-                                    onChange={(event) => form.setData('stagnant_product_notification_frequency', event.target.value)}
+                                    value={
+                                        form.data
+                                            .stagnant_product_notification_frequency
+                                    }
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'stagnant_product_notification_frequency',
+                                            event.target.value,
+                                        )
+                                    }
                                 />
-                                <InputError message={form.errors.stagnant_product_notification_frequency} />
+                                <InputError
+                                    message={
+                                        form.errors
+                                            .stagnant_product_notification_frequency
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="rounded-md border bg-card p-4 shadow-sm">
+                        <h2 className="font-semibold">Expiry alerts</h2>
+                        <div className="mt-4 grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-2">
+                                <Label htmlFor="expiry_alert_days">
+                                    Alert window (days)
+                                </Label>
+                                <Input
+                                    id="expiry_alert_days"
+                                    type="number"
+                                    min="1"
+                                    max="365"
+                                    value={form.data.expiry_alert_days}
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'expiry_alert_days',
+                                            event.target.value,
+                                        )
+                                    }
+                                />
+                                <InputError
+                                    message={form.errors.expiry_alert_days}
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="expiry_notification_frequency">
+                                    Reminder frequency days
+                                </Label>
+                                <Input
+                                    id="expiry_notification_frequency"
+                                    type="number"
+                                    min="1"
+                                    max="90"
+                                    value={
+                                        form.data.expiry_notification_frequency
+                                    }
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'expiry_notification_frequency',
+                                            event.target.value,
+                                        )
+                                    }
+                                />
+                                <InputError
+                                    message={
+                                        form.errors
+                                            .expiry_notification_frequency
+                                    }
+                                />
                             </div>
                         </div>
                     </div>
@@ -188,7 +380,15 @@ export default function Preferences({ preferences, options }: Props) {
     );
 }
 
-function PreferenceToggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
+function PreferenceToggle({
+    label,
+    checked,
+    onChange,
+}: {
+    label: string;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+}) {
     return (
         <label className="flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2 text-sm">
             <span>{label}</span>

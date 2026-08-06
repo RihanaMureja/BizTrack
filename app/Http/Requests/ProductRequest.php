@@ -27,7 +27,7 @@ class ProductRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::exists('categories', 'id')
-                    ->where(fn ($query) => $query->where('business_id', $businessId)),
+                    ->where(fn($query) => $query->where('business_id', $businessId)),
             ],
             'name' => ['required', 'string', 'max:150'],
             'barcode' => [
@@ -35,7 +35,7 @@ class ProductRequest extends FormRequest
                 'string',
                 'max:100',
                 Rule::unique('products', 'barcode')
-                    ->where(fn ($query) => $query->where('business_id', $businessId))
+                    ->where(fn($query) => $query->where('business_id', $businessId))
                     ->ignore($product),
             ],
             'description' => ['nullable', 'string', 'max:1000'],
@@ -43,6 +43,7 @@ class ProductRequest extends FormRequest
             'selling_price' => ['required', 'numeric', 'min:0', 'max:99999999.99', 'gte:buy_price'],
             'unit' => ['nullable', 'string', 'max:30'],
             'reorder_level' => ['required', 'integer', 'min:0', 'max:1000000'],
+            'expire_date' => ['nullable', 'date', 'after:today'],
             'status' => ['required', Rule::enum(RecordStatus::class)],
         ];
     }

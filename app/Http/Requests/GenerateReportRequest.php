@@ -16,7 +16,8 @@ class GenerateReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::in(['sales', 'expenses', 'profit', 'inventory', 'tax'])],
+            'type' => ['required', Rule::in(['sales', 'expenses', 'profit', 'inventory', 'tax', 'products'])],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'date_from' => ['nullable', 'date'],
             'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
         ];

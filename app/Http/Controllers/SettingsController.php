@@ -64,6 +64,8 @@ class SettingsController extends Controller
             'stagnant_product_days' => (int) ($preferences['stagnant_product_days'] ?? 30),
             'stagnant_product_minimum_stock' => (int) ($preferences['stagnant_product_minimum_stock'] ?? 1),
             'stagnant_product_notification_frequency' => (int) ($preferences['stagnant_product_notification_frequency'] ?? 7),
+            'expiry_alert_days' => (int) ($preferences['expiry_alert_days'] ?? 30),
+            'expiry_notification_frequency' => (int) ($preferences['expiry_notification_frequency'] ?? 7),
             'compact_sidebar' => (bool) ($preferences['compact_sidebar'] ?? false),
         ];
     }

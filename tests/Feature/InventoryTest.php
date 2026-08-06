@@ -8,6 +8,7 @@ use App\Models\Business;
 use App\Models\BusinessPermission;
 use App\Models\BusinessRole;
 use App\Models\Category;
+use App\Models\Expense;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\User;
@@ -70,9 +71,10 @@ test('employee with inventory permission can view inventory list', function () {
     $this->actingAs($employee)
         ->get(route('inventory.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('inventory/index')
-            ->where('inventory.total', 1)
+        ->assertInertia(
+            fn($page) => $page
+                ->component('inventory/index')
+                ->where('inventory.total', 1)
         );
 });
 
@@ -120,9 +122,10 @@ test('owner can view inventory list', function () {
     $this->actingAs($owner)
         ->get(route('inventory.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('inventory/index')
-            ->where('inventory.total', 1)
+        ->assertInertia(
+            fn($page) => $page
+                ->component('inventory/index')
+                ->where('inventory.total', 1)
         );
 });
 
@@ -192,6 +195,11 @@ test('returned stock increases inventory', function () {
 
     expect($inventory->refresh()->available_stock)->toBe(2)
         ->and($inventory->transactions()->first()->type)->toBe(InventoryTransactionType::Return);
+    $expense = Expense::query()->where('business_id', $business->id)->latest()->first();
+
+    expect($expense)->not->toBeNull()
+        ->and($expense->title)->toContain('Restock:')
+        ->and($expense->amount)->toBe((float) $product->buy_price * 12);
 });
 
 test('owner cannot adjust another business inventory', function () {
@@ -228,9 +236,10 @@ test('inventory history page shows transaction records', function () {
     $this->actingAs($owner)
         ->get(route('inventory.transactions.index', $inventory))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('inventory/history')
-            ->where('transactions.total', 1)
+        ->assertInertia(
+            fn($page) => $page
+                ->component('inventory/history')
+                ->where('transactions.total', 1)
         );
 });
 

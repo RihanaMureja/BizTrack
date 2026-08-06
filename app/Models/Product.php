@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['business_id', 'category_id', 'name', 'barcode', 'description', 'buy_price', 'selling_price', 'unit', 'reorder_level', 'status'])]
+#[Fillable(['business_id', 'category_id', 'name', 'barcode', 'description', 'buy_price', 'selling_price', 'unit', 'reorder_level', 'expire_date', 'status'])]
 class Product extends Model
 {
     use HasFactory;
@@ -20,6 +20,7 @@ class Product extends Model
         return [
             'buy_price' => 'decimal:2',
             'selling_price' => 'decimal:2',
+            'expire_date' => 'date',
             'status' => RecordStatus::class,
         ];
     }
