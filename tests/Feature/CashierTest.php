@@ -222,12 +222,15 @@ test('cashier navigation stays restricted', function () {
         ->get(route('dashboard'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->where('navigation.0.title', 'Dashboard')
-            ->where('navigation.1.title', 'Customers')
-            ->where('navigation.2.title', 'Sales')
-            ->where('navigation.3.title', 'Payments')
-            ->where('navigation.4.title', 'Notifications')
-            ->where('navigation.5.title', 'Profile')
-            ->missing('navigation.6.title')
+            ->where('navigation.0.label', 'Workspace')
+            ->where('navigation.0.items.0.title', 'Dashboard')
+            ->where('navigation.1.label', 'Operations')
+            ->where('navigation.1.items.0.title', 'Sales')
+            ->where('navigation.1.items.1.title', 'Customers')
+            ->where('navigation.1.items.2.title', 'Payments')
+            ->where('navigation.2.label', 'Settings')
+            ->where('navigation.2.items.0.title', 'Notifications')
+            ->where('navigation.2.items.1.title', 'Profile')
+            ->missing('navigation.3.label')
         );
 });

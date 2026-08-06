@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'price', 'duration_months', 'max_cashiers', 'description', 'status'])]
+#[Fillable(['name', 'price', 'duration_months', 'duration_days', 'max_cashiers', 'description', 'features', 'status'])]
 class Subscription extends Model
 {
     use HasFactory;
@@ -18,6 +18,7 @@ class Subscription extends Model
         return [
             'price' => 'decimal:2',
             'status' => RecordStatus::class,
+            'features' => 'array',
         ];
     }
 

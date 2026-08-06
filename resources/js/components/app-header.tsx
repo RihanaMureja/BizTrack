@@ -27,7 +27,11 @@ type Props = {
 };
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
-    const { auth, navigation = [], notificationSummary } = usePage<SharedData>().props;
+    const {
+        auth,
+        navigation = [],
+        notificationSummary,
+    } = usePage<SharedData>().props;
     const getInitials = useInitials();
 
     return (
@@ -37,54 +41,96 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="mr-2"
+                                >
                                     <Menu className="size-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="flex h-full w-72 flex-col bg-sidebar text-sidebar-foreground">
-                                <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+                            <SheetContent
+                                side="left"
+                                className="flex h-full w-72 flex-col bg-sidebar text-sidebar-foreground"
+                            >
+                                <SheetTitle className="sr-only">
+                                    Navigation menu
+                                </SheetTitle>
                                 <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
                                     <AppLogo />
                                 </SheetHeader>
-                                <nav className="grid gap-1 p-4">
-                                    {navigation.map((item) => (
-                                        <Link
-                                            key={item.title}
-                                            href={item.href}
-                                            className="rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent"
-                                        >
-                                            {item.title}
-                                        </Link>
+                                <nav className="grid gap-4 p-4">
+                                    {navigation.map((group) => (
+                                        <div key={group.label}>
+                                            <p className="px-3 text-xs font-semibold tracking-wide text-muted-foreground/70 uppercase">
+                                                {group.label}
+                                            </p>
+                                            <div className="mt-1 grid gap-1">
+                                                {group.items.map((item) => (
+                                                    <Link
+                                                        key={item.title}
+                                                        href={item.href}
+                                                        className="rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent"
+                                                    >
+                                                        {item.title}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </nav>
                             </SheetContent>
                         </Sheet>
                     </div>
 
-                    <Link href={dashboard()} prefetch className="flex items-center">
+                    <Link
+                        href={dashboard()}
+                        prefetch
+                        className="flex items-center"
+                    >
                         <AppLogo />
                     </Link>
 
                     <div className="ml-auto flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="hidden md:inline-flex">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hidden md:inline-flex"
+                        >
                             <Search className="size-5 opacity-70" />
                         </Button>
                         <AppearanceToggleButton />
-                        <Button variant="ghost" size="icon" asChild className="relative">
-                            <Link href="/notifications" aria-label="Notifications">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            asChild
+                            className="relative"
+                        >
+                            <Link
+                                href="/notifications"
+                                aria-label="Notifications"
+                            >
                                 <Bell className="size-5" />
                                 {notificationSummary.unreadCount > 0 && (
                                     <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                                        {notificationSummary.unreadCount > 99 ? '99+' : notificationSummary.unreadCount}
+                                        {notificationSummary.unreadCount > 99
+                                            ? '99+'
+                                            : notificationSummary.unreadCount}
                                     </span>
                                 )}
                             </Link>
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="size-10 rounded-md p-1">
+                                <Button
+                                    variant="ghost"
+                                    className="size-10 rounded-md p-1"
+                                >
                                     <Avatar className="size-8 overflow-hidden rounded-md">
-                                        <AvatarImage src={auth.user?.avatar} alt={auth.user?.name} />
+                                        <AvatarImage
+                                            src={auth.user?.avatar}
+                                            alt={auth.user?.name}
+                                        />
                                         <AvatarFallback className="rounded-md bg-primary text-primary-foreground">
                                             {getInitials(auth.user?.name ?? '')}
                                         </AvatarFallback>
@@ -92,7 +138,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end">
-                                {auth.user && <UserMenuContent user={auth.user} />}
+                                {auth.user && (
+                                    <UserMenuContent user={auth.user} />
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

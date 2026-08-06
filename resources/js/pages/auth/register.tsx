@@ -129,7 +129,7 @@ export default function Register({ passwordRules }: Props) {
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
-                                Create account
+                                Continue
                             </Button>
                         </div>
 

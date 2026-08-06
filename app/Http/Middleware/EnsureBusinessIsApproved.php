@@ -19,13 +19,25 @@ class EnsureBusinessIsApproved
 
         $business = $user->ownedBusiness ?? $user->business;
 
-        if (! $business || $business->status !== RecordStatus::Active) {
+        if (! $business) {
+            if (! $user->isOwner()) {
+                abort(403);
+            }
+
+            return redirect()->route('business.setup');
+        }
+
+        if ($business->status !== RecordStatus::Active) {
             if (! $user->isOwner()) {
                 abort(403);
             }
 
             return redirect()->route('business.profile')
                 ->with('error', 'Your business must be reviewed and approved before you can access this module.');
+        }
+
+        if ($user->isOwner() && ! $business->hasActiveSubscription()) {
+            return redirect()->route('subscriptions.select');
         }
 
         return $next($request);

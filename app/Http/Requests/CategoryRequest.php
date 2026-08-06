@@ -25,7 +25,7 @@ class CategoryRequest extends FormRequest
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('categories', 'name')
+                Rule::unique('categories', 'barcode')
                     ->where(fn ($query) => $query->where('business_id', $businessId))
                     ->ignore($this->route('category')),
             ],

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BusinessSubscriptionStatus;
 use App\Enums\RecordStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['owner_id', 'subscription_id', 'business_name', 'business_type', 'email', 'phone', 'address', 'logo', 'national_id_fan_number', 'national_id_photo_path', 'trade_license_path', 'tin_certificate_path', 'is_vat_registered', 'vat_certificate_path', 'has_physical_shop', 'rental_agreement_path', 'submitted_for_review_at', 'status'])]
+#[Fillable(['owner_id', 'subscription_id', 'subscription_started_at', 'subscription_ends_at', 'subscription_status', 'business_name', 'business_type', 'email', 'phone', 'address', 'logo', 'national_id_fan_number', 'national_id_photo_path', 'trade_license_path', 'tin_certificate_path', 'is_vat_registered', 'vat_certificate_path', 'has_physical_shop', 'rental_agreement_path', 'submitted_for_review_at', 'status'])]
 class Business extends Model
 {
     use HasFactory;
@@ -18,10 +19,20 @@ class Business extends Model
     {
         return [
             'status' => RecordStatus::class,
+            'subscription_status' => BusinessSubscriptionStatus::class,
+            'subscription_started_at' => 'datetime',
+            'subscription_ends_at' => 'datetime',
             'is_vat_registered' => 'boolean',
             'has_physical_shop' => 'boolean',
             'submitted_for_review_at' => 'datetime',
         ];
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->subscription_id !== null
+            && $this->subscription_status === BusinessSubscriptionStatus::Active
+            && ($this->subscription_ends_at === null || $this->subscription_ends_at->isFuture());
     }
 
     public function owner(): BelongsTo

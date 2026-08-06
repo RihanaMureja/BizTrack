@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\BusinessSubscriptionStatus;
 use App\Enums\RecordStatus;
 use App\Events\BusinessRegistered;
 use App\Models\Business;
+use App\Models\Subscription;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
@@ -114,8 +117,72 @@ class BusinessService
 
     public function assignSubscription(Business $business, int $subscriptionId): Business
     {
-        $business->forceFill(['subscription_id' => $subscriptionId])->save();
+        return $this->activateSubscription($business, Subscription::findOrFail($subscriptionId));
+    }
+
+    /**
+     * Create (or update) the owner's business during onboarding without an admin approval step.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function setupForOwner(User $owner, array $data): Business
+    {
+        $business = $owner->ownedBusiness;
+
+        if ($business) {
+            $business->forceFill([
+                'business_name' => $data['business_name'],
+                'business_type' => $data['business_type'],
+            ])->save();
+
+            return $business->refresh();
+        }
+
+        $business = Business::create([
+            'owner_id' => $owner->id,
+            'business_name' => $data['business_name'],
+            'business_type' => $data['business_type'],
+            'email' => $owner->email,
+            'status' => RecordStatus::Active,
+        ]);
+
+        $owner->forceFill(['business_id' => $business->id])->save();
+
+        BusinessRegistered::dispatch($business);
+
+        return $business;
+    }
+
+    public function activateSubscription(Business $business, Subscription $plan): Business
+    {
+        $business->forceFill([
+            'subscription_id' => $plan->id,
+            'subscription_status' => BusinessSubscriptionStatus::Active,
+            'subscription_started_at' => now(),
+            'subscription_ends_at' => $this->subscriptionEndsAt($plan),
+        ])->save();
 
         return $business->refresh();
+    }
+
+    public function pendingSubscription(Business $business, Subscription $plan): Business
+    {
+        $business->forceFill([
+            'subscription_id' => $plan->id,
+            'subscription_status' => BusinessSubscriptionStatus::Pending,
+            'subscription_started_at' => null,
+            'subscription_ends_at' => null,
+        ])->save();
+
+        return $business->refresh();
+    }
+
+    private function subscriptionEndsAt(Subscription $plan): CarbonInterface
+    {
+        if ($plan->duration_days) {
+            return now()->addDays((int) $plan->duration_days);
+        }
+
+        return now()->addMonths(max(1, (int) $plan->duration_months));
     }
 }

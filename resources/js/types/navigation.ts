@@ -20,6 +20,16 @@ export type ServerNavItem = {
     icon: string;
 };
 
+export type ServerNavGroup = {
+    label: string;
+    items: ServerNavItem[];
+};
+
+export type NavGroup = {
+    label: string;
+    items: NavItem[];
+};
+
 export type SharedNotification = {
     id: number;
     title: string;
@@ -32,7 +42,7 @@ export type SharedNotification = {
 export type SharedData = {
     name: string;
     auth: Auth;
-    navigation: ServerNavItem[];
+    navigation: ServerNavGroup[];
     notificationSummary: {
         unreadCount: number;
         recent: SharedNotification[];

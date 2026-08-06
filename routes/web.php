@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\AdminSubscriptionController;
 use App\Http\Controllers\AdminBusinessVerificationController;
-use App\Http\Controllers\BusinessManagementController;
+use App\Http\Controllers\AdminSubscriptionController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessLogoController;
-use App\Http\Controllers\BusinessVerificationDocumentController;
+use App\Http\Controllers\BusinessManagementController;
 use App\Http\Controllers\BusinessRoleController;
+use App\Http\Controllers\BusinessSetupController;
+use App\Http\Controllers\BusinessVerificationDocumentController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
@@ -19,14 +20,14 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductInsightController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -128,12 +129,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('payments', PaymentController::class)->only(['index', 'store', 'show']);
         });
 
-
         Route::middleware('business.permission:view_notifications')->group(function () {
             Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
             Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
             Route::resource('notifications', NotificationController::class)->only(['index']);
         });
+    });
+});
+
+Route::middleware('auth')->group(function () {
+    Route::middleware('role:owner')->group(function () {
+        Route::get('business/setup', [BusinessSetupController::class, 'index'])->name('business.setup');
+        Route::post('business/setup', [BusinessSetupController::class, 'store'])->name('business.setup.store');
+        Route::get('subscriptions', [SubscriptionController::class, 'select'])->name('subscriptions.select');
+        Route::post('subscriptions/select', [SubscriptionController::class, 'selectPlan'])->name('subscriptions.select.store');
     });
 });
 
