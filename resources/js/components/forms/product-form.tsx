@@ -1,11 +1,11 @@
+import { useForm } from '@inertiajs/react';
+import { Save } from 'lucide-react';
+import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { useForm } from '@inertiajs/react';
-import { Save } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 export type ProductFormCategory = {
     id: number;

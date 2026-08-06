@@ -1,3 +1,7 @@
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { AlertTriangle, Boxes, History, PackagePlus, SlidersHorizontal } from 'lucide-react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import InputError from '@/components/input-error';
@@ -11,10 +15,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { AlertTriangle, Boxes, History, PackagePlus, SlidersHorizontal } from 'lucide-react';
-import type { FormEvent } from 'react';
-import { useState } from 'react';
 
 type InventoryItem = {
     id: number;

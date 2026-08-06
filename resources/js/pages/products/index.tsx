@@ -1,18 +1,18 @@
+import { Head, router } from '@inertiajs/react';
+import { AlertTriangle, Boxes, Pencil, Plus, Power, ScanBarcode } from 'lucide-react';
+import { useState } from 'react';
+import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
-import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { ProductForm } from '@/components/forms/product-form';
-import { ProductCard } from '@/components/product-card/product-card';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
+import { ProductCard } from '@/components/product-card/product-card';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, Boxes, Pencil, Plus, Power, ScanBarcode } from 'lucide-react';
-import { useState } from 'react';
 
 type Category = {
     id: number;

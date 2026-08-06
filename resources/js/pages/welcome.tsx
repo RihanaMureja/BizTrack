@@ -26,22 +26,26 @@ const highlights = [
 const features = [
     {
         title: 'Sell with control',
-        description: 'Record sales, payments, discounts, and customer credit without scattered notebooks.',
+        description:
+            'Record sales, payments, discounts, and customer credit without scattered notebooks.',
         icon: ReceiptText,
     },
     {
         title: 'Know your stock',
-        description: 'Track products, available stock, low-stock items, and slow-moving inventory.',
+        description:
+            'Track products, available stock, low-stock items, and slow-moving inventory.',
         icon: Boxes,
     },
     {
         title: 'Manage your team',
-        description: 'Give employees only the permissions they need for their daily work.',
+        description:
+            'Give employees only the permissions they need for their daily work.',
         icon: UsersRound,
     },
     {
         title: 'Stay verified',
-        description: 'Business documents, subscriptions, audit logs, and reports stay organized.',
+        description:
+            'Business documents, subscriptions, audit logs, and reports stay organized.',
         icon: ScrollText,
     },
 ];
@@ -103,12 +107,14 @@ export default function Welcome() {
                             <ShieldCheck className="size-4 text-primary" />
                             Verified business management for growing SMEs
                         </div>
-                        <h1 className="mt-6 max-w-3xl text-3xl font-semibold leading-tight tracking-normal md:text-5xl">
-                            Run sales, stock, payments, and reports from one clean workspace.
+                        <h1 className="mt-6 max-w-3xl text-3xl leading-tight font-semibold tracking-normal md:text-5xl">
+                            Run sales, stock, payments, and reports from one
+                            clean workspace.
                         </h1>
                         <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
-                            BizTrack helps business owners manage POS sales, products, inventory,
-                            employees, customer credit, expenses, and reports without spreadsheet chaos.
+                            BizTrack helps business owners manage POS sales,
+                            products, inventory, employees, customer credit,
+                            expenses, and reports without spreadsheet chaos.
                         </p>
 
                         <div className="mt-7 flex flex-wrap gap-3">
@@ -128,11 +134,16 @@ export default function Welcome() {
 
                         <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-2">
                             {highlights.map(({ label, icon: Icon }) => (
-                                <div key={label} className="flex items-center gap-3 rounded-md border bg-card p-3 shadow-sm">
+                                <div
+                                    key={label}
+                                    className="flex items-center gap-3 rounded-md border bg-card p-3 shadow-sm"
+                                >
                                     <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
                                         <Icon className="size-4" />
                                     </div>
-                                    <span className="text-sm font-medium">{label}</span>
+                                    <span className="text-sm font-medium">
+                                        {label}
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -152,12 +163,17 @@ export default function Welcome() {
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-white/10" />
                         <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8">
                             <div className="max-w-md">
-                                <p className="text-sm font-medium text-white/80">Built for real business operations</p>
-                                <h2 className="mt-2 text-2xl font-semibold leading-tight">
-                                    Daily work stays organized from checkout to reporting.
+                                <p className="text-sm font-medium text-white/80">
+                                    Built for real business operations
+                                </p>
+                                <h2 className="mt-2 text-2xl leading-tight font-semibold">
+                                    Daily work stays organized from checkout to
+                                    reporting.
                                 </h2>
                                 <p className="mt-3 text-sm leading-6 text-white/75">
-                                    Owners see the full picture while employees work inside the permissions they are trusted with.
+                                    Owners see the full picture while employees
+                                    work inside the permissions they are trusted
+                                    with.
                                 </p>
                             </div>
                         </div>
@@ -168,8 +184,12 @@ export default function Welcome() {
                     <div className="rounded-md border bg-card p-5 shadow-sm md:p-6">
                         <div className="flex flex-wrap items-end justify-between gap-4">
                             <div>
-                                <p className="text-sm font-medium text-primary">What BizTrack handles</p>
-                                <h2 className="mt-2 text-2xl font-semibold">The important business work, connected.</h2>
+                                <p className="text-sm font-medium text-primary">
+                                    What BizTrack handles
+                                </p>
+                                <h2 className="mt-2 text-2xl font-semibold">
+                                    The important business work, connected.
+                                </h2>
                             </div>
                             <div className="inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm font-medium text-primary">
                                 <KeyRound className="size-4" />
@@ -178,15 +198,24 @@ export default function Welcome() {
                         </div>
 
                         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                            {features.map(({ title, description, icon: Icon }) => (
-                                <div key={title} className="rounded-md border bg-background p-4">
-                                    <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-                                        <Icon className="size-5" />
+                            {features.map(
+                                ({ title, description, icon: Icon }) => (
+                                    <div
+                                        key={title}
+                                        className="rounded-md border bg-background p-4"
+                                    >
+                                        <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+                                            <Icon className="size-5" />
+                                        </div>
+                                        <h3 className="mt-4 font-semibold">
+                                            {title}
+                                        </h3>
+                                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                                            {description}
+                                        </p>
                                     </div>
-                                    <h3 className="mt-4 font-semibold">{title}</h3>
-                                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
-                                </div>
-                            ))}
+                                ),
+                            )}
                         </div>
                     </div>
                 </section>

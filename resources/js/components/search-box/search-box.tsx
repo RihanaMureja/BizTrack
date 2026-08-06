@@ -1,6 +1,6 @@
-import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Input } from '@/components/ui/input';
 
 type Props = {
     defaultValue?: string;
@@ -23,6 +23,7 @@ export function SearchBox({
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
+
             return;
         }
 

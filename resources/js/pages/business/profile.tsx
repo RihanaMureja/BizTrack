@@ -1,5 +1,5 @@
-import { BusinessForm } from '@/components/forms/business-form';
 import { Head } from '@inertiajs/react';
+import { BusinessForm } from '@/components/forms/business-form';
 import { Building2, Clock3, Eye, ShieldCheck } from 'lucide-react';
 import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
 

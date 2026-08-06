@@ -1,3 +1,6 @@
+import { Head, router } from '@inertiajs/react';
+import { AlertTriangle, KeyRound, Pencil, Plus, Power, Trash2, UserRoundCog } from 'lucide-react';
+import { useState } from 'react';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
@@ -9,9 +12,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, KeyRound, Pencil, Plus, Power, Trash2, UserRoundCog } from 'lucide-react';
-import { useState } from 'react';
 
 type Cashier = {
     id: number;

@@ -4,7 +4,6 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AdminSubscriptionController;
 use App\Http\Controllers\AdminBusinessVerificationController;
-use App\Http\Controllers\AdminServiceFeeController;
 use App\Http\Controllers\BusinessManagementController;
 use App\Http\Controllers\BusinessLogoController;
 use App\Http\Controllers\BusinessVerificationDocumentController;
@@ -25,7 +24,6 @@ use App\Http\Controllers\ProductInsightController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
-use App\Http\Controllers\ServiceFeeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SubscriptionController;
@@ -59,8 +57,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('subscriptions/{subscription}/activate', [AdminSubscriptionController::class, 'activate'])->name('subscriptions.activate');
         Route::post('subscriptions/{subscription}/deactivate', [AdminSubscriptionController::class, 'deactivate'])->name('subscriptions.deactivate');
         Route::resource('subscriptions', AdminSubscriptionController::class)->only(['index', 'store', 'update']);
-        Route::get('service-fees', [AdminServiceFeeController::class, 'index'])->name('service-fees.index');
-        Route::put('businesses/{business}/service-fee-setting', [AdminServiceFeeController::class, 'updateSetting'])->name('businesses.service-fee-setting.update');
         Route::resource('roles', RoleController::class)->only(['index']);
         Route::resource('permissions', PermissionController::class)->only(['index']);
     });
@@ -120,7 +116,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::get('sales/pos', [SaleController::class, 'create'])->middleware('business.permission:create_sales')->name('sales.pos');
+        Route::get('sales/checkout', [SaleController::class, 'checkoutPage'])->middleware('business.permission:create_sales')->name('sales.checkout.page');
         Route::post('sales', [SaleController::class, 'store'])->middleware('business.permission:create_sales')->name('sales.store');
+        Route::post('sales/checkout', [SaleController::class, 'checkout'])->middleware('business.permission:create_sales')->name('sales.checkout');
         Route::middleware('business.permission:view_sales')->group(function () {
             Route::resource('sales', SaleController::class)->only(['index', 'show']);
         });
@@ -130,10 +128,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('payments', PaymentController::class)->only(['index', 'store', 'show']);
         });
 
-        Route::middleware('role:owner')->group(function () {
-            Route::get('service-fees', [ServiceFeeController::class, 'index'])->name('service-fees.index');
-            Route::post('service-fees/{serviceFee}/pay', [ServiceFeeController::class, 'pay'])->name('service-fees.pay');
-        });
 
         Route::middleware('business.permission:view_notifications')->group(function () {
             Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');

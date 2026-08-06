@@ -1,7 +1,7 @@
-import { DataTable } from '@/components/data-table/data-table';
-import { Button } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, ReceiptText } from 'lucide-react';
+import { DataTable } from '@/components/data-table/data-table';
+import { Button } from '@/components/ui/button';
 
 type Item = { id: number; quantity: number; unit_price: string; line_total: string; product: { name: string } };
 type Sale = { invoice_number: string; subtotal: string; tax_amount: string; discount_amount: string; grand_total: string; status: string; customer: { full_name: string } | null; user: { name: string } | null; items: Item[] };

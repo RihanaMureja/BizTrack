@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['owner_id', 'subscription_id', 'business_name', 'business_type', 'email', 'phone', 'address', 'logo', 'national_id_fan_number', 'national_id_photo_path', 'trade_license_path', 'tin_certificate_path', 'is_vat_registered', 'vat_certificate_path', 'has_physical_shop', 'rental_agreement_path', 'submitted_for_review_at', 'status'])]
 class Business extends Model
@@ -68,16 +67,6 @@ class Business extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
-    }
-
-    public function serviceFeeSetting(): HasOne
-    {
-        return $this->hasOne(ServiceFeeSetting::class);
-    }
-
-    public function serviceFees(): HasMany
-    {
-        return $this->hasMany(ServiceFee::class);
     }
 
     public function expenseCategories(): HasMany

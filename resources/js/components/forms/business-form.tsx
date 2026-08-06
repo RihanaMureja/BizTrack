@@ -1,3 +1,6 @@
+import { useForm } from '@inertiajs/react';
+import { Save } from 'lucide-react';
+import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +13,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { useForm } from '@inertiajs/react';
-import { Save } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 export type BusinessFormBusiness = {
     id?: number;

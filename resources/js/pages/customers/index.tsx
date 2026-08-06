@@ -1,6 +1,9 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { AlertTriangle, Eye, Pencil, Plus, Trash2, Users } from 'lucide-react';
+import { useState } from 'react';
+import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
-import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { CustomerForm } from '@/components/forms/customer-form';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
@@ -9,9 +12,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, Eye, Pencil, Plus, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
 
 type Customer = {
     id: number;

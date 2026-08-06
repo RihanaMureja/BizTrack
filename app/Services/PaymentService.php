@@ -17,7 +17,6 @@ class PaymentService
 {
     public function __construct(
         private readonly CustomerCreditService $customerCreditService,
-        private readonly ServiceFeeService $serviceFeeService,
     ) {}
 
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
@@ -73,7 +72,6 @@ class PaymentService
             $this->syncSalePaymentStatus($sale);
 
             if ($status === PaymentStatus::Completed) {
-                $this->serviceFeeService->createForPayment($payment);
                 PaymentCompleted::dispatch($payment->load(['business.owner', 'sale', 'customer', 'user']));
             }
 
@@ -103,7 +101,6 @@ class PaymentService
             $this->syncSalePaymentStatus($payment->sale()->lockForUpdate()->firstOrFail());
 
             if ($status === PaymentStatus::Completed) {
-                $this->serviceFeeService->createForPayment($payment);
                 PaymentCompleted::dispatch($payment->load(['business.owner', 'sale', 'customer', 'user']));
             }
 

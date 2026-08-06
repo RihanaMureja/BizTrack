@@ -1,11 +1,11 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { Plus, Receipt } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Button } from '@/components/ui/button';
-import { Head, Link, router } from '@inertiajs/react';
-import { Plus, Receipt } from 'lucide-react';
 
 type Sale = { id: number; invoice_number: string; grand_total: string; status: string; sold_at: string; customer: { full_name: string } | null; user: { name: string } | null };
 type Props = { sales: { data: Sale[]; links: PaginationLink[]; from: number | null; to: number | null; total: number } | null; filters: { search: string | null } };

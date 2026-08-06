@@ -36,7 +36,7 @@ function stagnantBusinessContext(array $preferences = []): array
     return [$owner, $business];
 }
 
-function stockedProduct(Business $business, int $stock = 10): Product
+function stagnantStockedProduct(Business $business, int $stock = 10): Product
 {
     $product = Product::factory()->create([
         'business_id' => $business->id,
@@ -55,7 +55,7 @@ function stockedProduct(Business $business, int $stock = 10): Product
 test('command detects stagnant products and notifies owner', function () {
     NotificationFake::fake();
     [$owner, $business] = stagnantBusinessContext();
-    $product = stockedProduct($business, 20);
+    $product = stagnantStockedProduct($business, 20);
 
     $this->artisan('products:detect-stagnant', ['business' => $business->id])
         ->assertSuccessful();
@@ -80,7 +80,7 @@ test('command detects stagnant products and notifies owner', function () {
 
 test('recently sold products are not marked stagnant', function () {
     [$owner, $business] = stagnantBusinessContext();
-    $product = stockedProduct($business, 12);
+    $product = stagnantStockedProduct($business, 12);
     $sale = Sale::factory()->create([
         'business_id' => $business->id,
         'user_id' => $owner->id,
@@ -100,7 +100,7 @@ test('recently sold products are not marked stagnant', function () {
 
 test('business preferences can disable stagnant detection', function () {
     [, $business] = stagnantBusinessContext(['notify_stagnant_products' => false]);
-    stockedProduct($business, 20);
+    stagnantStockedProduct($business, 20);
 
     $this->artisan('products:detect-stagnant', ['business' => $business->id])
         ->assertSuccessful();
@@ -110,7 +110,7 @@ test('business preferences can disable stagnant detection', function () {
 
 test('owner can view and update product insight status', function () {
     [$owner, $business] = stagnantBusinessContext();
-    $product = stockedProduct($business, 8);
+    $product = stagnantStockedProduct($business, 8);
     $insight = ProductMovementInsight::factory()->create([
         'business_id' => $business->id,
         'product_id' => $product->id,

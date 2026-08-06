@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
 import { Barcode, Package } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 type Props = {
     product: {

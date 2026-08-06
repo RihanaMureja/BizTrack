@@ -6,7 +6,9 @@ use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\CustomerCredit;
 use App\Models\Notification;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
@@ -239,4 +241,48 @@ test('cashier from another business cannot view a sale', function () {
     $this->actingAs($otherCashier)
         ->get(route('sales.show', $sale))
         ->assertForbidden();
+});
+
+test('checkout creates a completed cash payment and records customer credit', function () {
+    [$owner, $business] = saleBusinessContext();
+    $customer = Customer::factory()->create(['business_id' => $business->id]);
+    $product = stockedProduct($business, 4, 25);
+
+    $this->actingAs($owner)
+        ->post(route('sales.checkout'), [
+            'customer_id' => $customer->id,
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+            'payment_method' => 'cash',
+            'amount_received' => 30,
+            'enable_credit' => true,
+        ])
+        ->assertRedirect();
+
+    $sale = Sale::query()->sole();
+    expect((float) $sale->paid_amount)->toBe(30.0)
+        ->and((float) $sale->balance_due)->toBe(20.0)
+        ->and($product->inventory->refresh()->available_stock)->toBe(2);
+    $this->assertDatabaseHas('payments', ['sale_id' => $sale->id, 'amount' => 30]);
+    $this->assertDatabaseHas('customer_credits', ['sale_id' => $sale->id, 'remaining_balance' => 20]);
+    expect(Payment::query()->count())->toBe(1)->and(CustomerCredit::query()->count())->toBe(1);
+});
+
+test('checkout rejects an unpaid walk-in sale without creating partial records', function () {
+    [$owner, $business] = saleBusinessContext();
+    $product = stockedProduct($business, 3, 25);
+
+    $this->actingAs($owner)
+        ->from(route('sales.checkout.page'))
+        ->post(route('sales.checkout'), [
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+            'payment_method' => 'cash',
+            'amount_received' => 10,
+            'enable_credit' => false,
+        ])
+        ->assertRedirect(route('sales.checkout.page'))
+        ->assertSessionHasErrors('amount_received');
+
+    expect(Sale::query()->count())->toBe(0)
+        ->and(Payment::query()->count())->toBe(0)
+        ->and($product->inventory->refresh()->available_stock)->toBe(3);
 });
