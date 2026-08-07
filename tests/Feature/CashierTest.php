@@ -227,7 +227,6 @@ test('cashier navigation stays restricted', function () {
             ->where('navigation.2.title', 'Sales')
             ->where('navigation.3.title', 'Payments')
             ->where('navigation.4.title', 'Notifications')
-            ->where('navigation.5.title', 'Profile')
-            ->missing('navigation.6.title')
+            ->missing('navigation.5.title')
         );
 });

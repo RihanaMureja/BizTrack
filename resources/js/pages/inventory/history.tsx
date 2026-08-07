@@ -16,6 +16,7 @@ type Transaction = {
     notes: string | null;
     created_at: string;
     user: { name: string } | null;
+    batch: { batch_number: string; unit_cost: string } | null;
 };
 
 type Props = {
@@ -43,6 +44,7 @@ export default function InventoryHistory({ inventory, transactions }: Props) {
         { key: 'quantity_change', header: 'Change', render: (transaction) => transaction.quantity_change > 0 ? `+${transaction.quantity_change}` : transaction.quantity_change },
         { key: 'quantity_before', header: 'Before' },
         { key: 'quantity_after', header: 'After' },
+        { key: 'batch', header: 'Batch', render: (transaction) => transaction.batch?.batch_number ?? 'No batch' },
         { key: 'notes', header: 'Notes', render: (transaction) => <span className="text-muted-foreground">{transaction.notes ?? 'No notes'}</span> },
         { key: 'user', header: 'By', render: (transaction) => transaction.user?.name ?? 'System' },
     ];

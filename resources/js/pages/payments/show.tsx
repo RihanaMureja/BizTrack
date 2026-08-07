@@ -1,8 +1,10 @@
+import { PaymentReceiptModal } from '@/components/payments/payment-receipt-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle2, CreditCard } from 'lucide-react';
 import { FormEvent } from 'react';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 type Payment = {
@@ -16,13 +18,14 @@ type Payment = {
     paid_at: string | null;
     verified_at: string | null;
     sale: { invoice_number: string; grand_total: string; paid_amount: string; balance_due: string; payment_status: string };
-    customer: { full_name: string } | null;
+    customer: { display_name: string } | null;
     user: { name: string } | null;
 };
 type VerifyStatus = { value: string; label: string };
 
 export default function PaymentShow({ payment, verifyStatuses }: { payment: Payment; verifyStatuses: VerifyStatus[] }) {
     const form = useForm({ status: 'completed', reference: payment.reference ?? '', notes: payment.notes ?? '' });
+    const [receiptOpen, setReceiptOpen] = useState(false);
     const submit = (event: FormEvent) => {
         event.preventDefault();
         form.post(`/payments/${payment.id}/verify`, { preserveScroll: true });
@@ -39,7 +42,7 @@ export default function PaymentShow({ payment, verifyStatuses }: { payment: Paym
                         </div>
                         <div>
                             <h1 className="text-xl font-semibold">{payment.payment_number}</h1>
-                            <p className="text-sm text-muted-foreground">{payment.sale.invoice_number} | {payment.customer?.full_name ?? 'Walk-in customer'}</p>
+                            <p className="text-sm text-muted-foreground">{payment.sale.invoice_number} | {payment.customer?.display_name ?? 'Walk-in customer'}</p>
                         </div>
                     </div>
                     <Button variant="outline" asChild>
@@ -47,6 +50,9 @@ export default function PaymentShow({ payment, verifyStatuses }: { payment: Paym
                             <ArrowLeft className="size-4" />
                             Back
                         </Link>
+                    </Button>
+                    <Button type="button" onClick={() => setReceiptOpen(true)}>
+                        Preview receipt
                     </Button>
                 </div>
 
@@ -101,6 +107,7 @@ export default function PaymentShow({ payment, verifyStatuses }: { payment: Paym
                     </form>
                 )}
             </div>
+            <PaymentReceiptModal paymentId={payment.id} open={receiptOpen} onOpenChange={setReceiptOpen} />
         </>
     );
 }

@@ -4,11 +4,13 @@ namespace App\Providers;
 
 use App\Events\BusinessRegistered;
 use App\Events\InventoryLow;
+use App\Events\InventoryBatchCreated;
 use App\Events\PaymentCompleted;
 use App\Events\SaleCompleted;
 use App\Listeners\CalculateRevenue;
 use App\Listeners\CreateAuditLog;
 use App\Listeners\GenerateReceipt;
+use App\Listeners\RecordRestockAsExpense;
 use App\Listeners\SendLowStockNotification;
 use App\Listeners\SendPaymentNotification;
 use App\Listeners\UpdateInventory;
@@ -56,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
             InventoryLow::class,
             SendLowStockNotification::class,
         );
+        Event::listen(InventoryBatchCreated::class, RecordRestockAsExpense::class);
 
         Event::listen(SaleCompleted::class, UpdateInventory::class);
         Event::listen(SaleCompleted::class, GenerateReceipt::class);

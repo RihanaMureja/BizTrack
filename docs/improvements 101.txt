@@ -1,0 +1,14 @@
+landing page should only include login
+First redirection should be a business profile only also with subscription plans. no side bar needed before verification or paying. after paying the business profile sidebar should disappear from sidebar and get into settings.
+Products and product insights in one
+Inventory (batch no)
+UI polish (dynamic for businesses) Organizations
+Credit limit logic & Discount logic
+Proceed to payment modal
+Restocking = Expense created
+no setting in the side bar also remove notifications
+Service fee removed
+Reports general and also specific
+Validation on categories and products
+Customer not only full name but also company or private should be picked.
+QRcode generator or barcode generator

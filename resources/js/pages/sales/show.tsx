@@ -4,7 +4,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, ReceiptText } from 'lucide-react';
 
 type Item = { id: number; quantity: number; unit_price: string; line_total: string; product: { name: string } };
-type Sale = { invoice_number: string; subtotal: string; tax_amount: string; discount_amount: string; grand_total: string; status: string; customer: { full_name: string } | null; user: { name: string } | null; items: Item[] };
+type Sale = { invoice_number: string; subtotal: string; tax_amount: string; discount_amount: string; grand_total: string; status: string; customer: { display_name: string } | null; user: { name: string } | null; items: Item[] };
 
 export default function SaleShow({ sale }: { sale: Sale }) {
     return (
@@ -20,7 +20,7 @@ export default function SaleShow({ sale }: { sale: Sale }) {
                         <div>
                             <h1 className="text-xl font-semibold">{sale.invoice_number}</h1>
                             <p className="text-sm text-muted-foreground">
-                                {sale.customer?.full_name ?? 'Walk-in customer'} | {sale.user?.name ?? 'System'}
+                                {sale.customer?.display_name ?? 'Walk-in customer'} | {sale.user?.name ?? 'System'}
                             </p>
                         </div>
                     </div>
@@ -50,7 +50,7 @@ export default function SaleShow({ sale }: { sale: Sale }) {
                         <span>{sale.subtotal} ETB</span>
                     </div>
                     <div className="flex justify-between">
-                        <span>Tax</span>
+                        <span>VAT</span>
                         <span>{sale.tax_amount} ETB</span>
                     </div>
                     <div className="flex justify-between">

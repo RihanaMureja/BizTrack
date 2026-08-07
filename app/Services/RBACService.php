@@ -23,29 +23,24 @@ class RBACService
                 ['title' => 'Businesses', 'href' => '/admin/businesses', 'icon' => 'Building2'],
                 ['title' => 'Users', 'href' => '/admin/users', 'icon' => 'Users'],
                 ['title' => 'Subscriptions', 'href' => '/admin/subscriptions', 'icon' => 'CreditCard'],
-                ['title' => 'Service Fees', 'href' => '/admin/service-fees', 'icon' => 'BadgeDollarSign'],
                 ['title' => 'Roles & Permissions', 'href' => '/admin/roles', 'icon' => 'ShieldCheck'],
                 ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
-                ['title' => 'Settings', 'href' => '/settings/profile', 'icon' => 'Settings'],
             ],
             Role::Owner => [
                 ...$base,
-                ['title' => 'Business Profile', 'href' => '/business/profile', 'icon' => 'Building2'],
                 ['title' => 'Products', 'href' => '/products', 'icon' => 'Package'],
-                ['title' => 'Product Insights', 'href' => '/products/insights', 'icon' => 'ChartColumnIncreasing'],
                 ['title' => 'Categories', 'href' => '/categories', 'icon' => 'Tags'],
                 ['title' => 'Inventory', 'href' => '/inventory', 'icon' => 'Boxes'],
                 ['title' => 'Customers', 'href' => '/customers', 'icon' => 'Users'],
+                ['title' => 'Credit & Discounts', 'href' => '/credit-discounts', 'icon' => 'BadgePercent'],
                 ['title' => 'Employees', 'href' => '/cashiers', 'icon' => 'UserRound'],
                 ['title' => 'Employee Roles', 'href' => '/business-roles', 'icon' => 'ShieldCheck'],
                 ['title' => 'Sales', 'href' => '/sales', 'icon' => 'Receipt'],
                 ['title' => 'Payments', 'href' => '/payments', 'icon' => 'CreditCard'],
-                ['title' => 'Service Fees', 'href' => '/service-fees', 'icon' => 'BadgeDollarSign'],
                 ['title' => 'Expenses', 'href' => '/expenses', 'icon' => 'WalletCards'],
                 ['title' => 'Reports', 'href' => '/reports', 'icon' => 'ChartNoAxesCombined'],
                 ['title' => 'Notifications', 'href' => '/notifications', 'icon' => 'Bell'],
                 ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
-                ['title' => 'Settings', 'href' => '/settings/profile', 'icon' => 'Settings'],
             ],
             Role::Cashier => $this->employeeNavigation($user, $base),
         };
@@ -75,8 +70,6 @@ class RBACService
                 $items[] = $item;
             }
         }
-
-        $items[] = ['title' => 'Profile', 'href' => '/settings/profile', 'icon' => 'UserRound'];
 
         return $items;
     }

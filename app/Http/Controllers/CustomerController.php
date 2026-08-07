@@ -59,14 +59,14 @@ class CustomerController extends Controller
                 'message' => 'Create or assign a business before adding customers.',
             ]);
 
-            return to_route('business.profile');
+            return to_route('settings.business.edit');
         }
 
         $this->authorize('create', Customer::class);
 
         $customer = $this->customerService->create($business, $request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => $customer->full_name.' customer created.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $customer->display_name.' customer created.']);
 
         return back();
     }
@@ -77,7 +77,7 @@ class CustomerController extends Controller
 
         $customer = $this->customerService->update($customer, $request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => $customer->full_name.' customer updated.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $customer->display_name.' customer updated.']);
 
         return back();
     }

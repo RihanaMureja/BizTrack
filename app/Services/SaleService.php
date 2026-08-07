@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Enums\InventoryTransactionType;
 use App\Enums\PaymentStatus;
 use App\Enums\SaleStatus;
-use App\Events\InventoryLow;
 use App\Events\SaleCompleted;
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Sale;
@@ -18,7 +18,11 @@ use Illuminate\Validation\ValidationException;
 
 class SaleService
 {
-    public function __construct(private readonly CustomerCreditService $customerCreditService) {}
+    public function __construct(
+        private readonly CustomerCreditService $customerCreditService,
+        private readonly FifoStockAllocationService $fifoStockAllocationService,
+        private readonly DiscountEngineService $discountEngineService,
+    ) {}
 
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
     {
@@ -69,18 +73,44 @@ class SaleService
                 $saleItems[] = compact('product', 'quantity', 'lineTotal', 'inventory');
             }
 
-            $tax = (float) ($data['tax_amount'] ?? 0);
+            $customer = ! empty($data['customer_id'])
+                ? $business->customers()->whereKey($data['customer_id'])->first()
+                : null;
+            $tax = 0.0;
             $discount = (float) ($data['discount_amount'] ?? 0);
-            $grandTotal = max(0, $subtotal + $tax - $discount);
+
+            if ($customer) {
+                $discount = max($discount, $this->discountEngineService->automaticDiscount($customer, $subtotal));
+            }
+
+            if ($discount > $subtotal) {
+                throw ValidationException::withMessages([
+                    'discount_amount' => 'Discount cannot exceed the sale subtotal.',
+                ]);
+            }
+
+            $taxableAmount = max(0, $subtotal - $discount);
+            $vatEnabled = (bool) ($data['apply_vat'] ?? false) && (bool) $business->is_vat_registered;
+            $vatRate = $vatEnabled ? 15.0 : 0.0;
+            $tax = $vatEnabled ? round($taxableAmount * ($vatRate / 100), 2) : 0.0;
+            $grandTotal = $taxableAmount + $tax;
+            $isCreditSale = (bool) ($data['is_credit_sale'] ?? false);
+
+            if ($isCreditSale) {
+                $this->validateCreditSale($customer, $grandTotal);
+            }
 
             $sale = Sale::create([
                 'business_id' => $business->id,
-                'customer_id' => $data['customer_id'] ?? null,
+                'customer_id' => $customer?->id,
                 'user_id' => $user->id,
                 'invoice_number' => $this->nextInvoiceNumber($business),
+                'is_credit_sale' => $isCreditSale,
                 'subtotal' => $subtotal,
                 'tax_amount' => $tax,
                 'discount_amount' => $discount,
+                'vat_enabled' => $vatEnabled,
+                'vat_rate' => $vatRate,
                 'grand_total' => $grandTotal,
                 'paid_amount' => 0,
                 'balance_due' => $grandTotal,
@@ -98,28 +128,13 @@ class SaleService
                     'line_total' => $item['lineTotal'],
                 ]);
 
-                $before = (int) $item['inventory']->available_stock;
-                $after = $before - $item['quantity'];
-                $item['inventory']->forceFill([
-                    'quantity' => $after,
-                    'available_stock' => $after,
-                    'updated_at' => now(),
-                ])->save();
-
-                $item['inventory']->transactions()->create([
-                    'product_id' => $item['product']->id,
-                    'business_id' => $business->id,
-                    'user_id' => $user->id,
-                    'type' => InventoryTransactionType::Sale,
-                    'quantity_change' => -$item['quantity'],
-                    'quantity_before' => $before,
-                    'quantity_after' => $after,
-                    'notes' => 'Sale '.$sale->invoice_number,
-                ]);
-
-                if ($after <= $item['product']->reorder_level) {
-                    InventoryLow::dispatch($item['inventory']->refresh());
-                }
+                $this->fifoStockAllocationService->deduct(
+                    $item['inventory'],
+                    $item['quantity'],
+                    InventoryTransactionType::Sale,
+                    'Sale '.$sale->invoice_number,
+                    $user,
+                );
             }
 
             $sale = $sale->load(['customer', 'user', 'items.product']);
@@ -136,5 +151,22 @@ class SaleService
         $next = Sale::query()->where('business_id', $business->id)->where('invoice_number', 'like', $prefix.'%')->count() + 1;
 
         return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    private function validateCreditSale(?Customer $customer, float $grandTotal): void
+    {
+        if (! $customer) {
+            throw ValidationException::withMessages([
+                'customer_id' => 'Select a customer before selling on credit.',
+            ]);
+        }
+
+        $availableCredit = max(0, (float) $customer->credit_limit - (float) $customer->current_balance);
+
+        if ($grandTotal > $availableCredit) {
+            throw ValidationException::withMessages([
+                'is_credit_sale' => 'This sale exceeds the customer available credit.',
+            ]);
+        }
     }
 }

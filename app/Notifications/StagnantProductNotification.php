@@ -26,6 +26,6 @@ class StagnantProductNotification extends Notification
             ->subject('Stagnant product detected')
             ->line($productName.' has not sold for '.$this->insight->days_without_sale.' days.')
             ->line($this->insight->suggested_action ?? 'Review pricing, promotion, or stocking strategy.')
-            ->action('View product insights', url('/products/insights'));
+            ->action('View product detail', url('/products/'.$this->insight->product_id));
     }
 }

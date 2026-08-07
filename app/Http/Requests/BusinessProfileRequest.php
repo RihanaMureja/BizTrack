@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class BusinessProfileRequest extends FormRequest
 {
@@ -18,6 +19,8 @@ class BusinessProfileRequest extends FormRequest
      */
     public function rules(): array
     {
+        $business = $this->user()?->ownedBusiness;
+
         return [
             'business_name' => ['required', 'string', 'max:150'],
             'business_type' => ['nullable', 'string', 'max:100'],
@@ -31,14 +34,41 @@ class BusinessProfileRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:1000'],
             'logo' => ['nullable', 'image', 'max:2048'],
-            'national_id_fan_number' => ['required', 'string', 'max:80'],
-            'national_id_photo' => [$this->user()?->ownedBusiness?->national_id_photo_path ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
-            'trade_license' => [$this->user()?->ownedBusiness?->trade_license_path ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
-            'tin_certificate' => [$this->user()?->ownedBusiness?->tin_certificate_path ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'national_id_fan_number' => ['nullable', 'string', 'max:80'],
+            'national_id_photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'trade_license' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'tin_certificate' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
             'is_vat_registered' => ['boolean'],
-            'vat_certificate' => ['nullable', 'required_if:is_vat_registered,1,true,on', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'vat_certificate' => [
+                Rule::requiredIf(fn (): bool => $this->boolean('is_vat_registered') && blank($business?->vat_certificate_path)),
+                'nullable',
+                'file',
+                'mimes:jpg,jpeg,png,pdf',
+                'max:4096',
+            ],
             'has_physical_shop' => ['boolean'],
-            'rental_agreement' => ['nullable', 'required_if:has_physical_shop,1,true,on', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'rental_agreement' => [
+                Rule::requiredIf(fn (): bool => $this->boolean('has_physical_shop') && blank($business?->rental_agreement_path)),
+                'nullable',
+                'file',
+                'mimes:jpg,jpeg,png,pdf',
+                'max:4096',
+            ],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                if (! $this->boolean('is_vat_registered') && $this->hasFile('vat_certificate')) {
+                    $validator->errors()->add('vat_certificate', 'Only upload a VAT certificate when the business is VAT registered.');
+                }
+
+                if (! $this->boolean('has_physical_shop') && $this->hasFile('rental_agreement')) {
+                    $validator->errors()->add('rental_agreement', 'Only upload a rental agreement when the business has a physical shop.');
+                }
+            },
         ];
     }
 }

@@ -46,9 +46,7 @@ test('owner can open payments page', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('payments/index')
-            ->where('payments.total', 0)
-            ->has('sales', 1)
-            ->has('methods', 4));
+            ->where('payments.total', 0));
 });
 
 test('cash payment completes immediately and updates sale balance', function () {
@@ -58,11 +56,9 @@ test('cash payment completes immediately and updates sale balance', function () 
     $sale = unpaidSale($business, $owner, 100);
 
     $this->actingAs($cashier)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 100,
             'method' => PaymentMethod::Cash->value,
-            'reference' => 'CASH-001',
         ])
         ->assertRedirect();
 
@@ -76,17 +72,16 @@ test('cash payment completes immediately and updates sale balance', function () 
     Event::assertDispatched(PaymentCompleted::class);
 });
 
-test('bank payment is pending until verified', function () {
+test('telebirr payment is pending until verified', function () {
     Event::fake([PaymentCompleted::class]);
     [$owner, $business] = paymentBusinessContext();
     $sale = unpaidSale($business, $owner, 120);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 80,
-            'method' => PaymentMethod::Bank->value,
-            'reference' => 'BANK-001',
+            'method' => PaymentMethod::Telebirr->value,
+            'phone' => '0911222333',
         ])
         ->assertRedirect();
 
@@ -100,7 +95,7 @@ test('bank payment is pending until verified', function () {
     $this->actingAs($owner)
         ->post(route('payments.verify', $payment), [
             'status' => PaymentStatus::Completed->value,
-            'reference' => 'BANK-VERIFIED',
+            'reference' => 'TEL-VERIFIED',
         ])
         ->assertRedirect(route('payments.show', $payment));
 
@@ -117,8 +112,7 @@ test('payment cannot exceed remaining sale balance', function () {
     $sale = unpaidSale($business, $owner, 75);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 76,
             'method' => PaymentMethod::Cash->value,
         ])
@@ -134,12 +128,11 @@ test('user cannot pay another business sale', function () {
     $sale = Sale::factory()->create(['business_id' => $otherBusiness->id]);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 20,
             'method' => PaymentMethod::Cash->value,
         ])
-        ->assertSessionHasErrors('sale_id');
+        ->assertForbidden();
 });
 
 test('completed payment creates notification and audit log', function () {
@@ -147,8 +140,7 @@ test('completed payment creates notification and audit log', function () {
     $sale = unpaidSale($business, $owner, 50);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 50,
             'method' => PaymentMethod::Cash->value,
         ])

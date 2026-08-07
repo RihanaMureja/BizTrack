@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CustomerType;
 use App\Models\Business;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -16,10 +17,13 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         $creditLimit = fake()->randomFloat(2, 500, 10000);
+        $name = fake()->name();
 
         return [
             'business_id' => Business::factory(),
-            'full_name' => fake()->name(),
+            'customer_type' => CustomerType::Individual,
+            'display_name' => $name,
+            'full_name' => $name,
             'phone' => fake()->optional()->phoneNumber(),
             'email' => fake()->unique()->safeEmail(),
             'address' => fake()->optional()->address(),

@@ -1,5 +1,6 @@
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { RestockBatchForm } from '@/components/inventory/restock-batch-form';
 import InputError from '@/components/input-error';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
@@ -12,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { AlertTriangle, Boxes, History, PackagePlus, SlidersHorizontal } from 'lucide-react';
+import { AlertTriangle, Boxes, History, Layers3, PackagePlus, SlidersHorizontal } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
@@ -46,44 +47,6 @@ type Props = {
     };
     adjustmentTypes: Array<{ value: string; label: string }>;
 };
-
-function RestockForm({ item, onSuccess }: { item: InventoryItem; onSuccess: () => void }) {
-    const form = useForm({ quantity: '1', notes: '' });
-
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
-        form.post(`/inventory/${item.id}/restock`, {
-            preserveScroll: true,
-            onSuccess: () => {
-                form.reset();
-                onSuccess();
-            },
-        });
-    };
-
-    return (
-        <form onSubmit={submit} className="grid gap-4">
-            <div>
-                <p className="text-sm font-medium">{item.product.name}</p>
-                <p className="text-sm text-muted-foreground">Current stock: {item.available_stock} {item.product.unit ?? 'units'}</p>
-            </div>
-            <div className="grid gap-2">
-                <Label htmlFor="restock_quantity">Quantity to add</Label>
-                <Input id="restock_quantity" type="number" min="1" value={form.data.quantity} onChange={(event) => form.setData('quantity', event.target.value)} required />
-                <InputError message={form.errors.quantity} />
-            </div>
-            <div className="grid gap-2">
-                <Label htmlFor="restock_notes">Notes</Label>
-                <Input id="restock_notes" value={form.data.notes} onChange={(event) => form.setData('notes', event.target.value)} placeholder="Supplier, delivery note, or reason" />
-                <InputError message={form.errors.notes} />
-            </div>
-            <Button type="submit" className="w-fit" disabled={form.processing}>
-                {form.processing ? <Spinner /> : <PackagePlus className="size-4" />}
-                Restock
-            </Button>
-        </form>
-    );
-}
 
 function AdjustmentForm({ item, types, onSuccess }: { item: InventoryItem; types: Props['adjustmentTypes']; onSuccess: () => void }) {
     const form = useForm({ type: 'adjustment', quantity: String(item.available_stock), notes: '' });
@@ -187,6 +150,11 @@ export default function InventoryIndex({ inventory, filters, adjustmentTypes }: 
                         Adjust
                     </Button>
                     <Button type="button" variant="outline" size="icon" asChild>
+                        <Link href={`/inventory/${item.id}/batches`} aria-label={`View ${item.product.name} batches`}>
+                            <Layers3 className="size-4" />
+                        </Link>
+                    </Button>
+                    <Button type="button" variant="outline" size="icon" asChild>
                         <Link href={`/inventory/${item.id}/transactions`} aria-label={`View ${item.product.name} history`}>
                             <History className="size-4" />
                         </Link>
@@ -235,7 +203,7 @@ export default function InventoryIndex({ inventory, filters, adjustmentTypes }: 
             <Dialog open={Boolean(restocking)} onOpenChange={(open) => !open && setRestocking(null)}>
                 <DialogContent>
                     <DialogHeader><DialogTitle>Restock product</DialogTitle></DialogHeader>
-                    {restocking && <RestockForm item={restocking} onSuccess={() => setRestocking(null)} />}
+                    {restocking && <RestockBatchForm item={restocking} onSuccess={() => setRestocking(null)} />}
                 </DialogContent>
             </Dialog>
 

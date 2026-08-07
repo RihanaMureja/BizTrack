@@ -121,8 +121,7 @@ test('employee sidebar follows assigned permissions', function () {
         ->assertInertia(fn ($page) => $page
             ->where('navigation.0.title', 'Dashboard')
             ->where('navigation.1.title', 'Payments')
-            ->where('navigation.2.title', 'Profile')
-            ->missing('navigation.3.title'));
+            ->missing('navigation.2.title'));
 });
 
 test('employee cannot access module without permission', function () {

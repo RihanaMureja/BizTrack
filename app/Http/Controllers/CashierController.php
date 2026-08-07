@@ -46,7 +46,7 @@ class CashierController extends Controller
         if (! $business) {
             Inertia::flash('toast', ['type' => 'error', 'message' => 'Create your business profile before adding employees.']);
 
-            return to_route('business.profile');
+            return to_route('settings.business.edit');
         }
 
         $this->authorize('create', User::class);

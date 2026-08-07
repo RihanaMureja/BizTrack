@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ExpenseSource;
 use App\Events\ExpenseRecorded;
 use App\Models\Business;
 use App\Models\Expense;
@@ -26,6 +27,7 @@ class ExpenseService
                 ->orWhere('vendor', 'like', '%'.$search.'%')
                 ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery->where('name', 'like', '%'.$search.'%'))))
             ->when($filters['category_id'] ?? null, fn ($query, $categoryId) => $query->where('expense_category_id', $categoryId))
+            ->when($filters['source'] ?? null, fn ($query, $source) => $query->where('source', $source))
             ->when($filters['date_from'] ?? null, fn ($query, $date) => $query->whereDate('expense_date', '>=', $date))
             ->when($filters['date_to'] ?? null, fn ($query, $date) => $query->whereDate('expense_date', '<=', $date))
             ->latest('expense_date')
@@ -38,6 +40,7 @@ class ExpenseService
         return (float) Expense::query()
             ->where('business_id', $business->id)
             ->when($filters['category_id'] ?? null, fn ($query, $categoryId) => $query->where('expense_category_id', $categoryId))
+            ->when($filters['source'] ?? null, fn ($query, $source) => $query->where('source', $source))
             ->when($filters['date_from'] ?? null, fn ($query, $date) => $query->whereDate('expense_date', '>=', $date))
             ->when($filters['date_to'] ?? null, fn ($query, $date) => $query->whereDate('expense_date', '<=', $date))
             ->sum('amount');
@@ -84,6 +87,10 @@ class ExpenseService
             ...$data,
             'business_id' => $business->id,
             'user_id' => $user->id,
+            'source' => ExpenseSource::Manual,
+            'source_reference_type' => null,
+            'source_reference_id' => null,
+            'source_period' => null,
             'receipt_path' => $receiptPath,
         ])->load(['category', 'user']);
 

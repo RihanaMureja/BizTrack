@@ -26,6 +26,7 @@ function creditSale(Business $business, User $user, Customer $customer, float $t
         'business_id' => $business->id,
         'customer_id' => $customer->id,
         'user_id' => $user->id,
+        'is_credit_sale' => true,
         'grand_total' => $total,
         'paid_amount' => 0,
         'balance_due' => $total,
@@ -54,8 +55,7 @@ test('completed payment reduces credit and marks partial balance', function () {
     app(\App\Services\CustomerCreditService::class)->syncForSale($sale);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 40,
             'method' => PaymentMethod::Cash->value,
         ])
@@ -75,8 +75,7 @@ test('full payment marks customer credit as paid and clears customer balance', f
     app(\App\Services\CustomerCreditService::class)->syncForSale($sale);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 75,
             'method' => PaymentMethod::Cash->value,
         ])
@@ -96,11 +95,10 @@ test('pending digital payment does not reduce customer credit until verified', f
     app(\App\Services\CustomerCreditService::class)->syncForSale($sale);
 
     $this->actingAs($owner)
-        ->post(route('payments.store'), [
-            'sale_id' => $sale->id,
+        ->post(route('sales.checkout.store', $sale), [
             'amount' => 90,
             'method' => PaymentMethod::Telebirr->value,
-            'reference' => 'TEL-001',
+            'phone' => '0911222333',
         ])
         ->assertRedirect();
 

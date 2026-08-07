@@ -5,6 +5,8 @@ use App\Enums\Role;
 use App\Models\Business;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\User;
 
 function productOwnerWithBusiness(): array
@@ -21,7 +23,6 @@ function validProductPayload(array $overrides = []): array
     return [
         'category_id' => null,
         'name' => 'Bottled Water 500ml',
-        'barcode' => 'BW500001',
         'description' => 'Clean bottled water',
         'buy_price' => 8,
         'selling_price' => 12,
@@ -61,16 +62,18 @@ test('owner can create a product and inventory record is created automatically',
         ->post(route('products.store'), validProductPayload(['category_id' => $category->id]))
         ->assertRedirect();
 
-    $product = Product::query()->where('barcode', 'BW500001')->firstOrFail();
+    $product = Product::query()->where('name', 'Bottled Water 500ml')->firstOrFail();
 
     expect($product->business_id)->toBe($business->id)
+        ->and($product->barcode)->not->toBeNull()
+        ->and($product->barcode)->not->toBe('BW500001')
+        ->and($product->qr_payload)->toContain($product->barcode)
         ->and($product->inventory)->not->toBeNull()
         ->and($product->inventory->available_stock)->toBe(0);
 });
 
-test('product barcode must be unique per business', function () {
-    [$owner, $business] = productOwnerWithBusiness();
-    Product::factory()->create(['business_id' => $business->id, 'barcode' => 'DUP001']);
+test('manual barcode input is prohibited', function () {
+    [$owner] = productOwnerWithBusiness();
 
     $this->actingAs($owner)
         ->post(route('products.store'), validProductPayload(['barcode' => 'DUP001']))
@@ -97,6 +100,43 @@ test('selling price must be greater than or equal to buy price', function () {
         ->assertSessionHasErrors('selling_price');
 });
 
+test('product name must be unique within the same business category', function () {
+    [$owner, $business] = productOwnerWithBusiness();
+    $category = Category::factory()->create(['business_id' => $business->id]);
+    Product::factory()->create([
+        'business_id' => $business->id,
+        'category_id' => $category->id,
+        'name' => 'Duplicate Name',
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('products.store'), validProductPayload([
+            'category_id' => $category->id,
+            'name' => 'Duplicate Name',
+        ]))
+        ->assertSessionHasErrors('name');
+});
+
+test('product name can be reused in a different category', function () {
+    [$owner, $business] = productOwnerWithBusiness();
+    $categoryA = Category::factory()->create(['business_id' => $business->id]);
+    $categoryB = Category::factory()->create(['business_id' => $business->id]);
+    Product::factory()->create([
+        'business_id' => $business->id,
+        'category_id' => $categoryA->id,
+        'name' => 'Shared Name',
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('products.store'), validProductPayload([
+            'category_id' => $categoryB->id,
+            'name' => 'Shared Name',
+        ]))
+        ->assertRedirect();
+
+    expect(Product::query()->where('business_id', $business->id)->where('name', 'Shared Name')->count())->toBe(2);
+});
+
 test('owner can update their own product', function () {
     [$owner, $business] = productOwnerWithBusiness();
     $product = Product::factory()->create(['business_id' => $business->id]);
@@ -104,11 +144,26 @@ test('owner can update their own product', function () {
     $this->actingAs($owner)
         ->put(route('products.update', $product), validProductPayload([
             'name' => 'Updated Product',
-            'barcode' => $product->barcode,
         ]))
         ->assertRedirect();
 
     expect($product->refresh()->name)->toBe('Updated Product');
+});
+
+test('barcode is immutable after a product is referenced by a sale', function () {
+    [$owner, $business] = productOwnerWithBusiness();
+    $product = Product::factory()->create(['business_id' => $business->id, 'barcode' => 'LOCKED001']);
+    $sale = Sale::factory()->create(['business_id' => $business->id, 'user_id' => $owner->id]);
+    SaleItem::factory()->create(['sale_id' => $sale->id, 'product_id' => $product->id]);
+
+    $this->actingAs($owner)
+        ->put(route('products.update', $product), validProductPayload([
+            'name' => 'Still Locked',
+            'barcode' => 'NEWCODE001',
+        ]))
+        ->assertSessionHasErrors('barcode');
+
+    expect($product->refresh()->barcode)->toBe('LOCKED001');
 });
 
 test('owner cannot update another business product', function () {

@@ -9,6 +9,8 @@ use App\Models\Sale;
 
 class CustomerCreditService
 {
+    public function __construct(private readonly CreditScoringService $creditScoringService) {}
+
     public function syncForSale(Sale $sale): ?CustomerCredit
     {
         if (! $sale->customer_id) {
@@ -16,13 +18,20 @@ class CustomerCreditService
         }
 
         $sale = $sale->refresh();
-        $creditAmount = (float) $sale->grand_total;
-        $paidAmount = min((float) $sale->paid_amount, $creditAmount);
-        $remainingBalance = max(0, $creditAmount - $paidAmount);
         $existing = CustomerCredit::query()
             ->where('business_id', $sale->business_id)
             ->where('sale_id', $sale->id)
             ->first();
+
+        if (! $sale->is_credit_sale && ! $existing) {
+            $this->syncCustomerBalance($sale->customer);
+
+            return null;
+        }
+
+        $creditAmount = (float) $sale->grand_total;
+        $paidAmount = min((float) $sale->paid_amount, $creditAmount);
+        $remainingBalance = max(0, $creditAmount - $paidAmount);
 
         if (! $existing && $remainingBalance <= 0) {
             $this->syncCustomerBalance($sale->customer);
@@ -81,6 +90,7 @@ class CustomerCreditService
             ->sum('remaining_balance');
 
         $customer->forceFill(['current_balance' => $balance])->save();
+        $this->creditScoringService->syncProfile($customer);
 
         return $customer->refresh();
     }

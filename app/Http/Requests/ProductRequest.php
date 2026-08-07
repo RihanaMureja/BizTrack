@@ -29,15 +29,18 @@ class ProductRequest extends FormRequest
                 Rule::exists('categories', 'id')
                     ->where(fn ($query) => $query->where('business_id', $businessId)),
             ],
-            'name' => ['required', 'string', 'max:150'],
-            'barcode' => [
-                'nullable',
+            'name' => [
+                'required',
                 'string',
-                'max:100',
-                Rule::unique('products', 'barcode')
-                    ->where(fn ($query) => $query->where('business_id', $businessId))
+                'max:150',
+                Rule::unique('products', 'name')
+                    ->where(fn ($query) => $query
+                        ->where('business_id', $businessId)
+                        ->where('category_id', $this->input('category_id')))
                     ->ignore($product),
             ],
+            'barcode' => ['prohibited'],
+            'qr_payload' => ['prohibited'],
             'description' => ['nullable', 'string', 'max:1000'],
             'buy_price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'selling_price' => ['required', 'numeric', 'min:0', 'max:99999999.99', 'gte:buy_price'],

@@ -1,3 +1,5 @@
+import { CustomerTypeFields } from '@/components/customers/customer-type-fields';
+import type { CustomerType } from '@/components/customers/customer-type-fields';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,12 +11,14 @@ import type { FormEvent } from 'react';
 
 export type CustomerFormCustomer = {
     id?: number;
+    customer_type?: CustomerType;
+    display_name?: string;
     full_name?: string;
+    contact_person?: string | null;
+    contact_person_phone?: string | null;
     phone?: string | null;
     email?: string | null;
     address?: string | null;
-    credit_limit?: string | number;
-    current_balance?: string | number;
 };
 
 type Props = {
@@ -26,12 +30,13 @@ export function CustomerForm({ customer, onSuccess }: Props) {
     const isEditing = Boolean(customer?.id);
 
     const form = useForm({
-        full_name: customer?.full_name ?? '',
+        customer_type: customer?.customer_type ?? 'individual',
+        display_name: customer?.display_name ?? customer?.full_name ?? '',
+        contact_person: customer?.contact_person ?? '',
+        contact_person_phone: customer?.contact_person_phone ?? '',
         phone: customer?.phone ?? '',
         email: customer?.email ?? '',
         address: customer?.address ?? '',
-        credit_limit: String(customer?.credit_limit ?? 0),
-        current_balance: String(customer?.current_balance ?? 0),
     });
 
     const submit = (event: FormEvent) => {
@@ -55,11 +60,17 @@ export function CustomerForm({ customer, onSuccess }: Props) {
     return (
         <form onSubmit={submit} className="grid gap-5">
             <div className="grid gap-4 md:grid-cols-2">
-                <div className="grid gap-2 md:col-span-2">
-                    <Label htmlFor="full_name">Full name</Label>
-                    <Input id="full_name" value={form.data.full_name} onChange={(event) => form.setData('full_name', event.target.value)} required autoFocus />
-                    <InputError message={form.errors.full_name} />
-                </div>
+                <CustomerTypeFields
+                    type={form.data.customer_type as CustomerType}
+                    displayName={form.data.display_name}
+                    contactPerson={form.data.contact_person}
+                    contactPersonPhone={form.data.contact_person_phone}
+                    errors={form.errors}
+                    onTypeChange={(value) => form.setData('customer_type', value)}
+                    onDisplayNameChange={(value) => form.setData('display_name', value)}
+                    onContactPersonChange={(value) => form.setData('contact_person', value)}
+                    onContactPersonPhoneChange={(value) => form.setData('contact_person_phone', value)}
+                />
                 <div className="grid gap-2">
                     <Label htmlFor="phone">Phone</Label>
                     <Input id="phone" value={form.data.phone} onChange={(event) => form.setData('phone', event.target.value)} placeholder="Optional" />
@@ -69,16 +80,6 @@ export function CustomerForm({ customer, onSuccess }: Props) {
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" value={form.data.email} onChange={(event) => form.setData('email', event.target.value)} placeholder="Optional" />
                     <InputError message={form.errors.email} />
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="credit_limit">Credit limit</Label>
-                    <Input id="credit_limit" type="number" min="0" step="0.01" value={form.data.credit_limit} onChange={(event) => form.setData('credit_limit', event.target.value)} required />
-                    <InputError message={form.errors.credit_limit} />
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="current_balance">Current balance</Label>
-                    <Input id="current_balance" type="number" min="0" step="0.01" value={form.data.current_balance} onChange={(event) => form.setData('current_balance', event.target.value)} required />
-                    <InputError message={form.errors.current_balance} />
                 </div>
                 <div className="grid gap-2 md:col-span-2">
                     <Label htmlFor="address">Address</Label>

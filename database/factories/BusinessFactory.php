@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\BusinessAccessMode;
 use App\Enums\RecordStatus;
 use App\Models\Business;
 use App\Models\Subscription;
@@ -25,6 +26,7 @@ class BusinessFactory extends Factory
             'address' => fake()->address(),
             'logo' => null,
             'status' => RecordStatus::Active,
+            'access_mode' => BusinessAccessMode::Active,
         ];
     }
 }

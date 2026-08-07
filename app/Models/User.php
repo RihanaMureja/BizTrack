@@ -34,7 +34,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['business_id', 'business_role_id', 'first_name', 'last_name', 'name', 'email', 'phone', 'password', 'role', 'status', 'preferences', 'must_reset_password', 'password_changed_at', 'temporary_password_expires_at'])]
+#[Fillable(['business_id', 'business_role_id', 'first_name', 'last_name', 'name', 'email', 'phone', 'password', 'role', 'status', 'salary', 'preferences', 'must_reset_password', 'password_changed_at', 'temporary_password_expires_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -59,6 +59,7 @@ class User extends Authenticatable implements PasskeyUser
             'two_factor_confirmed_at' => 'datetime',
             'role' => Role::class,
             'status' => RecordStatus::class,
+            'salary' => 'decimal:2',
             'preferences' => 'array',
             'must_reset_password' => 'boolean',
             'password_changed_at' => 'datetime',
@@ -89,6 +90,11 @@ class User extends Authenticatable implements PasskeyUser
     public function securityQuestions(): HasMany
     {
         return $this->hasMany(UserSecurityQuestion::class);
+    }
+
+    public function phoneVerifications(): HasMany
+    {
+        return $this->hasMany(PhoneVerification::class);
     }
 
     public function getRoleLabelAttribute(): string

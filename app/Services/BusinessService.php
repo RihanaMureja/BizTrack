@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
+use App\Enums\BusinessAccessMode;
+use App\Enums\BusinessVerificationDocumentType;
 use App\Enums\RecordStatus;
 use App\Events\BusinessRegistered;
 use App\Models\Business;
+use App\Models\BusinessVerificationDocument;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class BusinessService
 {
-    public function __construct(private readonly BusinessVerificationService $businessVerificationService) {}
-
     public function paginateForAdmin(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
         return Business::query()
@@ -25,7 +25,7 @@ class BusinessService
                 ->orWhere('business_type', 'like', '%'.$search.'%')
                 ->orWhere('email', 'like', '%'.$search.'%')
                 ->orWhereHas('owner', fn ($ownerQuery) => $ownerQuery->where('email', 'like', '%'.$search.'%'))))
-            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('access_mode', $status))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
@@ -38,18 +38,20 @@ class BusinessService
     {
         return DB::transaction(function () use ($owner, $data): Business {
             $existingBusiness = $owner->ownedBusiness;
-            $payload = Arr::except($data, [
+            $payload = collect($data)->except([
                 'logo',
                 'national_id_photo',
                 'trade_license',
                 'tin_certificate',
                 'vat_certificate',
                 'rental_agreement',
-            ]);
+            ])->all();
 
             if (($data['logo'] ?? null) instanceof UploadedFile) {
                 $payload['logo'] = $data['logo']->store('business-logos', 'public');
             }
+
+            $documentPaths = [];
 
             foreach ([
                 'national_id_photo' => 'national_id_photo_path',
@@ -60,6 +62,7 @@ class BusinessService
             ] as $input => $column) {
                 if (($data[$input] ?? null) instanceof UploadedFile) {
                     $payload[$column] = $data[$input]->store('business-verifications', 'public');
+                    $documentPaths[$input] = $payload[$column];
                 }
             }
 
@@ -72,23 +75,14 @@ class BusinessService
                     'email' => $payload['email'] ?? $owner->email,
                     'is_vat_registered' => (bool) ($payload['is_vat_registered'] ?? false),
                     'has_physical_shop' => (bool) ($payload['has_physical_shop'] ?? false),
-                    'status' => RecordStatus::PendingReview,
-                    'submitted_for_review_at' => now(),
+                    'status' => $existingBusiness?->status ?? RecordStatus::Active,
+                    'access_mode' => $existingBusiness?->access_mode ?? BusinessAccessMode::Onboarding,
                 ],
             );
 
             $owner->forceFill(['business_id' => $business->id])->save();
-            $this->businessVerificationService->syncSubmittedDocuments(
-                $business,
-                $owner,
-                Arr::only($business->getAttributes(), [
-                    'national_id_photo_path',
-                    'trade_license_path',
-                    'tin_certificate_path',
-                    'vat_certificate_path',
-                    'rental_agreement_path',
-                ]),
-            );
+
+            $this->syncOptionalDocuments($business, $owner, $documentPaths);
 
             if (! $existingBusiness) {
                 BusinessRegistered::dispatch($business->refresh());
@@ -117,5 +111,43 @@ class BusinessService
         $business->forceFill(['subscription_id' => $subscriptionId])->save();
 
         return $business->refresh();
+    }
+
+    /**
+     * @param  array<string, string>  $paths
+     */
+    private function syncOptionalDocuments(Business $business, User $owner, array $paths): void
+    {
+        $types = [
+            'national_id_photo' => BusinessVerificationDocumentType::NationalId,
+            'trade_license' => BusinessVerificationDocumentType::TradeLicense,
+            'tin_certificate' => BusinessVerificationDocumentType::TinCertificate,
+            'vat_certificate' => BusinessVerificationDocumentType::VatCertificate,
+            'rental_agreement' => BusinessVerificationDocumentType::RentalAgreement,
+        ];
+
+        foreach ($paths as $input => $path) {
+            $type = $types[$input] ?? null;
+
+            if (! $type) {
+                continue;
+            }
+
+            BusinessVerificationDocument::query()->updateOrCreate(
+                [
+                    'business_id' => $business->id,
+                    'type' => $type,
+                ],
+                [
+                    'uploaded_by' => $owner->id,
+                    'label' => $type->label(),
+                    'path' => $path,
+                    'status' => RecordStatus::Active,
+                    'notes' => null,
+                    'reviewed_at' => null,
+                    'reviewed_by' => null,
+                ],
+            );
+        }
     }
 }

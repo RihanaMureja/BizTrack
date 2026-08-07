@@ -26,8 +26,8 @@ class CreditReminderNotification extends Notification
         $credit = $this->credit->loadMissing(['customer', 'sale']);
 
         return (new MailMessage)
-            ->subject('Credit reminder: '.$credit->customer->full_name)
-            ->line($credit->customer->full_name.' has '.$credit->remaining_balance.' ETB remaining on '.$credit->sale->invoice_number.'.')
+            ->subject('Credit reminder: '.$credit->customer->display_name)
+            ->line($credit->customer->display_name.' has '.$credit->remaining_balance.' ETB remaining on '.$credit->sale->invoice_number.'.')
             ->line('Due date: '.($credit->due_date?->toFormattedDateString() ?? 'Not set').'.');
     }
 }

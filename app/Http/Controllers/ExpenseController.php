@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseSource;
 use App\Enums\ExpenseStatus;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
@@ -24,6 +25,7 @@ class ExpenseController extends Controller
         $filters = [
             'search' => $request->string('search')->toString() ?: null,
             'category_id' => $request->integer('category_id') ?: null,
+            'source' => $request->string('source')->toString() ?: null,
             'date_from' => $request->string('date_from')->toString() ?: null,
             'date_to' => $request->string('date_to')->toString() ?: null,
         ];
@@ -34,6 +36,10 @@ class ExpenseController extends Controller
             'statuses' => collect(ExpenseStatus::cases())->map(fn (ExpenseStatus $status): array => [
                 'value' => $status->value,
                 'label' => $status->label(),
+            ])->values(),
+            'sources' => collect(ExpenseSource::cases())->map(fn (ExpenseSource $source): array => [
+                'value' => $source->value,
+                'label' => $source->label(),
             ])->values(),
             'total' => $business ? number_format($this->expenseService->totalForBusiness($business, $filters), 2) : '0.00',
             'filters' => $filters,

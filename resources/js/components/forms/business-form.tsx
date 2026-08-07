@@ -45,9 +45,10 @@ export type BusinessFormSubscription = {
 type Props = {
     business: BusinessFormBusiness | null;
     subscriptions: BusinessFormSubscription[];
+    action?: string;
 };
 
-export function BusinessForm({ business, subscriptions }: Props) {
+export function BusinessForm({ business, subscriptions, action = '/settings/business' }: Props) {
     const form = useForm({
         business_name: business?.business_name ?? '',
         business_type: business?.business_type ?? '',
@@ -69,7 +70,7 @@ export function BusinessForm({ business, subscriptions }: Props) {
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        form.post('/business/profile', { forceFormData: true });
+        form.post(action, { forceFormData: true });
     };
 
     return (
@@ -163,7 +164,7 @@ export function BusinessForm({ business, subscriptions }: Props) {
             <div className="rounded-md border bg-background p-4">
                 <h2 className="font-semibold">Owner verification</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                    These documents are required before BizTrack unlocks products, inventory, sales, and reports.
+                    These documents are optional records you can keep with your profile. They do not block access.
                 </p>
 
                 <div className="mt-4 grid gap-4">
@@ -173,7 +174,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                             id="national_id_fan_number"
                             value={form.data.national_id_fan_number}
                             onChange={(event) => form.setData('national_id_fan_number', event.target.value)}
-                            required
                         />
                         <InputError message={form.errors.national_id_fan_number} />
                     </div>
@@ -182,7 +182,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                         id="national_id_photo"
                         label="National ID photo"
                         existing={business?.national_id_photo_path}
-                        required={!business?.national_id_photo_path}
                         error={form.errors.national_id_photo}
                         onChange={(file) => form.setData('national_id_photo', file)}
                     />
@@ -191,7 +190,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                         id="trade_license"
                         label="Business license / trade license"
                         existing={business?.trade_license_path}
-                        required={!business?.trade_license_path}
                         error={form.errors.trade_license}
                         onChange={(file) => form.setData('trade_license', file)}
                     />
@@ -200,7 +198,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                         id="tin_certificate"
                         label="Tax certificate / TIN"
                         existing={business?.tin_certificate_path}
-                        required={!business?.tin_certificate_path}
                         error={form.errors.tin_certificate}
                         onChange={(file) => form.setData('tin_certificate', file)}
                     />
@@ -224,7 +221,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                             id="vat_certificate"
                             label="VAT certificate"
                             existing={business?.vat_certificate_path}
-                            required={!business?.vat_certificate_path}
                             error={form.errors.vat_certificate}
                             onChange={(file) => form.setData('vat_certificate', file)}
                         />
@@ -244,7 +240,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                             id="rental_agreement"
                             label="Rental agreement / shop ownership proof"
                             existing={business?.rental_agreement_path}
-                            required={!business?.rental_agreement_path}
                             error={form.errors.rental_agreement}
                             onChange={(file) => form.setData('rental_agreement', file)}
                         />

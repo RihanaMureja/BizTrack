@@ -1,9 +1,10 @@
 import { RevenueOverview } from '@/components/charts/revenue-overview';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { ProfitByProductChart, type ProductProfitPoint } from '@/components/reports/profit-by-product-chart';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { BarChart3, Download, FileText, Save } from 'lucide-react';
 import type { FormEvent } from 'react';
 
@@ -11,6 +12,8 @@ type SummaryPoint = { label: string; value: string };
 type ChartPoint = { label: string; value: number };
 type ReportRow = Record<string, string | number | null>;
 type ReportType = { value: string; label: string };
+type ExpenseSource = { value: string; label: string };
+type Category = { id: number; name: string };
 type RecentReport = { id: number; type: string; title: string; date_from: string | null; date_to: string | null; generated_at: string };
 type Props = {
     report: {
@@ -21,18 +24,23 @@ type Props = {
         summary: SummaryPoint[];
         chart: ChartPoint[];
         rows: ReportRow[];
-        topProducts?: Array<{ name: string; quantity: number; total: number }>;
+        topProducts?: Array<{ id: number; name: string; quantity: number; total: number; href: string }>;
+        productProfit?: ProductProfitPoint[];
     };
     recentReports: RecentReport[];
     types: ReportType[];
-    filters: { type: string; date_from: string; date_to: string };
+    sources: ExpenseSource[];
+    categories: Category[];
+    filters: { type: string; date_from: string; date_to: string; source: string; category_id: string | number };
 };
 
-export default function ReportsIndex({ report, recentReports, types, filters }: Props) {
+export default function ReportsIndex({ report, recentReports, types, sources, categories, filters }: Props) {
     const form = useForm({
         type: filters.type,
         date_from: filters.date_from,
         date_to: filters.date_to,
+        source: filters.source,
+        category_id: String(filters.category_id ?? ''),
     });
 
     const applyFilters = () => {
@@ -70,12 +78,20 @@ export default function ReportsIndex({ report, recentReports, types, filters }: 
                     </Button>
                 </div>
 
-                <form onSubmit={generate} className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[12rem_10rem_10rem_auto_auto]">
+                <form onSubmit={generate} className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[12rem_10rem_10rem_11rem_12rem_auto_auto]">
                     <select value={form.data.type} onChange={(event) => form.setData('type', event.target.value)} onBlur={applyFilters} className="border-input bg-background h-10 rounded-md border px-3 text-sm">
                         {types.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
                     </select>
                     <input type="date" value={form.data.date_from} onChange={(event) => form.setData('date_from', event.target.value)} onBlur={applyFilters} className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
                     <input type="date" value={form.data.date_to} onChange={(event) => form.setData('date_to', event.target.value)} onBlur={applyFilters} className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
+                    <select value={form.data.source} onChange={(event) => form.setData('source', event.target.value)} onBlur={applyFilters} className="border-input bg-background h-10 rounded-md border px-3 text-sm" disabled={!['expenses', 'profit'].includes(form.data.type)}>
+                        <option value="">All sources</option>
+                        {sources.map((source) => <option key={source.value} value={source.value}>{source.label}</option>)}
+                    </select>
+                    <select value={form.data.category_id} onChange={(event) => form.setData('category_id', event.target.value)} onBlur={applyFilters} className="border-input bg-background h-10 rounded-md border px-3 text-sm" disabled={!['sales', 'profit'].includes(form.data.type)}>
+                        <option value="">All categories</option>
+                        {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                    </select>
                     <Button type="button" variant="outline" onClick={applyFilters}>Preview</Button>
                     <Button type="submit" disabled={form.processing}>
                         <Save className="size-4" />
@@ -94,13 +110,17 @@ export default function ReportsIndex({ report, recentReports, types, filters }: 
 
                 <RevenueOverview title={report.title} description={`${report.date_from} to ${report.date_to}`} data={report.chart} />
 
+                {report.productProfit && report.productProfit.length > 0 && (
+                    <ProfitByProductChart data={report.productProfit} />
+                )}
+
                 {report.topProducts && report.topProducts.length > 0 && (
                     <section className="rounded-md border bg-card p-5 shadow-sm">
                         <h2 className="font-semibold">Top Products</h2>
                         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                             {report.topProducts.map((product) => (
                                 <div key={product.name} className="rounded-md border p-3">
-                                    <p className="font-medium">{product.name}</p>
+                                    <Link href={product.href} className="font-medium text-primary underline-offset-4 hover:underline">{product.name}</Link>
                                     <p className="text-sm text-muted-foreground">Qty {product.quantity}</p>
                                     <p className="mt-2 font-semibold">{product.total.toFixed(2)} ETB</p>
                                 </div>

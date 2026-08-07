@@ -53,6 +53,9 @@ class InventoryController extends Controller
         $this->inventoryService->restock(
             $inventory,
             (int) $request->validated('quantity'),
+            (float) $request->validated('unit_cost'),
+            $request->validated('received_at'),
+            $request->validated('expiry_date'),
             $request->validated('notes'),
             $request->user(),
         );

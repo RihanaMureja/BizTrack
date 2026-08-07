@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ExpenseSource;
 use App\Enums\ExpenseStatus;
 use App\Models\Business;
 use App\Models\Expense;
@@ -24,6 +25,10 @@ class ExpenseFactory extends Factory
             'amount' => fake()->randomFloat(2, 10, 2000),
             'expense_date' => today(),
             'status' => ExpenseStatus::Approved,
+            'source' => ExpenseSource::Manual,
+            'source_reference_type' => null,
+            'source_reference_id' => null,
+            'source_period' => null,
             'vendor' => fake()->optional()->company(),
             'receipt_path' => null,
             'notes' => fake()->optional()->sentence(),

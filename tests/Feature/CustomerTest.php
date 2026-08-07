@@ -25,12 +25,11 @@ function cashierForBusiness(Business $business): User
 function validCustomerPayload(array $overrides = []): array
 {
     return [
-        'full_name' => 'Sara Customer',
+        'customer_type' => 'individual',
+        'display_name' => 'Sara Customer',
         'phone' => '0911222333',
         'email' => 'sara.customer@biztrack.test',
         'address' => 'Addis Ababa',
-        'credit_limit' => 5000,
-        'current_balance' => 1000,
         ...$overrides,
     ];
 }
@@ -72,6 +71,8 @@ test('owner can create a customer', function () {
     $this->assertDatabaseHas('customers', [
         'business_id' => $business->id,
         'email' => 'sara.customer@biztrack.test',
+        'credit_limit' => 0,
+        'current_balance' => 0,
     ]);
 });
 
@@ -98,15 +99,37 @@ test('customer email must be unique per business', function () {
         ->assertSessionHasErrors('email');
 });
 
-test('current balance cannot exceed credit limit', function () {
+test('current balance cannot be manually submitted', function () {
     [$owner] = customerOwnerWithBusiness();
 
     $this->actingAs($owner)
         ->post(route('customers.store'), validCustomerPayload([
-            'credit_limit' => 100,
             'current_balance' => 200,
         ]))
         ->assertSessionHasErrors('current_balance');
+});
+
+test('credit limit cannot be manually submitted on customer form', function () {
+    [$owner] = customerOwnerWithBusiness();
+
+    $this->actingAs($owner)
+        ->post(route('customers.store'), validCustomerPayload([
+            'credit_limit' => 5000,
+        ]))
+        ->assertSessionHasErrors('credit_limit');
+});
+
+test('customer balance is derived as zero when customer is created', function () {
+    [$owner, $business] = customerOwnerWithBusiness();
+
+    $this->actingAs($owner)
+        ->post(route('customers.store'), validCustomerPayload())
+        ->assertRedirect();
+
+    $customer = Customer::query()->where('business_id', $business->id)->firstOrFail();
+
+    expect((float) $customer->current_balance)->toBe(0.0);
+    expect((float) $customer->credit_limit)->toBe(0.0);
 });
 
 test('owner can update their own customer', function () {
@@ -115,12 +138,13 @@ test('owner can update their own customer', function () {
 
     $this->actingAs($owner)
         ->put(route('customers.update', $customer), validCustomerPayload([
-            'full_name' => 'Updated Customer',
+            'display_name' => 'Updated Customer',
             'email' => $customer->email,
         ]))
         ->assertRedirect();
 
-    expect($customer->refresh()->full_name)->toBe('Updated Customer');
+    expect($customer->refresh()->display_name)->toBe('Updated Customer')
+        ->and($customer->full_name)->toBe('Updated Customer');
 });
 
 test('cashier cannot update another business customer', function () {
@@ -149,15 +173,15 @@ test('owner can view customer profile', function () {
 
 test('owner can search customers by phone', function () {
     [$owner, $business] = customerOwnerWithBusiness();
-    Customer::factory()->create(['business_id' => $business->id, 'full_name' => 'Matching Customer', 'phone' => '0911444555']);
-    Customer::factory()->create(['business_id' => $business->id, 'full_name' => 'Other Customer', 'phone' => '0922000000']);
+    Customer::factory()->create(['business_id' => $business->id, 'display_name' => 'Matching Customer', 'full_name' => 'Matching Customer', 'phone' => '0911444555']);
+    Customer::factory()->create(['business_id' => $business->id, 'display_name' => 'Other Customer', 'full_name' => 'Other Customer', 'phone' => '0922000000']);
 
     $this->actingAs($owner)
         ->get(route('customers.index', ['search' => '0911444555']))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('customers/index')
-            ->where('customers.data.0.full_name', 'Matching Customer')
+            ->where('customers.data.0.display_name', 'Matching Customer')
             ->where('customers.total', 1)
         );
 });

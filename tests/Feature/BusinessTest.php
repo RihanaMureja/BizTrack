@@ -1,21 +1,18 @@
 <?php
 
+use App\Enums\BusinessAccessMode;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\Business;
 use App\Models\BusinessVerificationDocument;
-use App\Models\BusinessVerificationReview;
 use App\Models\Subscription;
 use App\Models\User;
-use App\Notifications\BusinessApprovedNotification;
-use App\Notifications\BusinessVerificationRejectedNotification;
-use App\Notifications\BusinessVerificationResubmissionRequestedNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 test('guest is redirected away from business profile', function () {
-    $this->get(route('business.profile'))
+    $this->get(route('settings.business.edit'))
         ->assertRedirect(route('login'));
 });
 
@@ -25,7 +22,7 @@ test('cashier cannot access owner business profile', function () {
     ]);
 
     $this->actingAs($cashier)
-        ->get(route('business.profile'))
+        ->get(route('settings.business.edit'))
         ->assertForbidden();
 });
 
@@ -47,7 +44,7 @@ function businessPayload(array $overrides = []): array
     ];
 }
 
-test('owner can submit a business profile for review without receiving approval notification', function () {
+test('owner can create an onboarding business profile without superadmin approval', function () {
     Notification::fake();
     Storage::fake('public');
 
@@ -55,33 +52,27 @@ test('owner can submit a business profile for review without receiving approval 
         'role' => Role::Owner,
     ]);
 
-    $subscription = Subscription::factory()->create([
-        'status' => RecordStatus::Active,
-    ]);
-
     $this->actingAs($owner)
-        ->post(route('business.profile.store'), businessPayload([
-            'subscription_id' => $subscription->id,
-        ]))
-        ->assertRedirect(route('business.profile', absolute: false));
+        ->post(route('settings.business.store'), businessPayload())
+        ->assertRedirect(route('onboarding.verify-phone', absolute: false));
+
+    $business = Business::firstWhere('owner_id', $owner->id);
 
     $this->assertDatabaseHas('businesses', [
         'owner_id' => $owner->id,
-        'subscription_id' => $subscription->id,
         'business_name' => 'Merkato Fresh Mart',
         'email' => 'hello@merkato.test',
-        'status' => RecordStatus::PendingReview->value,
+        'status' => RecordStatus::Active->value,
+        'access_mode' => BusinessAccessMode::Onboarding->value,
         'national_id_fan_number' => 'FAN-123456',
     ]);
 
-    $business = Business::firstWhere('owner_id', $owner->id);
-    expect($owner->refresh()->business_id)->not->toBeNull()
+    expect($owner->refresh()->business_id)->toBe($business?->id)
         ->and($business?->national_id_photo_path)->not->toBeNull()
         ->and($business?->trade_license_path)->not->toBeNull()
         ->and($business?->tin_certificate_path)->not->toBeNull();
 
     expect(BusinessVerificationDocument::query()->where('business_id', $business->id)->count())->toBe(3);
-
     Notification::assertNothingSent();
 });
 
@@ -92,75 +83,37 @@ test('owner can update business profile without creating a duplicate business', 
         'role' => Role::Owner,
     ]);
 
-    $subscription = Subscription::factory()->create([
-        'status' => RecordStatus::Active->value,
-    ]);
-
     $business = Business::factory()->create([
         'owner_id' => $owner->id,
-        'subscription_id' => $subscription->id,
         'business_name' => 'Old Name',
         'email' => 'old@example.test',
+        'access_mode' => BusinessAccessMode::Onboarding,
     ]);
 
     $owner->forceFill(['business_id' => $business->id])->save();
 
     $this->actingAs($owner)
-        ->put(route('business.profile.update'), businessPayload([
+        ->put(route('settings.business.update'), businessPayload([
             'business_name' => 'New Name',
             'business_type' => 'Service',
-            'subscription_id' => $subscription->id,
             'email' => 'new@example.test',
             'phone' => '0911223344',
             'address' => 'Bole',
         ]))
-        ->assertRedirect(route('business.profile', absolute: false));
+        ->assertRedirect(route('onboarding.verify-phone', absolute: false));
 
     $this->assertDatabaseCount('businesses', 1);
     $this->assertDatabaseHas('businesses', [
         'id' => $business->id,
         'business_name' => 'New Name',
         'email' => 'new@example.test',
+        'access_mode' => BusinessAccessMode::Onboarding->value,
     ]);
 
     Notification::assertNothingSent();
 });
 
-test('owner cannot access business modules until business is approved', function () {
-    $owner = User::factory()->create([
-        'role' => Role::Owner,
-    ]);
-
-    $business = Business::factory()->create([
-        'owner_id' => $owner->id,
-        'status' => RecordStatus::PendingReview,
-    ]);
-
-    $owner->forceFill(['business_id' => $business->id])->save();
-
-    $this->actingAs($owner)
-        ->get(route('products.index'))
-        ->assertRedirect(route('business.profile', absolute: false));
-});
-
-test('owner is redirected from dashboard to verification until business is approved', function () {
-    $owner = User::factory()->create([
-        'role' => Role::Owner,
-    ]);
-
-    $business = Business::factory()->create([
-        'owner_id' => $owner->id,
-        'status' => RecordStatus::PendingReview,
-    ]);
-
-    $owner->forceFill(['business_id' => $business->id])->save();
-
-    $this->actingAs($owner)
-        ->get(route('dashboard'))
-        ->assertRedirect(route('business.profile', absolute: false));
-});
-
-test('approved owner can access dashboard', function () {
+test('owner cannot access business modules until trial or paid access is active', function () {
     $owner = User::factory()->create([
         'role' => Role::Owner,
     ]);
@@ -168,6 +121,25 @@ test('approved owner can access dashboard', function () {
     $business = Business::factory()->create([
         'owner_id' => $owner->id,
         'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Onboarding,
+    ]);
+
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->get(route('products.index'))
+        ->assertRedirect(route('onboarding.index', absolute: false));
+});
+
+test('trial owner can access dashboard', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Trial,
     ]);
 
     $owner->forceFill(['business_id' => $business->id])->save();
@@ -177,241 +149,74 @@ test('approved owner can access dashboard', function () {
         ->assertOk();
 });
 
-test('super admin approval activates the business and notifies the owner', function () {
-    Notification::fake();
-
-    $superAdmin = User::factory()->create([
-        'role' => Role::SuperAdmin,
-    ]);
-
+test('paid owner can access dashboard', function () {
     $owner = User::factory()->create([
         'role' => Role::Owner,
     ]);
 
     $business = Business::factory()->create([
         'owner_id' => $owner->id,
-        'status' => RecordStatus::PendingReview,
-    ]);
-
-    $owner->forceFill(['business_id' => $business->id])->save();
-
-    $this->actingAs($superAdmin)
-        ->post(route('admin.businesses.approve', $business))
-        ->assertRedirect();
-
-    $this->assertDatabaseHas('businesses', [
-        'id' => $business->id,
         'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Active,
     ]);
 
-    Notification::assertSentTo($owner, BusinessApprovedNotification::class);
-    expect(BusinessVerificationReview::query()->where('business_id', $business->id)->where('decision', 'approved')->exists())->toBeTrue();
-});
-
-test('super admin can view business verification review page', function () {
-    $superAdmin = User::factory()->create([
-        'role' => Role::SuperAdmin,
-    ]);
-
-    $business = Business::factory()->create([
-        'status' => RecordStatus::PendingReview,
-    ]);
-
-    BusinessVerificationDocument::create([
-        'business_id' => $business->id,
-        'type' => 'national_id',
-        'label' => 'National ID photo',
-        'path' => 'business-verifications/national-id.jpg',
-        'status' => RecordStatus::PendingReview,
-    ]);
-
-    $this->actingAs($superAdmin)
-        ->get(route('admin.business-verifications.show', $business))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('admin/business-verifications/show')
-            ->where('business.id', $business->id)
-            ->has('business.verification_documents', 1));
-});
-
-test('super admin can reject business verification with a reason', function () {
-    Notification::fake();
-    Storage::fake('public');
-
-    $superAdmin = User::factory()->create([
-        'role' => Role::SuperAdmin,
-    ]);
-    $owner = User::factory()->create([
-        'role' => Role::Owner,
-    ]);
-    $business = Business::factory()->create([
-        'owner_id' => $owner->id,
-        'status' => RecordStatus::PendingReview,
-        'national_id_photo_path' => 'business-verifications/reject-id.jpg',
-        'trade_license_path' => 'business-verifications/reject-license.pdf',
-        'tin_certificate_path' => 'business-verifications/reject-tin.pdf',
-    ]);
     $owner->forceFill(['business_id' => $business->id])->save();
-    $documentReviews = [];
-    foreach ([
-        'national_id' => ['National ID photo', 'business-verifications/reject-id.jpg'],
-        'trade_license' => ['Business license / trade license', 'business-verifications/reject-license.pdf'],
-        'tin_certificate' => ['Tax certificate / TIN', 'business-verifications/reject-tin.pdf'],
-    ] as $type => [$label, $path]) {
-        Storage::disk('public')->put($path, 'verification-file');
-        $document = BusinessVerificationDocument::create([
-            'business_id' => $business->id,
-            'uploaded_by' => $owner->id,
-            'type' => $type,
-            'label' => $label,
-            'path' => $path,
-            'status' => RecordStatus::PendingReview,
-        ]);
-        $documentReviews[] = [
-            'document_id' => $document->id,
-            'decision' => $type === 'trade_license' ? 'rejected' : 'approved',
-            'notes' => $type === 'trade_license' ? 'The trade license is expired.' : null,
-        ];
-    }
-
-    $this->actingAs($superAdmin)
-        ->post(route('admin.business-verifications.review', $business), [
-            'decision' => 'rejected',
-            'reason' => 'Trade license is expired.',
-            'document_reviews' => $documentReviews,
-        ])
-        ->assertRedirect(route('admin.business-verifications.show', $business, absolute: false));
-
-    $this->assertDatabaseHas('businesses', [
-        'id' => $business->id,
-        'status' => RecordStatus::Rejected->value,
-    ]);
-    $this->assertDatabaseHas('business_verification_reviews', [
-        'business_id' => $business->id,
-        'decision' => 'rejected',
-        'reason' => 'Trade license is expired.',
-    ]);
-    expect(BusinessVerificationReview::query()->where('business_id', $business->id)->latest()->first()?->document_reviews)
-        ->toHaveCount(3);
-    $this->assertDatabaseMissing('business_verification_documents', [
-        'business_id' => $business->id,
-    ]);
-    $business->refresh();
-    expect($business->national_id_photo_path)->toBeNull()
-        ->and($business->trade_license_path)->toBeNull()
-        ->and($business->tin_certificate_path)->toBeNull();
-    Storage::disk('public')->assertMissing('business-verifications/reject-id.jpg');
-    Storage::disk('public')->assertMissing('business-verifications/reject-license.pdf');
-    Storage::disk('public')->assertMissing('business-verifications/reject-tin.pdf');
-
-    Notification::assertSentTo($owner, BusinessVerificationRejectedNotification::class);
-});
-
-test('rejection and resubmission decisions require a reason', function () {
-    $superAdmin = User::factory()->create([
-        'role' => Role::SuperAdmin,
-    ]);
-    $business = Business::factory()->create([
-        'status' => RecordStatus::PendingReview,
-    ]);
-
-    $this->actingAs($superAdmin)
-        ->post(route('admin.business-verifications.review', $business), [
-            'decision' => 'resubmission_required',
-            'reason' => '',
-        ])
-        ->assertSessionHasErrors('reason');
-});
-
-test('super admin can request verification resubmission and owner can resubmit documents', function () {
-    Notification::fake();
-    Storage::fake('public');
-
-    $superAdmin = User::factory()->create([
-        'role' => Role::SuperAdmin,
-    ]);
-    $owner = User::factory()->create([
-        'role' => Role::Owner,
-    ]);
-    $business = Business::factory()->create([
-        'owner_id' => $owner->id,
-        'status' => RecordStatus::PendingReview,
-        'national_id_photo_path' => 'business-verifications/old-id.jpg',
-        'trade_license_path' => 'business-verifications/old-license.pdf',
-        'tin_certificate_path' => 'business-verifications/old-tin.pdf',
-    ]);
-    $owner->forceFill(['business_id' => $business->id])->save();
-    $documentReviews = [];
-    foreach ([
-        'national_id' => ['National ID photo', 'business-verifications/old-id.jpg'],
-        'trade_license' => ['Business license / trade license', 'business-verifications/old-license.pdf'],
-        'tin_certificate' => ['Tax certificate / TIN', 'business-verifications/old-tin.pdf'],
-    ] as $type => [$label, $path]) {
-        Storage::disk('public')->put($path, 'old-verification-file');
-        $document = BusinessVerificationDocument::create([
-            'business_id' => $business->id,
-            'uploaded_by' => $owner->id,
-            'type' => $type,
-            'label' => $label,
-            'path' => $path,
-            'status' => RecordStatus::PendingReview,
-        ]);
-        $documentReviews[] = [
-            'document_id' => $document->id,
-            'decision' => $type === 'national_id' ? 'resubmission_required' : 'approved',
-            'notes' => $type === 'national_id' ? 'National ID image is unclear.' : null,
-        ];
-    }
-
-    $this->actingAs($superAdmin)
-        ->post(route('admin.business-verifications.review', $business), [
-            'decision' => 'resubmission_required',
-            'reason' => 'National ID image is unclear.',
-            'document_reviews' => $documentReviews,
-        ])
-        ->assertRedirect(route('admin.business-verifications.show', $business, absolute: false));
-
-    $this->assertDatabaseHas('businesses', [
-        'id' => $business->id,
-        'status' => RecordStatus::ResubmissionRequired->value,
-    ]);
-    $this->assertDatabaseMissing('business_verification_documents', [
-        'business_id' => $business->id,
-    ]);
-    Storage::disk('public')->assertMissing('business-verifications/old-id.jpg');
-    Storage::disk('public')->assertMissing('business-verifications/old-license.pdf');
-    Storage::disk('public')->assertMissing('business-verifications/old-tin.pdf');
-    Notification::assertSentTo($owner, BusinessVerificationResubmissionRequestedNotification::class);
 
     $this->actingAs($owner)
-        ->put(route('business.profile.update'), businessPayload([
-            'email' => 'resubmitted@example.test',
-            'national_id_photo' => UploadedFile::fake()->image('clear-national-id.jpg'),
-            'trade_license' => UploadedFile::fake()->create('new-license.pdf', 120, 'application/pdf'),
-            'tin_certificate' => UploadedFile::fake()->create('new-tin.pdf', 120, 'application/pdf'),
+        ->get(route('dashboard'))
+        ->assertOk();
+});
+
+test('base business documents are optional during profile setup', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('settings.business.store'), businessPayload([
+            'national_id_fan_number' => null,
+            'national_id_photo' => null,
+            'trade_license' => null,
+            'tin_certificate' => null,
+            'is_vat_registered' => false,
+            'vat_certificate' => null,
+            'has_physical_shop' => false,
+            'rental_agreement' => null,
         ]))
-        ->assertRedirect(route('business.profile', absolute: false));
-
-    $this->assertDatabaseHas('businesses', [
-        'id' => $business->id,
-        'status' => RecordStatus::PendingReview->value,
-        'email' => 'resubmitted@example.test',
-    ]);
-
-    expect(BusinessVerificationDocument::query()->where('business_id', $business->id)->where('type', 'national_id')->first()?->path)
-        ->toContain('business-verifications');
+        ->assertSessionDoesntHaveErrors([
+            'national_id_fan_number',
+            'national_id_photo',
+            'trade_license',
+            'tin_certificate',
+            'vat_certificate',
+            'rental_agreement',
+        ]);
 });
 
-test('business name is required', function () {
+test('vat certificate is required only when business is vat registered', function () {
     $owner = User::factory()->create([
         'role' => Role::Owner,
     ]);
 
     $this->actingAs($owner)
-        ->post(route('business.profile.store'), [
-            'business_name' => '',
-        ])
-        ->assertSessionHasErrors('business_name');
+        ->post(route('settings.business.store'), businessPayload([
+            'is_vat_registered' => true,
+            'vat_certificate' => null,
+        ]))
+        ->assertSessionHasErrors('vat_certificate');
+});
+
+test('rental agreement is required only when business has a physical shop', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('settings.business.store'), businessPayload([
+            'has_physical_shop' => true,
+            'rental_agreement' => null,
+        ]))
+        ->assertSessionHasErrors('rental_agreement');
 });
 
 test('business email must be unique', function () {
@@ -424,14 +229,14 @@ test('business email must be unique', function () {
     ]);
 
     $this->actingAs($owner)
-        ->post(route('business.profile.store'), [
+        ->post(route('settings.business.store'), [
             'business_name' => 'Unique Shop',
             'email' => 'taken@example.test',
         ])
         ->assertSessionHasErrors('email');
 });
 
-test('subscription must be an active plan', function () {
+test('subscription must be an active plan when selected', function () {
     $owner = User::factory()->create([
         'role' => Role::Owner,
     ]);
@@ -441,35 +246,9 @@ test('subscription must be an active plan', function () {
     ]);
 
     $this->actingAs($owner)
-        ->post(route('business.profile.store'), [
+        ->post(route('settings.business.store'), [
             'business_name' => 'Inactive Plan Shop',
             'subscription_id' => $inactiveSubscription->id,
         ])
         ->assertSessionHasErrors('subscription_id');
-});
-
-test('vat certificate is required only for vat registered businesses', function () {
-    $owner = User::factory()->create([
-        'role' => Role::Owner,
-    ]);
-
-    $this->actingAs($owner)
-        ->post(route('business.profile.store'), businessPayload([
-            'is_vat_registered' => true,
-            'vat_certificate' => null,
-        ]))
-        ->assertSessionHasErrors('vat_certificate');
-});
-
-test('rental agreement is required only for physical shops', function () {
-    $owner = User::factory()->create([
-        'role' => Role::Owner,
-    ]);
-
-    $this->actingAs($owner)
-        ->post(route('business.profile.store'), businessPayload([
-            'has_physical_shop' => true,
-            'rental_agreement' => null,
-        ]))
-        ->assertSessionHasErrors('rental_agreement');
 });

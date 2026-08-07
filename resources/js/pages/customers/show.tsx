@@ -6,7 +6,11 @@ import { ArrowLeft, Bell, Mail, Phone, ReceiptText, UserRound } from 'lucide-rea
 type Props = {
     customer: {
         id: number;
+        customer_type: string;
+        display_name: string;
         full_name: string;
+        contact_person: string | null;
+        contact_person_phone: string | null;
         phone: string | null;
         email: string | null;
         address: string | null;
@@ -33,7 +37,7 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
 
     return (
         <>
-            <Head title={customer.full_name} />
+            <Head title={customer.display_name} />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -41,7 +45,7 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                             <UserRound className="size-5" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-semibold">{customer.full_name}</h1>
+                            <h1 className="text-xl font-semibold">{customer.display_name}</h1>
                             <p className="text-sm text-muted-foreground">Customer profile, credit balance, and purchase history.</p>
                         </div>
                     </div>
@@ -57,6 +61,13 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                     <Card>
                         <CardHeader><CardTitle>Contact</CardTitle></CardHeader>
                         <CardContent className="grid gap-3 text-sm">
+                            <p className="text-muted-foreground capitalize">{customer.customer_type.replace('_', ' ')}</p>
+                            {customer.contact_person && (
+                                <p className="flex items-center gap-2"><UserRound className="size-4 text-muted-foreground" />{customer.contact_person}</p>
+                            )}
+                            {customer.contact_person_phone && (
+                                <p className="flex items-center gap-2"><Phone className="size-4 text-muted-foreground" />{customer.contact_person_phone}</p>
+                            )}
                             <p className="flex items-center gap-2"><Phone className="size-4 text-muted-foreground" />{customer.phone || 'No phone'}</p>
                             <p className="flex items-center gap-2"><Mail className="size-4 text-muted-foreground" />{customer.email || 'No email'}</p>
                             <p className="text-muted-foreground">{customer.address || 'No address recorded'}</p>

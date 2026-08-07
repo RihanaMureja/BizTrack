@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ExpenseSource;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\DateHelper;
 use App\Helpers\ReportHelper;
@@ -19,11 +20,13 @@ use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
+    public function __construct(private readonly ProductReportService $productReportService) {}
+
     public function generate(Business $business, User $user, array $filters): Report
     {
         $type = $filters['type'];
         [$from, $to] = DateHelper::range($filters['date_from'] ?? null, $filters['date_to'] ?? null);
-        $data = $this->data($business, $type, $from, $to);
+        $data = $this->data($business, $type, $from, $to, $filters);
 
         return Report::create([
             'business_id' => $business->id,
@@ -47,12 +50,12 @@ class ReportService
             ->get();
     }
 
-    public function data(Business $business, string $type, CarbonInterface $from, CarbonInterface $to): array
+    public function data(Business $business, string $type, CarbonInterface $from, CarbonInterface $to, array $filters = []): array
     {
         return match ($type) {
-            'sales' => $this->sales($business, $from, $to),
-            'expenses' => $this->expenses($business, $from, $to),
-            'profit' => $this->profit($business, $from, $to),
+            'sales' => $this->sales($business, $from, $to, $filters['category_id'] ?? null),
+            'expenses' => $this->expenses($business, $from, $to, $filters['source'] ?? null),
+            'profit' => $this->profit($business, $from, $to, $filters['source'] ?? null, $filters['category_id'] ?? null),
             'inventory' => $this->inventory($business),
             'tax' => $this->tax($business, $from, $to),
             default => $this->sales($business, $from, $to),
@@ -70,28 +73,36 @@ class ReportService
         ];
     }
 
-    private function sales(Business $business, CarbonInterface $from, CarbonInterface $to): array
+    private function sales(Business $business, CarbonInterface $from, CarbonInterface $to, mixed $categoryId = null): array
     {
         $sales = Sale::query()
             ->where('business_id', $business->id)
             ->whereBetween('sold_at', [$from->startOfDay(), $to->endOfDay()])
+            ->when($categoryId, fn ($query) => $query->whereHas('items.product', fn ($productQuery) => $productQuery->where('category_id', $categoryId)))
             ->with(['customer', 'user'])
             ->latest('sold_at')
             ->get();
         $topProducts = SaleItem::query()
             ->select('product_id', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(line_total) as total'))
-            ->whereHas('sale', fn ($query) => $query->where('business_id', $business->id)->whereBetween('sold_at', [$from->startOfDay(), $to->endOfDay()]))
+            ->whereHas('sale', fn ($query) => $query->where('business_id', $business->id)->whereBetween('sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()]))
+            ->when($categoryId, fn ($query) => $query->whereHas('product', fn ($productQuery) => $productQuery->where('category_id', $categoryId)))
             ->with('product:id,name')
             ->groupBy('product_id')
             ->orderByDesc('total')
-            ->take(5)
             ->get()
             ->map(fn (SaleItem $item): array => [
+                'id' => (int) $item->product_id,
                 'name' => $item->product?->name ?? 'Deleted product',
                 'quantity' => (int) $item->quantity,
                 'total' => (float) $item->total,
+                'href' => route('reports.products.show', [
+                    'product' => $item->product_id,
+                    'date_from' => $from->toDateString(),
+                    'date_to' => $to->toDateString(),
+                ]),
             ])
             ->values();
+        $productProfit = $this->profitByProduct($business, $from, $to, $categoryId);
 
         return [
             'summary' => [
@@ -103,21 +114,23 @@ class ReportService
             'chart' => $this->dailySeries($from, $to, $sales, 'sold_at', 'grand_total'),
             'rows' => $sales->map(fn (Sale $sale): array => [
                 'invoice' => $sale->invoice_number,
-                'customer' => $sale->customer?->full_name ?? 'Walk-in customer',
+                'customer' => $sale->customer?->display_name ?? 'Walk-in customer',
                 'sold_by' => $sale->user?->name ?? 'System',
                 'date' => $sale->sold_at?->toDateString(),
                 'total' => (float) $sale->grand_total,
             ])->values(),
-            'topProducts' => $topProducts,
+            'topProducts' => $topProducts->take(5)->values(),
+            'productProfit' => $productProfit,
         ];
     }
 
-    private function expenses(Business $business, CarbonInterface $from, CarbonInterface $to): array
+    private function expenses(Business $business, CarbonInterface $from, CarbonInterface $to, ?string $source = null): array
     {
         $expenses = Expense::query()
             ->where('business_id', $business->id)
             ->whereDate('expense_date', '>=', $from->toDateString())
             ->whereDate('expense_date', '<=', $to->toDateString())
+            ->when($source, fn ($query) => $query->where('source', $source))
             ->with('category')
             ->latest('expense_date')
             ->get();
@@ -127,11 +140,16 @@ class ReportService
                 'expenses_count' => $expenses->count(),
                 'expenses' => (float) $expenses->sum('amount'),
                 'average_expense' => $expenses->count() ? (float) $expenses->avg('amount') : 0,
+                'manual_expenses' => (float) $expenses->where('source', ExpenseSource::Manual)->sum('amount'),
+                'restock_expenses' => (float) $expenses->where('source', ExpenseSource::Restock)->sum('amount'),
+                'payroll_expenses' => (float) $expenses->where('source', ExpenseSource::Payroll)->sum('amount'),
             ],
             'chart' => $this->dailySeries($from, $to, $expenses, 'expense_date', 'amount'),
             'rows' => $expenses->map(fn (Expense $expense): array => [
                 'title' => $expense->title,
                 'category' => $expense->category?->name ?? 'Uncategorized',
+                'source' => $expense->source->label(),
+                'period' => $expense->source_period,
                 'date' => $expense->expense_date?->toDateString(),
                 'amount' => (float) $expense->amount,
                 'status' => $expense->status->value,
@@ -139,10 +157,10 @@ class ReportService
         ];
     }
 
-    private function profit(Business $business, CarbonInterface $from, CarbonInterface $to): array
+    private function profit(Business $business, CarbonInterface $from, CarbonInterface $to, ?string $expenseSource = null, mixed $categoryId = null): array
     {
-        $sales = $this->sales($business, $from, $to);
-        $expenses = $this->expenses($business, $from, $to);
+        $sales = $this->sales($business, $from, $to, $categoryId);
+        $expenses = $this->expenses($business, $from, $to, $expenseSource);
         $revenue = (float) $sales['summary']['revenue'];
         $expenseTotal = (float) $expenses['summary']['expenses'];
 
@@ -159,7 +177,45 @@ class ReportService
                 ['label' => 'Expenses', 'amount' => $expenseTotal],
                 ['label' => 'Profit', 'amount' => $revenue - $expenseTotal],
             ],
+            'productProfit' => $sales['productProfit'] ?? [],
         ];
+    }
+
+    private function profitByProduct(Business $business, CarbonInterface $from, CarbonInterface $to, mixed $categoryId = null): array
+    {
+        return SaleItem::query()
+            ->select('product_id', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(line_total) as revenue'))
+            ->whereHas('sale', fn ($query) => $query->where('business_id', $business->id)->whereBetween('sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()]))
+            ->when($categoryId, fn ($query) => $query->whereHas('product', fn ($productQuery) => $productQuery->where('category_id', $categoryId)))
+            ->with(['product:id,name'])
+            ->groupBy('product_id')
+            ->orderByDesc('revenue')
+            ->get()
+            ->map(function (SaleItem $summary) use ($business, $from, $to): array {
+                $items = SaleItem::query()
+                    ->with('sale:id,business_id,invoice_number,sold_at')
+                    ->where('product_id', $summary->product_id)
+                    ->whereHas('sale', fn ($query) => $query->where('business_id', $business->id)->whereBetween('sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()]))
+                    ->get();
+                $cost = $this->productReportService->batchCostForItems($items);
+                $revenue = (float) $summary->revenue;
+
+                return [
+                    'id' => (int) $summary->product_id,
+                    'product' => $summary->product?->name ?? 'Deleted product',
+                    'quantity' => (int) $summary->quantity,
+                    'revenue' => $revenue,
+                    'cost' => $cost,
+                    'profit' => $revenue - $cost,
+                    'href' => route('reports.products.show', [
+                        'product' => $summary->product_id,
+                        'date_from' => $from->toDateString(),
+                        'date_to' => $to->toDateString(),
+                    ]),
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function inventory(Business $business): array

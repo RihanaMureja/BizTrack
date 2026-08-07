@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus, Receipt } from 'lucide-react';
 
-type Sale = { id: number; invoice_number: string; grand_total: string; status: string; sold_at: string; customer: { full_name: string } | null; user: { name: string } | null };
+type Sale = { id: number; invoice_number: string; grand_total: string; status: string; sold_at: string; customer: { display_name: string } | null; user: { name: string } | null };
 type Props = { sales: { data: Sale[]; links: PaginationLink[]; from: number | null; to: number | null; total: number } | null; filters: { search: string | null } };
 
 export default function SalesIndex({ sales, filters }: Props) {
     const columns: DataTableColumn<Sale>[] = [
         { key: 'invoice_number', header: 'Invoice', render: (sale) => <Link className="font-medium underline" href={`/sales/${sale.id}`}>{sale.invoice_number}</Link> },
-        { key: 'customer', header: 'Customer', render: (sale) => sale.customer?.full_name ?? 'Walk-in customer' },
+        { key: 'customer', header: 'Customer', render: (sale) => sale.customer?.display_name ?? 'Walk-in customer' },
         { key: 'grand_total', header: 'Total', render: (sale) => `${sale.grand_total} ETB` },
         { key: 'status', header: 'Status' },
         { key: 'user', header: 'Sold by', render: (sale) => sale.user?.name ?? 'System' },

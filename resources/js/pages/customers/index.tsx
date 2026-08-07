@@ -15,7 +15,11 @@ import { useState } from 'react';
 
 type Customer = {
     id: number;
+    customer_type: 'individual' | 'company' | 'government' | 'other';
+    display_name: string;
     full_name: string;
+    contact_person: string | null;
+    contact_person_phone: string | null;
     phone: string | null;
     email: string | null;
     address: string | null;
@@ -69,12 +73,14 @@ export default function CustomersIndex({ customers, filters }: Props) {
 
     const columns: DataTableColumn<Customer>[] = [
         {
-            key: 'full_name',
+            key: 'display_name',
             header: 'Customer',
             render: (customer) => (
                 <div>
-                    <p className="font-medium">{customer.full_name}</p>
-                    <p className="text-xs text-muted-foreground">{customer.phone || 'No phone'} | {customer.email || 'No email'}</p>
+                    <p className="font-medium">{customer.display_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {customer.customer_type.replace('_', ' ')} | {customer.contact_person ? `Contact: ${customer.contact_person}` : customer.phone || 'No phone'}
+                    </p>
                 </div>
             ),
         },
@@ -104,14 +110,14 @@ export default function CustomersIndex({ customers, filters }: Props) {
             render: (customer) => (
                 <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" size="icon" asChild>
-                        <Link href={`/customers/${customer.id}`} aria-label={`View ${customer.full_name}`}>
+                        <Link href={`/customers/${customer.id}`} aria-label={`View ${customer.display_name}`}>
                             <Eye className="size-4" />
                         </Link>
                     </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => setEditingCustomer(customer)} aria-label={`Edit ${customer.full_name}`}>
+                    <Button type="button" variant="outline" size="icon" onClick={() => setEditingCustomer(customer)} aria-label={`Edit ${customer.display_name}`}>
                         <Pencil className="size-4" />
                     </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => setDeletingCustomer(customer)} aria-label={`Delete ${customer.full_name}`}>
+                    <Button type="button" variant="outline" size="icon" onClick={() => setDeletingCustomer(customer)} aria-label={`Delete ${customer.display_name}`}>
                         <Trash2 className="size-4" />
                     </Button>
                 </div>
@@ -173,7 +179,7 @@ export default function CustomersIndex({ customers, filters }: Props) {
             <DeleteDialog
                 open={Boolean(deletingCustomer)}
                 onOpenChange={(open) => !open && setDeletingCustomer(null)}
-                itemLabel={deletingCustomer?.full_name ?? 'this customer'}
+                itemLabel={deletingCustomer?.display_name ?? 'this customer'}
                 onConfirm={confirmDelete}
                 processing={deleting}
             />

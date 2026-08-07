@@ -16,6 +16,7 @@ export type CashierFormCashier = {
     name?: string;
     email?: string;
     phone?: string | null;
+    salary?: string | null;
     status?: string;
 };
 
@@ -41,6 +42,7 @@ export function CashierForm({ cashier, onSuccess, passwordRules, businessRoles =
         email: cashier?.email ?? '',
         business_role_id: cashier?.business_role_id ? String(cashier.business_role_id) : String(businessRoles.find((role) => role.is_default)?.id ?? businessRoles[0]?.id ?? ''),
         phone: cashier?.phone ?? '',
+        salary: cashier?.salary ?? '',
         status: cashier?.status ?? 'active',
         password: '',
         password_confirmation: '',
@@ -91,6 +93,11 @@ export function CashierForm({ cashier, onSuccess, passwordRules, businessRoles =
                     <Label htmlFor="phone">Phone</Label>
                     <Input id="phone" value={form.data.phone} onChange={(event) => form.setData('phone', event.target.value)} placeholder="Optional" />
                     <InputError message={form.errors.phone} />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="salary">Monthly salary</Label>
+                    <Input id="salary" type="number" min="0" step="0.01" value={form.data.salary} onChange={(event) => form.setData('salary', event.target.value)} placeholder="Optional" />
+                    <InputError message={form.errors.salary} />
                 </div>
                 <div className="grid gap-2 md:col-span-2">
                     <Label htmlFor="business_role_id">Employee role</Label>

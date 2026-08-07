@@ -18,13 +18,12 @@ class BusinessController extends Controller
         private readonly SubscriptionService $subscriptionService,
     ) {}
 
-    public function show(Request $request): Response
+    public function settings(Request $request): Response
     {
-        return Inertia::render('business/profile', [
+        return Inertia::render('settings/business', [
             'business' => $request->user()->ownedBusiness?->load([
                 'subscription',
                 'verificationDocuments',
-                'verificationReviews.reviewer:id,first_name,last_name,email,role,status',
             ]),
             'subscriptions' => $this->subscriptionService->activePlans(),
         ]);
@@ -34,13 +33,15 @@ class BusinessController extends Controller
     {
         $business = $this->businessService->upsertForOwner($request->user(), $request->validated());
 
-        return to_route('business.profile')->with('success', $business->business_name.' profile created.');
+        return to_route($business->hasCompletedOnboarding() ? 'settings.business.edit' : 'onboarding.verify-phone')
+            ->with('success', $business->business_name.' profile created.');
     }
 
     public function update(UpdateBusinessRequest $request): RedirectResponse
     {
         $business = $this->businessService->upsertForOwner($request->user(), $request->validated());
 
-        return to_route('business.profile')->with('success', $business->business_name.' profile updated.');
+        return to_route($business->hasCompletedOnboarding() ? 'settings.business.edit' : 'onboarding.verify-phone')
+            ->with('success', $business->business_name.' profile updated.');
     }
 }

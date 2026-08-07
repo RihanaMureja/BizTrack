@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\SecurityQuestionController;
@@ -20,6 +21,12 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::middleware('role:owner')->group(function () {
+        Route::get('settings/business', [BusinessController::class, 'settings'])->name('settings.business.edit');
+        Route::post('settings/business', [BusinessController::class, 'store'])->name('settings.business.store');
+        Route::put('settings/business', [BusinessController::class, 'update'])->name('settings.business.update');
+    });
 
     Route::get('settings/security', [SecurityController::class, 'edit'])
         ->middleware(RequirePassword::class)

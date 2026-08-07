@@ -31,6 +31,7 @@ class CashierRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($cashier)],
             'business_role_id' => ['nullable', 'integer', Rule::exists('business_roles', 'id')->where('business_id', $businessId)],
             'phone' => ['nullable', 'string', 'max:20'],
+            'salary' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'password' => $cashier
                 ? ['nullable', ...array_slice($this->passwordRules(), 1)]

@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     Bell,
     BadgeDollarSign,
+    BadgePercent,
     Boxes,
     Building2,
     ChartNoAxesCombined,
@@ -36,6 +37,7 @@ import type { SharedData } from '@/types';
 
 const icons = {
     BadgeDollarSign,
+    BadgePercent,
     Bell,
     Boxes,
     Building2,

@@ -52,6 +52,7 @@ class CashierService
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
+            'salary' => $data['salary'] ?? null,
             'password' => $data['password'],
             'role' => Role::Cashier,
             'status' => RecordStatus::from($data['status']),
@@ -77,6 +78,7 @@ class CashierService
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
+            'salary' => $data['salary'] ?? null,
             'status' => RecordStatus::from($data['status']),
         ];
 

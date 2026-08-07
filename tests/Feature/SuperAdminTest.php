@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BusinessAccessMode;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\AuditLog;
@@ -14,7 +15,7 @@ function superAdminUser(): User
 
 function ownerBusinessContext(): array
 {
-    $owner = User::factory()->create(['role' => Role::Owner]);
+    [$owner] = ownerBusinessContext();
     $business = Business::factory()->create(['owner_id' => $owner->id]);
     $owner->forceFill(['business_id' => $business->id])->save();
 
@@ -35,11 +36,11 @@ test('only super admins can access the admin dashboard', function () {
 
 test('super admin can view and filter businesses', function () {
     $admin = superAdminUser();
-    Business::factory()->create(['business_name' => 'Alpha Market', 'status' => RecordStatus::Active]);
-    Business::factory()->create(['business_name' => 'Beta Shop', 'status' => RecordStatus::Inactive]);
+    Business::factory()->create(['business_name' => 'Alpha Market', 'access_mode' => BusinessAccessMode::Active]);
+    Business::factory()->create(['business_name' => 'Beta Shop', 'access_mode' => BusinessAccessMode::Suspended]);
 
     $this->actingAs($admin)
-        ->get(route('admin.businesses.index', ['search' => 'Alpha', 'status' => RecordStatus::Active->value]))
+        ->get(route('admin.businesses.index', ['search' => 'Alpha', 'status' => BusinessAccessMode::Active->value]))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('admin/businesses/index')
@@ -47,30 +48,21 @@ test('super admin can view and filter businesses', function () {
             ->where('businesses.data.0.business_name', 'Alpha Market'));
 });
 
-test('super admin can approve deactivate and change business subscription', function () {
+test('super admin can change business subscription without approving or deactivating access', function () {
     $admin = superAdminUser();
     [, $business] = ownerBusinessContext();
     $subscription = Subscription::factory()->create();
-    $business->forceFill(['status' => RecordStatus::Inactive])->save();
-
-    $this->actingAs($admin)
-        ->post(route('admin.businesses.approve', $business))
-        ->assertRedirect();
-    expect($business->refresh()->status)->toBe(RecordStatus::Active);
+    $business->forceFill([
+        'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Onboarding,
+    ])->save();
 
     $this->actingAs($admin)
         ->put(route('admin.businesses.subscription.update', $business), ['subscription_id' => $subscription->id])
         ->assertRedirect();
-    expect($business->refresh()->subscription_id)->toBe($subscription->id);
 
-    $this->actingAs($admin)
-        ->post(route('admin.businesses.deactivate', $business))
-        ->assertRedirect();
-    expect($business->refresh()->status)->toBe(RecordStatus::Inactive);
-
-    expect(AuditLog::where('action', 'business.verification.approved')->exists())->toBeTrue()
-        ->and(AuditLog::where('action', 'business.subscription_updated')->exists())->toBeTrue()
-        ->and(AuditLog::where('action', 'business.deactivated')->exists())->toBeTrue();
+    expect($business->refresh()->subscription_id)->toBe($subscription->id)
+        ->and($business->access_mode)->toBe(BusinessAccessMode::Onboarding);
 });
 
 test('super admin can view users and update non super admin status only', function () {

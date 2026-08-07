@@ -51,7 +51,7 @@ test('temporary password user can set permanent password', function () {
 });
 
 test('user can save a security question answer', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => Role::Cashier]);
     $question = SecurityQuestion::create([
         'question' => 'What is your test recovery answer?',
         'is_active' => true,

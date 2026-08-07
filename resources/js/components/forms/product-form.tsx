@@ -17,6 +17,7 @@ export type ProductFormProduct = {
     category_id?: number | null;
     name?: string;
     barcode?: string | null;
+    qr_payload?: string | null;
     description?: string | null;
     buy_price?: string | number;
     selling_price?: string | number;
@@ -37,7 +38,6 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
     const form = useForm({
         category_id: product?.category_id ? String(product.category_id) : '',
         name: product?.name ?? '',
-        barcode: product?.barcode ?? '',
         description: product?.description ?? '',
         buy_price: String(product?.buy_price ?? ''),
         selling_price: String(product?.selling_price ?? ''),
@@ -100,14 +100,10 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="barcode">Barcode</Label>
-                    <Input
-                        id="barcode"
-                        value={form.data.barcode}
-                        onChange={(event) => form.setData('barcode', event.target.value)}
-                        placeholder="Optional"
-                    />
-                    <InputError message={form.errors.barcode} />
+                    <Label>Product code</Label>
+                    <div className="flex h-9 items-center rounded-md border bg-muted px-3 text-sm text-muted-foreground">
+                        {product?.barcode ?? 'Generated automatically after save'}
+                    </div>
                 </div>
 
                 <div className="grid gap-2">

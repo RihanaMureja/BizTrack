@@ -4,9 +4,8 @@ import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Head, Link, router } from '@inertiajs/react';
-import { Building2, Check, Eye, Power } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { Building2 } from 'lucide-react';
 
 type Business = {
     id: number;
@@ -14,6 +13,7 @@ type Business = {
     business_type: string | null;
     email: string | null;
     status: string;
+    access_mode: string;
     users_count: number;
     products_count: number;
     sales_count: number;
@@ -41,7 +41,15 @@ export default function AdminBusinessesIndex({ businesses, subscriptions, status
         { key: 'owner', header: 'Owner', render: (business) => business.owner?.email ?? 'No owner' },
         { key: 'subscription', header: 'Plan', render: (business) => business.subscription?.name ?? 'No plan' },
         { key: 'users_count', header: 'Users' },
-        { key: 'status', header: 'Status', render: (business) => <Badge variant={business.status === 'active' ? 'default' : 'secondary'}>{business.status}</Badge> },
+        {
+            key: 'access_mode',
+            header: 'Access',
+            render: (business) => (
+                <Badge variant={business.access_mode === 'active' || business.access_mode === 'trial' ? 'default' : 'secondary'}>
+                    {business.access_mode.replace('_', ' ')}
+                </Badge>
+            ),
+        },
         {
             key: 'actions',
             header: '',
@@ -56,20 +64,6 @@ export default function AdminBusinessesIndex({ businesses, subscriptions, status
                         <option value="">Change plan</option>
                         {subscriptions.map((subscription) => <option key={subscription.id} value={subscription.id}>{subscription.name}</option>)}
                     </select>
-                    <Button asChild type="button" variant="outline" size="sm">
-                        <Link href={`/admin/business-verifications/${business.id}`}>
-                            <Eye className="size-4" /> Review
-                        </Link>
-                    </Button>
-                    {business.status === 'active' ? (
-                        <Button type="button" variant="outline" size="sm" onClick={() => router.post(`/admin/businesses/${business.id}/deactivate`, {}, { preserveScroll: true })}>
-                            <Power className="size-4" /> Deactivate
-                        </Button>
-                    ) : (
-                        <Button type="button" size="sm" onClick={() => router.post(`/admin/businesses/${business.id}/approve`, {}, { preserveScroll: true })}>
-                            <Check className="size-4" /> Approve
-                        </Button>
-                    )}
                 </div>
             ),
         },
@@ -81,7 +75,7 @@ export default function AdminBusinessesIndex({ businesses, subscriptions, status
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
                 <div className="flex items-center gap-3">
                     <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm"><Building2 className="size-5" /></div>
-                    <div><h1 className="text-xl font-semibold">Businesses</h1><p className="text-sm text-muted-foreground">Approve, deactivate, and assign subscription plans across the platform.</p></div>
+                    <div><h1 className="text-xl font-semibold">Businesses</h1><p className="text-sm text-muted-foreground">Read-only business directory with subscription plan visibility.</p></div>
                 </div>
                 <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem]">
                     <SearchBox defaultValue={filters.search ?? ''} placeholder="Search businesses..." onSearch={(search) => applyFilters({ search })} className="relative w-full" />

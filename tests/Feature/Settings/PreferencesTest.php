@@ -1,9 +1,10 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\User;
 
 test('preferences page is displayed', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => Role::Cashier]);
 
     $this->actingAs($user)
         ->get(route('preferences.edit'))
@@ -16,7 +17,7 @@ test('preferences page is displayed', function () {
 });
 
 test('user preferences can be updated', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => Role::Cashier]);
 
     $this->actingAs($user)
         ->put(route('preferences.update'), [
@@ -45,7 +46,7 @@ test('user preferences can be updated', function () {
 });
 
 test('preference values are validated', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => Role::Cashier]);
 
     $this->actingAs($user)
         ->put(route('preferences.update'), [

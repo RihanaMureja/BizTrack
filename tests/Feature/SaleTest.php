@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\InventoryBatch;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\Sale;
@@ -27,6 +28,14 @@ function stockedProduct(Business $business, int $stock = 10, float $price = 25):
     $category = Category::factory()->create(['business_id' => $business->id]);
     $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id, 'selling_price' => $price]);
     $product->inventory->forceFill(['quantity' => $stock, 'available_stock' => $stock])->save();
+    InventoryBatch::factory()->create([
+        'product_id' => $product->id,
+        'business_id' => $business->id,
+        'quantity_received' => $stock,
+        'quantity_remaining' => $stock,
+        'unit_cost' => $product->buy_price,
+        'received_at' => now()->subDay(),
+    ]);
     return $product->refresh();
 }
 
@@ -54,7 +63,6 @@ test('cashier can create sale and inventory is reduced', function () {
     $this->actingAs($cashier)
         ->post(route('sales.store'), [
             'customer_id' => $customer->id,
-            'tax_amount' => 5,
             'discount_amount' => 10,
             'items' => [['product_id' => $product->id, 'quantity' => 2]],
         ])
@@ -62,7 +70,7 @@ test('cashier can create sale and inventory is reduced', function () {
 
     $sale = Sale::query()->firstOrFail();
     expect((float) $sale->subtotal)->toBe(50.0)
-        ->and((float) $sale->grand_total)->toBe(45.0)
+        ->and((float) $sale->grand_total)->toBe(40.0)
         ->and($sale->status)->toBe(SaleStatus::Completed)
         ->and($product->inventory->refresh()->available_stock)->toBe(8);
 
@@ -82,6 +90,20 @@ test('sale fails when stock is not enough', function () {
         ->assertSessionHasErrors('items');
 
     expect($product->inventory->refresh()->available_stock)->toBe(1);
+});
+
+test('sale discount cannot exceed subtotal', function () {
+    [$owner, $business] = saleBusinessContext();
+    $product = stockedProduct($business, 10, 25);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'discount_amount' => 30,
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+        ])
+        ->assertSessionHasErrors('discount_amount');
+
+    expect($product->inventory->refresh()->available_stock)->toBe(10);
 });
 
 test('owner cannot sell another business product', function () {
@@ -144,7 +166,6 @@ test('sale totals are summed correctly across multiple items', function () {
 
     $this->actingAs($owner)
         ->post(route('sales.store'), [
-            'tax_amount' => 4,
             'discount_amount' => 9,
             'items' => [
                 ['product_id' => $productA->id, 'quantity' => 2],
@@ -154,9 +175,9 @@ test('sale totals are summed correctly across multiple items', function () {
         ->assertRedirect(route('sales.index'));
 
     $sale = Sale::query()->firstOrFail();
-    // (2 * 20) + (3 * 15) = 85 subtotal, +4 tax -9 discount = 80 grand total
+    // (2 * 20) + (3 * 15) = 85 subtotal, -9 discount = 76 grand total
     expect((float) $sale->subtotal)->toBe(85.0)
-        ->and((float) $sale->grand_total)->toBe(80.0)
+        ->and((float) $sale->grand_total)->toBe(76.0)
         ->and($sale->items()->count())->toBe(2)
         ->and($productA->inventory->refresh()->available_stock)->toBe(8)
         ->and($productB->inventory->refresh()->available_stock)->toBe(2);
@@ -173,6 +194,14 @@ test('sale that drops stock to reorder level dispatches low stock event and noti
         'reorder_level' => 5,
     ]);
     $product->inventory->forceFill(['quantity' => 8, 'available_stock' => 8])->save();
+    InventoryBatch::factory()->create([
+        'product_id' => $product->id,
+        'business_id' => $business->id,
+        'quantity_received' => 8,
+        'quantity_remaining' => 8,
+        'unit_cost' => $product->buy_price,
+        'received_at' => now()->subDay(),
+    ]);
     $product->refresh();
 
     $this->actingAs($owner)
@@ -195,6 +224,14 @@ test('low stock event from a sale creates an in app notification for the owner',
         'reorder_level' => 5,
     ]);
     $product->inventory->forceFill(['quantity' => 6, 'available_stock' => 6])->save();
+    InventoryBatch::factory()->create([
+        'product_id' => $product->id,
+        'business_id' => $business->id,
+        'quantity_received' => 6,
+        'quantity_remaining' => 6,
+        'unit_cost' => $product->buy_price,
+        'received_at' => now()->subDay(),
+    ]);
     $product->refresh();
 
     $this->actingAs($owner)

@@ -10,7 +10,7 @@ import {
     UsersRound,
     WalletCards,
 } from 'lucide-react';
-import { dashboard, login, register } from '@/routes';
+import { dashboard, login } from '@/routes';
 import landingImageOne from '../../../assets/images/1 img.png';
 import landingImageTwo from '../../../assets/images/2 img.png';
 import landingImageThree from '../../../assets/images/3 img.png';
@@ -79,20 +79,12 @@ export default function Welcome() {
                                 Dashboard
                             </Link>
                         ) : (
-                            <>
-                                <Link
-                                    href={login()}
-                                    className="rounded-md px-4 py-2 text-sm font-semibold text-foreground hover:bg-accent"
-                                >
-                                    Log in
-                                </Link>
-                                <Link
-                                    href={register()}
-                                    className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
-                                >
-                                    Create account
-                                </Link>
-                            </>
+                            <Link
+                                href={login()}
+                                className="rounded-md px-4 py-2 text-sm font-semibold text-foreground hover:bg-accent"
+                            >
+                                Log in
+                            </Link>
                         )}
                     </nav>
                 </header>
@@ -113,14 +105,8 @@ export default function Welcome() {
 
                         <div className="mt-7 flex flex-wrap gap-3">
                             <Link
-                                href={auth.user ? dashboard() : register()}
-                                className="rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
-                            >
-                                Create account
-                            </Link>
-                            <Link
                                 href={auth.user ? dashboard() : login()}
-                                className="rounded-md border bg-card px-5 py-3 text-sm font-semibold shadow-sm hover:bg-accent"
+                                className="rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
                             >
                                 Log in
                             </Link>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ExpenseSource;
 use App\Enums\BusinessPermissionKey;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,6 +20,8 @@ class GenerateReportRequest extends FormRequest
             'type' => ['required', Rule::in(['sales', 'expenses', 'profit', 'inventory', 'tax'])],
             'date_from' => ['nullable', 'date'],
             'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+            'source' => ['nullable', Rule::enum(ExpenseSource::class)],
+            'category_id' => ['nullable', 'integer'],
         ];
     }
 }

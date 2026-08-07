@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\BusinessAccessMode;
 use App\Enums\RecordStatus;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,13 +20,15 @@ class EnsureBusinessIsApproved
 
         $business = $user->ownedBusiness ?? $user->business;
 
-        if (! $business || $business->status !== RecordStatus::Active) {
+        if (! $business
+            || $business->status !== RecordStatus::Active
+            || ! in_array($business->access_mode, [BusinessAccessMode::Trial, BusinessAccessMode::Active], true)) {
             if (! $user->isOwner()) {
                 abort(403);
             }
 
-            return redirect()->route('business.profile')
-                ->with('error', 'Your business must be reviewed and approved before you can access this module.');
+            return redirect()->route('onboarding.index')
+                ->with('error', 'Complete onboarding or choose a plan to access this module.');
         }
 
         return $next($request);

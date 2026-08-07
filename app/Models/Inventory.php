@@ -33,4 +33,9 @@ class Inventory extends Model
     {
         return $this->hasMany(InventoryTransaction::class);
     }
+
+    public function batches(): HasMany
+    {
+        return $this->hasMany(InventoryBatch::class, 'product_id', 'product_id');
+    }
 }

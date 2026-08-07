@@ -8,6 +8,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CustomerService
 {
+    public function __construct(private readonly CreditScoringService $creditScoringService) {}
+
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
     {
         return Customer::query()
@@ -15,12 +17,14 @@ class CustomerService
             ->when($search, function ($query) use ($search): void {
                 $query->where(function ($query) use ($search): void {
                     $query
-                        ->where('full_name', 'like', '%'.$search.'%')
+                        ->where('display_name', 'like', '%'.$search.'%')
+                        ->orWhere('full_name', 'like', '%'.$search.'%')
+                        ->orWhere('contact_person', 'like', '%'.$search.'%')
                         ->orWhere('phone', 'like', '%'.$search.'%')
                         ->orWhere('email', 'like', '%'.$search.'%');
                 });
             })
-            ->orderBy('full_name')
+            ->orderBy('display_name')
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -30,10 +34,19 @@ class CustomerService
      */
     public function create(Business $business, array $data): Customer
     {
-        return Customer::create([
+        unset($data['current_balance'], $data['credit_limit']);
+        $data['full_name'] = $data['display_name'];
+
+        $customer = Customer::create([
             ...$data,
             'business_id' => $business->id,
+            'credit_limit' => 0,
+            'current_balance' => 0,
         ]);
+
+        $this->creditScoringService->syncProfile($customer);
+
+        return $customer;
     }
 
     /**
@@ -41,7 +54,11 @@ class CustomerService
      */
     public function update(Customer $customer, array $data): Customer
     {
+        unset($data['current_balance'], $data['credit_limit']);
+        $data['full_name'] = $data['display_name'];
+
         $customer->update($data);
+        $this->creditScoringService->syncProfile($customer);
 
         return $customer->refresh();
     }

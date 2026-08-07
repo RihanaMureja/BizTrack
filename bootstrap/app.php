@@ -3,6 +3,7 @@
 use App\Http\Middleware\BusinessMiddleware;
 use App\Http\Middleware\EnsureBusinessIsActive;
 use App\Http\Middleware\EnsureBusinessIsApproved;
+use App\Http\Middleware\EnsureOnboardingComplete;
 use App\Http\Middleware\EnsureBusinessPermission;
 use App\Http\Middleware\EnsurePasswordIsNotTemporary;
 use App\Http\Middleware\EnsureSubscriptionIsActive;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'business' => BusinessMiddleware::class,
             'business.active' => EnsureBusinessIsActive::class,
             'business.approved' => EnsureBusinessIsApproved::class,
+            'onboarding.complete' => EnsureOnboardingComplete::class,
             'business.permission' => EnsureBusinessPermission::class,
             'subscription.active' => EnsureSubscriptionIsActive::class,
             'role' => RoleMiddleware::class,
@@ -42,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             EnsurePasswordIsNotTemporary::class,
+            EnsureOnboardingComplete::class,
             LogActivity::class,
         ]);
     })

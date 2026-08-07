@@ -36,8 +36,8 @@ class CustomerCreditController extends Controller
             $credit->business,
             $owner,
             NotificationType::CreditReminder,
-            'Credit reminder: '.$credit->customer->full_name,
-            $credit->customer->full_name.' has '.$credit->remaining_balance.' ETB due for '.$credit->sale->invoice_number.'.',
+            'Credit reminder: '.$credit->customer->display_name,
+            $credit->customer->display_name.' has '.$credit->remaining_balance.' ETB due for '.$credit->sale->invoice_number.'.',
         );
 
         $credit->forceFill(['reminded_at' => now()])->save();

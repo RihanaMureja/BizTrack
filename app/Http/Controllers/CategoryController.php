@@ -45,7 +45,7 @@ class CategoryController extends Controller
                 'message' => 'Create your business profile before adding categories.',
             ]);
 
-            return to_route('business.profile');
+            return to_route('settings.business.edit');
         }
 
         $this->authorize('create', Category::class);

@@ -9,6 +9,8 @@ use App\Models\Business;
 use App\Models\Payment;
 use App\Models\Sale;
 use App\Models\User;
+use App\Services\PaymentGateway\CashPaymentHandler;
+use App\Services\PaymentGateway\TelebirrGatewayService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +19,7 @@ class PaymentService
 {
     public function __construct(
         private readonly CustomerCreditService $customerCreditService,
-        private readonly ServiceFeeService $serviceFeeService,
+        private readonly PaymentReceiptService $paymentReceiptService,
     ) {}
 
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
@@ -69,11 +71,63 @@ class PaymentService
                 'paid_at' => $status === PaymentStatus::Completed ? now() : null,
                 'verified_at' => $status === PaymentStatus::Completed ? now() : null,
             ]);
+            $payment = $this->paymentReceiptService->ensureReceipt($payment);
 
             $this->syncSalePaymentStatus($sale);
 
             if ($status === PaymentStatus::Completed) {
-                $this->serviceFeeService->createForPayment($payment);
+                PaymentCompleted::dispatch($payment->load(['business.owner', 'sale', 'customer', 'user']));
+            }
+
+            return $payment->load(['sale', 'customer', 'user']);
+        });
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function createFromCheckout(Sale $sale, User $user, array $data): Payment
+    {
+        return DB::transaction(function () use ($sale, $user, $data): Payment {
+            $sale = Sale::query()->whereKey($sale->id)->lockForUpdate()->firstOrFail();
+            $amount = (float) ($data['amount'] ?? $this->balanceDue($sale));
+            $balanceDue = $this->balanceDue($sale);
+
+            if ($amount > $balanceDue) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Payment cannot exceed the remaining sale balance.',
+                ]);
+            }
+
+            $method = PaymentMethod::from($data['method']);
+            $gateway = match ($method) {
+                PaymentMethod::Cash => app(CashPaymentHandler::class),
+                PaymentMethod::Telebirr => app(TelebirrGatewayService::class),
+                default => throw ValidationException::withMessages(['method' => 'Unsupported checkout payment method.']),
+            };
+            $result = $gateway->requestToPay($sale, $amount, (string) ($data['phone'] ?? ''));
+            $status = PaymentStatus::from($result['status']);
+
+            $payment = Payment::create([
+                'business_id' => $sale->business_id,
+                'sale_id' => $sale->id,
+                'customer_id' => $sale->customer_id,
+                'user_id' => $user->id,
+                'payment_number' => $this->nextPaymentNumber($sale->business),
+                'method' => $method,
+                'status' => $status,
+                'amount' => $amount,
+                'reference' => $result['reference'],
+                'gateway_reference' => $result['gateway_reference'],
+                'notes' => $data['notes'] ?? $result['message'],
+                'paid_at' => $status === PaymentStatus::Completed ? now() : null,
+                'verified_at' => $status === PaymentStatus::Completed ? now() : null,
+            ]);
+            $payment = $this->paymentReceiptService->ensureReceipt($payment);
+
+            $this->syncSalePaymentStatus($sale);
+
+            if ($status === PaymentStatus::Completed) {
                 PaymentCompleted::dispatch($payment->load(['business.owner', 'sale', 'customer', 'user']));
             }
 
@@ -99,11 +153,11 @@ class PaymentService
                 'verified_at' => now(),
                 'user_id' => $payment->user_id ?? $user->id,
             ])->save();
+            $payment = $this->paymentReceiptService->ensureReceipt($payment);
 
             $this->syncSalePaymentStatus($payment->sale()->lockForUpdate()->firstOrFail());
 
             if ($status === PaymentStatus::Completed) {
-                $this->serviceFeeService->createForPayment($payment);
                 PaymentCompleted::dispatch($payment->load(['business.owner', 'sale', 'customer', 'user']));
             }
 

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseSource;
 use App\Helpers\DateHelper;
 use App\Helpers\ReportHelper;
 use App\Http\Requests\GenerateReportRequest;
+use App\Models\Category;
 use App\Models\Report;
 use App\Services\ReportService;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +29,10 @@ class ReportController extends Controller
             $request->string('date_to')->toString() ?: null,
         );
         $data = $business
-            ? $this->reportService->data($business, $type, $from, $to)
+            ? $this->reportService->data($business, $type, $from, $to, [
+                'source' => $request->string('source')->toString() ?: null,
+                'category_id' => $request->integer('category_id') ?: null,
+            ])
             : ['summary' => [], 'chart' => [], 'rows' => []];
 
         return Inertia::render('reports/index', [
@@ -41,8 +46,10 @@ class ReportController extends Controller
                 'chart' => $data['chart'],
                 'rows' => $data['rows'],
                 'topProducts' => $data['topProducts'] ?? [],
+                'productProfit' => $data['productProfit'] ?? [],
             ],
             'recentReports' => $business ? $this->reportService->latestForBusiness($business) : [],
+            'categories' => $business ? Category::query()->where('business_id', $business->id)->orderBy('name')->get(['id', 'name']) : [],
             'types' => [
                 ['value' => 'sales', 'label' => 'Sales'],
                 ['value' => 'expenses', 'label' => 'Expenses'],
@@ -50,10 +57,16 @@ class ReportController extends Controller
                 ['value' => 'inventory', 'label' => 'Inventory'],
                 ['value' => 'tax', 'label' => 'Tax'],
             ],
+            'sources' => collect(ExpenseSource::cases())->map(fn (ExpenseSource $source): array => [
+                'value' => $source->value,
+                'label' => $source->label(),
+            ])->values(),
             'filters' => [
                 'type' => $type,
                 'date_from' => $from->toDateString(),
                 'date_to' => $to->toDateString(),
+                'source' => $request->string('source')->toString() ?: '',
+                'category_id' => $request->integer('category_id') ?: '',
             ],
         ]);
     }
@@ -70,6 +83,8 @@ class ReportController extends Controller
             'type' => $report->type,
             'date_from' => $report->date_from?->toDateString(),
             'date_to' => $report->date_to?->toDateString(),
+            'source' => $request->validated('source'),
+            'category_id' => $request->validated('category_id'),
         ])->with('success', $report->title.' generated.');
     }
 }

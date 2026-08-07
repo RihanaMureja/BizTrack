@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Business;
-use App\Services\ProductInsightService;
+use App\Services\ProductService;
 use Illuminate\Console\Command;
 
 class DetectStagnantProducts extends Command
@@ -12,13 +12,13 @@ class DetectStagnantProducts extends Command
 
     protected $description = 'Detect stagnant products and notify business owners.';
 
-    public function handle(ProductInsightService $productInsightService): int
+    public function handle(ProductService $productService): int
     {
         $businessId = $this->argument('business');
 
         $created = $businessId
-            ? $productInsightService->detectForBusiness(Business::query()->findOrFail($businessId))
-            : $productInsightService->detectAll();
+            ? $productService->detectForBusiness(Business::query()->findOrFail($businessId))
+            : $productService->detectAll();
 
         $this->info($created.' stagnant product insight(s) created.');
 
