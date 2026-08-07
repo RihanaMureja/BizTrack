@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('products:detect-stagnant')->dailyAt('06:00');
 Schedule::command('products:detect-expiring')->dailyAt('06:30');
+Schedule::command('customers:evaluate-credit-policy')->dailyAt('05:30');

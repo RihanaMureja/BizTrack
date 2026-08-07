@@ -8,6 +8,18 @@ import { Save, SlidersHorizontal } from 'lucide-react';
 import type { FormEvent } from 'react';
 
 type Option = { value: string; label: string };
+type CreditPolicyRule = {
+    id: string;
+    condition:
+        'reliability_score_gte' | 'overdue_count_gte' | 'completed_on_time_gte';
+    value: number;
+    action:
+        | 'increase_limit_percent'
+        | 'decrease_limit_percent'
+        | 'freeze_limit'
+        | 'discount_percent';
+    action_value: number;
+};
 type Preferences = {
     default_landing_page: string;
     records_per_page: number;
@@ -23,6 +35,7 @@ type Preferences = {
     expiry_alert_days: number;
     expiry_notification_frequency: number;
     compact_sidebar: boolean;
+    credit_policy_rules: CreditPolicyRule[];
 };
 type Props = {
     preferences: Preferences;
@@ -55,6 +68,7 @@ export default function Preferences({ preferences, options }: Props) {
             preferences.expiry_notification_frequency,
         ),
         compact_sidebar: preferences.compact_sidebar,
+        credit_policy_rules: preferences.credit_policy_rules,
     });
 
     const submit = (event: FormEvent) => {
@@ -184,6 +198,178 @@ export default function Preferences({ preferences, options }: Props) {
                                 <InputError message={form.errors.currency} />
                             </div>
                         </div>
+                    </div>
+
+                    <div className="rounded-md border bg-card p-4 shadow-sm">
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <h2 className="font-semibold">
+                                    Customer credit & discount policy
+                                </h2>
+                                <p className="text-sm text-muted-foreground">
+                                    Rules are evaluated in order; the first
+                                    matching credit-limit rule applies.
+                                </p>
+                            </div>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() =>
+                                    form.setData('credit_policy_rules', [
+                                        ...form.data.credit_policy_rules,
+                                        {
+                                            id: String(Date.now()),
+                                            condition: 'reliability_score_gte',
+                                            value: 80,
+                                            action: 'increase_limit_percent',
+                                            action_value: 10,
+                                        },
+                                    ])
+                                }
+                            >
+                                Add rule
+                            </Button>
+                        </div>
+                        <div className="mt-4 grid gap-3">
+                            {form.data.credit_policy_rules.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                    No automatic credit or loyalty discount
+                                    rules yet.
+                                </p>
+                            ) : (
+                                form.data.credit_policy_rules.map(
+                                    (rule, index) => (
+                                        <div
+                                            key={rule.id}
+                                            className="grid gap-3 rounded-md border p-3 md:grid-cols-[minmax(0,1.2fr)_7rem_minmax(0,1.2fr)_7rem_auto] md:items-end"
+                                        >
+                                            <label className="grid gap-1 text-sm">
+                                                <span>Condition</span>
+                                                <select
+                                                    value={rule.condition}
+                                                    onChange={(event) =>
+                                                        updateCreditRule(
+                                                            form,
+                                                            index,
+                                                            {
+                                                                condition: event
+                                                                    .target
+                                                                    .value as CreditPolicyRule['condition'],
+                                                            },
+                                                        )
+                                                    }
+                                                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                                                >
+                                                    <option value="reliability_score_gte">
+                                                        Reliability score ≥
+                                                    </option>
+                                                    <option value="overdue_count_gte">
+                                                        Overdue count ≥
+                                                    </option>
+                                                    <option value="completed_on_time_gte">
+                                                        On-time completions ≥
+                                                    </option>
+                                                </select>
+                                            </label>
+                                            <label className="grid gap-1 text-sm">
+                                                <span>Threshold</span>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    value={rule.value}
+                                                    onChange={(event) =>
+                                                        updateCreditRule(
+                                                            form,
+                                                            index,
+                                                            {
+                                                                value: Number(
+                                                                    event.target
+                                                                        .value,
+                                                                ),
+                                                            },
+                                                        )
+                                                    }
+                                                />
+                                            </label>
+                                            <label className="grid gap-1 text-sm">
+                                                <span>Action</span>
+                                                <select
+                                                    value={rule.action}
+                                                    onChange={(event) =>
+                                                        updateCreditRule(
+                                                            form,
+                                                            index,
+                                                            {
+                                                                action: event
+                                                                    .target
+                                                                    .value as CreditPolicyRule['action'],
+                                                            },
+                                                        )
+                                                    }
+                                                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                                                >
+                                                    <option value="increase_limit_percent">
+                                                        Increase limit (%)
+                                                    </option>
+                                                    <option value="decrease_limit_percent">
+                                                        Decrease limit (%)
+                                                    </option>
+                                                    <option value="freeze_limit">
+                                                        Freeze limit
+                                                    </option>
+                                                    <option value="discount_percent">
+                                                        Loyalty discount (%)
+                                                    </option>
+                                                </select>
+                                            </label>
+                                            <label className="grid gap-1 text-sm">
+                                                <span>Value</span>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    value={rule.action_value}
+                                                    disabled={
+                                                        rule.action ===
+                                                        'freeze_limit'
+                                                    }
+                                                    onChange={(event) =>
+                                                        updateCreditRule(
+                                                            form,
+                                                            index,
+                                                            {
+                                                                action_value:
+                                                                    Number(
+                                                                        event
+                                                                            .target
+                                                                            .value,
+                                                                    ),
+                                                            },
+                                                        )
+                                                    }
+                                                />
+                                            </label>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    form.setData(
+                                                        'credit_policy_rules',
+                                                        form.data.credit_policy_rules.filter(
+                                                            (_, ruleIndex) =>
+                                                                ruleIndex !==
+                                                                index,
+                                                        ),
+                                                    )
+                                                }
+                                            >
+                                                Remove
+                                            </Button>
+                                        </div>
+                                    ),
+                                )
+                            )}
+                        </div>
+                        <InputError message={form.errors.credit_policy_rules} />
                     </div>
 
                     <div className="rounded-md border bg-card p-4 shadow-sm">
@@ -377,6 +563,20 @@ export default function Preferences({ preferences, options }: Props) {
                 </form>
             </div>
         </>
+    );
+}
+
+function updateCreditRule(
+    form: ReturnType<typeof useForm>,
+    index: number,
+    patch: Partial<CreditPolicyRule>,
+) {
+    form.setData(
+        'credit_policy_rules',
+        form.data.credit_policy_rules.map(
+            (rule: CreditPolicyRule, ruleIndex: number) =>
+                ruleIndex === index ? { ...rule, ...patch } : rule,
+        ),
     );
 }
 

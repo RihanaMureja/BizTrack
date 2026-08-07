@@ -5,10 +5,36 @@ namespace App\Services;
 use App\Enums\PaymentStatus;
 use App\Models\Customer;
 use App\Models\CustomerCredit;
+use App\Models\Business;
 use App\Models\Sale;
 
 class CustomerCreditService
 {
+    /** @return array{completed_on_time: int, completed_late: int, overdue_count: int, total_credits_issued: int, reliability_score: int} */
+    public function paymentHistoryFor(Customer $customer): array
+    {
+        $credits = CustomerCredit::query()->where('customer_id', $customer->id);
+        $total = (clone $credits)->count();
+        $onTime = (clone $credits)
+            ->where('status', PaymentStatus::Completed->value)
+            ->whereColumn('paid_at', '<=', 'due_date')
+            ->count();
+        $late = (clone $credits)
+            ->where('status', PaymentStatus::Completed->value)
+            ->whereColumn('paid_at', '>', 'due_date')
+            ->count();
+        $overdue = (clone $credits)->where('status', PaymentStatus::Overdue->value)->count();
+        $score = round((($onTime * 2 - $overdue * 3) / max(1, $total)) * 50 + 50);
+
+        return [
+            'completed_on_time' => $onTime,
+            'completed_late' => $late,
+            'overdue_count' => $overdue,
+            'total_credits_issued' => $total,
+            'reliability_score' => max(0, min(100, (int) $score)),
+        ];
+    }
+
     public function syncForSale(Sale $sale): ?CustomerCredit
     {
         if (! $sale->customer_id) {
@@ -25,7 +51,8 @@ class CustomerCreditService
             ->first();
 
         if (! $existing && $remainingBalance <= 0) {
-            $this->syncCustomerBalance($sale->customer);
+            $customer = $this->syncCustomerBalance($sale->customer);
+            app(CustomerCreditPolicyService::class)->evaluate($customer);
 
             return null;
         }
@@ -48,7 +75,8 @@ class CustomerCreditService
             ],
         );
 
-        $this->syncCustomerBalance($sale->customer);
+        $customer = $this->syncCustomerBalance($sale->customer);
+        app(CustomerCreditPolicyService::class)->evaluate($customer);
 
         return $credit->refresh();
     }
@@ -60,6 +88,7 @@ class CustomerCreditService
         }
 
         $credit->forceFill(['status' => PaymentStatus::Overdue])->save();
+        app(CustomerCreditPolicyService::class)->evaluate($credit->customer()->firstOrFail());
 
         return $credit->refresh();
     }
@@ -67,6 +96,16 @@ class CustomerCreditService
     public function markPastDueCredits(): int
     {
         return CustomerCredit::query()
+            ->where('remaining_balance', '>', 0)
+            ->whereDate('due_date', '<', today())
+            ->where('status', '!=', PaymentStatus::Overdue->value)
+            ->update(['status' => PaymentStatus::Overdue->value, 'updated_at' => now()]);
+    }
+
+    public function markPastDueCreditsForBusiness(Business $business): int
+    {
+        return CustomerCredit::query()
+            ->where('business_id', $business->id)
             ->where('remaining_balance', '>', 0)
             ->whereDate('due_date', '<', today())
             ->where('status', '!=', PaymentStatus::Overdue->value)

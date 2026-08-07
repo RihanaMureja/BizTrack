@@ -28,7 +28,7 @@ class ProductService
             })
             ->when($categoryId, fn ($query) => $query->where('category_id', $categoryId))
             ->when($status, fn ($query) => $query->where('status', $status))
-            ->latest()
+            ->latest('created_at')
             ->paginate($perPage)
             ->withQueryString();
     }

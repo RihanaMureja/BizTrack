@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Models\AuditLog;
+use App\Services\CustomerCreditService;
 use App\Services\CustomerService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +18,10 @@ class CustomerController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(private readonly CustomerService $customerService) {}
+    public function __construct(
+        private readonly CustomerService $customerService,
+        private readonly CustomerCreditService $customerCreditService,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -41,6 +46,13 @@ class CustomerController extends Controller
 
         return Inertia::render('customers/show', [
             'customer' => $customer->load(['credits.sale']),
+            'paymentHistory' => $this->customerCreditService->paymentHistoryFor($customer),
+            'latestCreditLimitAdjustment' => AuditLog::query()
+                ->where('table_name', 'customers')
+                ->where('record_id', $customer->id)
+                ->where('action', 'credit_limit.auto_adjusted')
+                ->latest()
+                ->first(['new_values', 'created_at']),
             'purchaseHistory' => $customer->credits()
                 ->with('sale')
                 ->latest()

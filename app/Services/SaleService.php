@@ -8,6 +8,7 @@ use App\Enums\SaleStatus;
 use App\Events\InventoryLow;
 use App\Events\SaleCompleted;
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -75,7 +76,10 @@ class SaleService
             }
 
             $tax = (float) ($data['tax_amount'] ?? 0);
-            $automaticDiscount = $this->discountService->calculate($business->loadMissing('owner'), collect($saleItems));
+            $customer = ! empty($data['customer_id'])
+                ? Customer::query()->where('business_id', $business->id)->find($data['customer_id'])
+                : null;
+            $automaticDiscount = $this->discountService->calculate($business->loadMissing('owner'), collect($saleItems), $customer);
             $isManualDiscount = ($data['discount_type'] ?? null) === 'manual';
             $legacyManualDiscount = ! array_key_exists('enable_credit', $data) && (float) ($data['discount_amount'] ?? 0) > 0;
             if ($isManualDiscount && ! $legacyManualDiscount && ! $user->isOwner()) {
@@ -156,15 +160,31 @@ class SaleService
     public function checkout(Business $business, User $user, array $data): array
     {
         return DB::transaction(function () use ($business, $user, $data): array {
-            $sale = $this->create($business, $user, $data);
             $amountReceived = (float) $data['amount_received'];
-            $unpaid = max(0, (float) $sale->grand_total - min($amountReceived, (float) $sale->grand_total));
+            $estimatedTotal = $this->estimatedTotal($business, $user, $data);
+            $unpaid = max(0, $estimatedTotal - min($amountReceived, $estimatedTotal));
 
-            if ($unpaid > 0 && (! $data['enable_credit'] || ! $sale->customer_id)) {
+            if ($unpaid > 0 && (! $data['enable_credit'] || empty($data['customer_id']))) {
                 throw ValidationException::withMessages([
                     'amount_received' => 'Full payment is required unless credit is enabled for a registered customer.',
                 ]);
             }
+
+            if ($unpaid > 0) {
+                $customer = Customer::query()
+                    ->where('business_id', $business->id)
+                    ->whereKey($data['customer_id'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ((float) $customer->current_balance + $unpaid > (float) $customer->credit_limit) {
+                    throw ValidationException::withMessages([
+                        'amount_received' => 'This sale would exceed the customer\'s available credit limit.',
+                    ]);
+                }
+            }
+
+            $sale = $this->create($business, $user, $data);
             $payment = $this->paymentService->create($business, $user, [
                 'sale_id' => $sale->id,
                 // Cash received can exceed the sale total; the excess is change, not revenue.
@@ -184,5 +204,37 @@ class SaleService
         $next = Sale::query()->where('business_id', $business->id)->where('invoice_number', 'like', $prefix.'%')->count() + 1;
 
         return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    /** @param array<string, mixed> $data */
+    private function estimatedTotal(Business $business, User $user, array $data): float
+    {
+        $items = collect($data['items']);
+        $products = Product::query()
+            ->where('business_id', $business->id)
+            ->whereIn('id', $items->pluck('product_id'))
+            ->get()
+            ->keyBy('id');
+        $saleItems = $items->map(function (array $item) use ($products): array {
+            $product = $products->get((int) $item['product_id']);
+
+            if (! $product) {
+                throw ValidationException::withMessages(['items' => 'One or more products are invalid.']);
+            }
+
+            return ['product' => $product, 'quantity' => (int) $item['quantity'], 'lineTotal' => (float) $product->selling_price * (int) $item['quantity']];
+        });
+        $subtotal = (float) $saleItems->sum('lineTotal');
+        $tax = (float) ($data['tax_amount'] ?? 0);
+        $customer = ! empty($data['customer_id'])
+            ? Customer::query()->where('business_id', $business->id)->find($data['customer_id'])
+            : null;
+        $automaticDiscount = $this->discountService->calculate($business->loadMissing('owner'), $saleItems, $customer);
+        $isManualDiscount = ($data['discount_type'] ?? null) === 'manual';
+        $discount = $isManualDiscount
+            ? (float) ($data['discount_value'] ?? 0)
+            : $automaticDiscount['amount'];
+
+        return max(0, $subtotal + $tax - min($discount, $subtotal + $tax));
     }
 }

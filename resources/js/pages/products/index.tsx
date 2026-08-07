@@ -1,23 +1,13 @@
 import { Head, router } from '@inertiajs/react';
-import {
-    AlertTriangle,
-    Boxes,
-    Pencil,
-    Plus,
-    Power,
-    ScanBarcode,
-} from 'lucide-react';
+import { AlertTriangle, Boxes, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
-import { DataTable } from '@/components/data-table/data-table';
-import type { DataTableColumn } from '@/components/data-table/data-table';
 import { ProductForm } from '@/components/forms/product-form';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { ProductCard } from '@/components/product-card/product-card';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -69,36 +59,6 @@ type Props = {
     statuses: Array<{ value: string; label: string }>;
 };
 
-const getExpiryState = (expireDate: string | null) => {
-    if (!expireDate) {
-        return null;
-    }
-
-    const today = new Date();
-    const expiry = new Date(expireDate);
-    const diffDays = Math.ceil(
-        (expiry.getTime() - today.setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24),
-    );
-
-    if (diffDays < 0) {
-        return {
-            label: 'Expired',
-            variant: 'destructive' as const,
-            className: 'bg-rose-600 text-white',
-        };
-    }
-
-    if (diffDays <= 30) {
-        return {
-            label: `${new Date(expireDate).toLocaleDateString()} • ${diffDays}d`,
-            variant: 'outline' as const,
-            className: 'border-amber-500 text-amber-700 dark:text-amber-400',
-        };
-    }
-
-    return null;
-};
-
 export default function ProductsIndex({
     products,
     categories,
@@ -140,116 +100,6 @@ export default function ProductsIndex({
             },
         });
     };
-
-    const columns: DataTableColumn<Product>[] = [
-        {
-            key: 'name',
-            header: 'Product',
-            render: (product) => (
-                <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                        {product.category?.name ?? 'Uncategorized'}
-                    </p>
-                </div>
-            ),
-        },
-        {
-            key: 'barcode',
-            header: 'Barcode',
-            render: (product) => (
-                <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <ScanBarcode className="size-4" />
-                    {product.barcode || 'No barcode'}
-                </span>
-            ),
-        },
-        {
-            key: 'prices',
-            header: 'Prices',
-            render: (product) => (
-                <div className="text-sm">
-                    <p>{product.selling_price} ETB</p>
-                    <p className="text-xs text-muted-foreground">
-                        Buy {product.buy_price} ETB
-                    </p>
-                </div>
-            ),
-        },
-        {
-            key: 'stock',
-            header: 'Stock',
-            render: (product) => (
-                <div className="text-sm">
-                    <p>
-                        {product.inventory?.available_stock ?? 0}{' '}
-                        {product.unit ?? 'units'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        Reorder at {product.reorder_level}
-                    </p>
-                </div>
-            ),
-        },
-        {
-            key: 'status',
-            header: 'Status',
-            render: (product) => {
-                const expiryState = product.expire_date
-                    ? getExpiryState(product.expire_date)
-                    : null;
-
-                return (
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Badge
-                            variant={
-                                product.status === 'active'
-                                    ? 'default'
-                                    : 'secondary'
-                            }
-                        >
-                            {product.status}
-                        </Badge>
-                        {expiryState && (
-                            <Badge
-                                variant={expiryState.variant}
-                                className={expiryState.className}
-                            >
-                                {expiryState.label}
-                            </Badge>
-                        )}
-                    </div>
-                );
-            },
-        },
-        {
-            key: 'actions',
-            header: '',
-            className: 'text-right',
-            render: (product) => (
-                <div className="flex justify-end gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setEditingProduct(product)}
-                        aria-label={`Edit ${product.name}`}
-                    >
-                        <Pencil className="size-4" />
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setDeactivatingProduct(product)}
-                        aria-label={`Deactivate ${product.name}`}
-                    >
-                        <Power className="size-4" />
-                    </Button>
-                </div>
-            ),
-        },
-    ];
 
     return (
         <>
@@ -343,21 +193,18 @@ export default function ProductsIndex({
                             </select>
                         </div>
 
-                        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                            {products.data.slice(0, 4).map((product) => (
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            {products.data.map((product) => (
                                 <ProductCard
                                     key={product.id}
                                     product={product}
+                                    onEdit={() => setEditingProduct(product)}
+                                    onDeactivate={() =>
+                                        setDeactivatingProduct(product)
+                                    }
                                 />
                             ))}
                         </div>
-
-                        <DataTable
-                            columns={columns}
-                            data={products.data}
-                            rowKey={(product) => product.id}
-                            emptyMessage="No products yet. Add the first product to start building your catalog."
-                        />
 
                         <Pagination
                             links={products.links}

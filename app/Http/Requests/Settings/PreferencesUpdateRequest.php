@@ -32,6 +32,12 @@ class PreferencesUpdateRequest extends FormRequest
             'expiry_alert_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
             'expiry_notification_frequency' => ['sometimes', 'integer', 'min:1', 'max:90'],
             'compact_sidebar' => ['boolean'],
+            'credit_policy_rules' => ['sometimes', 'array', 'max:50'],
+            'credit_policy_rules.*.id' => ['required', 'string', 'max:80'],
+            'credit_policy_rules.*.condition' => ['required', Rule::in(['reliability_score_gte', 'overdue_count_gte', 'completed_on_time_gte'])],
+            'credit_policy_rules.*.value' => ['required', 'numeric', 'min:0', 'max:1000000'],
+            'credit_policy_rules.*.action' => ['required', Rule::in(['increase_limit_percent', 'decrease_limit_percent', 'freeze_limit', 'discount_percent'])],
+            'credit_policy_rules.*.action_value' => ['required', 'numeric', 'min:0', 'max:1000000'],
         ];
     }
 }

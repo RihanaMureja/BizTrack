@@ -67,6 +67,9 @@ class SettingsController extends Controller
             'expiry_alert_days' => (int) ($preferences['expiry_alert_days'] ?? 30),
             'expiry_notification_frequency' => (int) ($preferences['expiry_notification_frequency'] ?? 7),
             'compact_sidebar' => (bool) ($preferences['compact_sidebar'] ?? false),
+            'credit_policy_rules' => is_array($preferences['credit_policy_rules'] ?? null)
+                ? $preferences['credit_policy_rules']
+                : [],
         ];
     }
 }

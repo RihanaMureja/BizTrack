@@ -3,17 +3,20 @@
 namespace App\Services;
 
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\SaleItem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class DiscountService
 {
+    public function __construct(private readonly CustomerCreditPolicyService $customerCreditPolicyService) {}
+
     /**
      * @param Collection<int, array{product: mixed, quantity: int, lineTotal: float}> $items
      * @return array{type: ?string, value: float, rule_id: ?string, amount: float}
      */
-    public function calculate(Business $business, Collection $items): array
+    public function calculate(Business $business, Collection $items, ?Customer $customer = null): array
     {
         $rules = collect($business->owner?->preferences['discount_rules'] ?? []);
         $best = ['type' => null, 'value' => 0.0, 'rule_id' => null, 'amount' => 0.0];
@@ -59,6 +62,13 @@ class DiscountService
 
         if ($stagnantAmount > $best['amount']) {
             $best = ['type' => 'stagnant_product', 'value' => $stagnantRate, 'rule_id' => 'stagnant-product', 'amount' => round($stagnantAmount, 2)];
+        }
+
+        $customerDiscount = $customer ? $this->customerCreditPolicyService->discountFor($customer) : 0.0;
+        $customerAmount = $items->sum('lineTotal') * $customerDiscount / 100;
+
+        if ($customerAmount > $best['amount']) {
+            $best = ['type' => 'customer_credit_policy', 'value' => $customerDiscount, 'rule_id' => 'customer-credit-policy', 'amount' => round($customerAmount, 2)];
         }
 
         return $best;
