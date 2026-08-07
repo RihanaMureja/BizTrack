@@ -1,3 +1,5 @@
+import { QRCodeSVG } from 'qrcode.react';
+
 type Props = {
     barcode: string;
     qrPayload: string | null;
@@ -12,12 +14,7 @@ function codeBars(value: string) {
 }
 
 export function ProductCodePreview({ barcode, qrPayload }: Props) {
-    const qrCells = Array.from({ length: 49 }, (_, index) => {
-        const source = `${qrPayload ?? barcode}${index}`;
-        const filled = source.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 3 !== 0;
-
-        return <span key={index} className={filled ? 'bg-foreground' : 'bg-background'} />;
-    });
+    const value = qrPayload ?? barcode;
 
     return (
         <div className="grid gap-4 md:grid-cols-[1fr_8rem]">
@@ -30,9 +27,10 @@ export function ProductCodePreview({ barcode, qrPayload }: Props) {
             </div>
             <div className="rounded-md border bg-background p-4">
                 <p className="text-xs font-medium uppercase text-muted-foreground">QR payload</p>
-                <div className="mt-3 grid aspect-square grid-cols-7 gap-0.5 rounded-sm border bg-background p-1">
-                    {qrCells}
+                <div className="mt-3 flex aspect-square items-center justify-center rounded-sm border bg-white p-2">
+                    <QRCodeSVG value={value} size={104} level="M" includeMargin />
                 </div>
+                <p className="mt-3 break-all font-mono text-[10px] text-muted-foreground">{value}</p>
             </div>
         </div>
     );
