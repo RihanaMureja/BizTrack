@@ -6,7 +6,6 @@ type Props = {
         name: string;
         barcode: string | null;
         selling_price: string;
-        unit: string | null;
         status: string;
         category?: { name: string } | null;
         inventory?: { available_stock: number } | null;
@@ -41,7 +40,7 @@ export function ProductCard({ product }: Props) {
                 <div>
                     <p className="text-xs text-muted-foreground">Stock</p>
                     <p className="font-semibold">
-                        {product.inventory?.available_stock ?? 0} {product.unit ?? 'units'}
+                        {product.inventory?.available_stock ?? 0} units
                     </p>
                 </div>
             </div>

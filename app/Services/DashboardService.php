@@ -4,15 +4,17 @@ namespace App\Services;
 
 use App\Enums\Role;
 use App\Enums\BusinessPermissionKey;
+use App\Helpers\BusinessDashboardConfig;
 use App\Models\Business;
-use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Expense;
-use App\Models\Inventory;
+use App\Models\InventoryBatch;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\Subscription;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardService
@@ -40,20 +42,30 @@ class DashboardService
     private function ownerDashboard(User $user): array
     {
         $business = $user->ownedBusiness ?? $user->business;
+        $config = BusinessDashboardConfig::for($business?->business_type);
+
+        $stats = $this->ownerStats($business);
+        $orderedStats = array_values(
+            array_map(
+                fn (array $spec): array => $stats[$spec['key']],
+                $config['stats'],
+            ),
+        );
 
         return [
             'role' => Role::Owner->value,
             'business' => $business,
-            'stats' => [
-                ['label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Completed sales'],
-                ['label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'POS activity'],
-                ['label' => 'Expenses today', 'value' => $this->money($this->revenueService->todayExpenses($business)), 'trend' => 'Recorded costs'],
-                ['label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Active catalog items'],
-            ],
+            'businessType' => $business?->business_type,
+            'focus' => $config['focus'],
+            'subtitle' => $config['subtitle'],
+            'sections' => $config['sections'],
+            'stats' => $orderedStats,
             'chart' => $this->emptySeries(),
             'lowStock' => $this->lowStock($business),
             'stagnantProducts' => $this->productInsightService->previewForBusiness($business),
-            'topProducts' => [],
+            'expiringProducts' => $this->expiringProducts($business),
+            'stockValue' => $this->stockValue($business),
+            'topProducts' => $this->topProducts($business),
             'nextSteps' => [
                 'Complete product categories',
                 'Add products and opening stock',
@@ -119,6 +131,25 @@ class DashboardService
         ];
     }
 
+    /**
+     * Build the full stat pool and pick the ordered subset for the owner.
+     *
+     * @return array<string, array{key: string, label: string, value: string, trend: string}>
+     */
+    private function ownerStats(?Business $business): array
+    {
+        return [
+            'revenue_today' => ['key' => 'revenue_today', 'label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Completed sales'],
+            'sales_today' => ['key' => 'sales_today', 'label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'POS activity'],
+            'expenses_today' => ['key' => 'expenses_today', 'label' => 'Expenses today', 'value' => $this->money($this->revenueService->todayExpenses($business)), 'trend' => 'Recorded costs'],
+            'products' => ['key' => 'products', 'label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Active catalog items'],
+            'low_stock' => ['key' => 'low_stock', 'label' => 'Low stock', 'value' => (string) count($this->lowStock($business)), 'trend' => 'Items to reorder'],
+            'expiring_soon' => ['key' => 'expiring_soon', 'label' => 'Expiring soon', 'value' => (string) count($this->expiringProducts($business)), 'trend' => 'Within 30 days'],
+            'stock_value' => ['key' => 'stock_value', 'label' => 'Stock value', 'value' => $this->money($this->stockValue($business)['total']), 'trend' => 'Cost on hand'],
+            'stagnant_count' => ['key' => 'stagnant_count', 'label' => 'Stagnant', 'value' => (string) count($this->productInsightService->previewForBusiness($business)), 'trend' => 'Need attention'],
+        ];
+    }
+
     private function businessCount(string $modelClass, ?Business $business): int
     {
         if (! $business) {
@@ -159,6 +190,105 @@ class DashboardService
                 'name' => $product->name,
                 'stock' => (int) ($product->inventory?->available_stock ?? 0),
                 'reorder' => (int) $product->reorder_level,
+            ])
+            ->all();
+    }
+
+    /**
+     * Products with batch stock expiring within the next 30 days.
+     *
+     * @return list<array{name: string, quantity: int, days_left: int, expires_at: string}>
+     */
+    private function expiringProducts(?Business $business): array
+    {
+        if (! $business || ! Schema::hasTable('inventory_batches')) {
+            return [];
+        }
+
+        return InventoryBatch::query()
+            ->with('product')
+            ->where('business_id', $business->id)
+            ->where('remaining_quantity', '>', 0)
+            ->whereNotNull('expires_at')
+            ->whereBetween('expires_at', [today(), today()->addDays(30)])
+            ->orderBy('expires_at')
+            ->take(5)
+            ->get()
+            ->map(fn (InventoryBatch $batch): array => [
+                'name' => $batch->product?->name ?? 'Unknown product',
+                'quantity' => (int) $batch->remaining_quantity,
+                'days_left' => (int) today()->diffInDays($batch->expires_at, false),
+                'expires_at' => $batch->expires_at?->toDateString() ?? '',
+            ])
+            ->all();
+    }
+
+    /**
+     * Total cost value of remaining batch stock plus the highest-value products.
+     *
+     * @return array{total: float, items: list<array{name: string, value: float}>}
+     */
+    private function stockValue(?Business $business): array
+    {
+        if (! $business || ! Schema::hasTable('inventory_batches')) {
+            return ['total' => 0.0, 'items' => []];
+        }
+
+        $rows = InventoryBatch::query()
+            ->with('product')
+            ->where('business_id', $business->id)
+            ->where('remaining_quantity', '>', 0)
+            ->where('unit_cost', '>', 0)
+            ->get(['product_id', 'remaining_quantity', 'unit_cost']);
+
+        $valuePerProduct = [];
+
+        foreach ($rows as $batch) {
+            $value = (float) $batch->remaining_quantity * (float) $batch->unit_cost;
+            $productId = $batch->product_id;
+            $valuePerProduct[$productId] = ($valuePerProduct[$productId] ?? 0.0) + $value;
+        }
+
+        arsort($valuePerProduct);
+
+        $total = array_sum($valuePerProduct);
+
+        $items = collect($rows->unique('product_id'))
+            ->filter(fn (InventoryBatch $batch) => isset($valuePerProduct[$batch->product_id]) && $valuePerProduct[$batch->product_id] > 0)
+            ->sortByDesc(fn (InventoryBatch $batch) => $valuePerProduct[$batch->product_id])
+            ->take(5)
+            ->values()
+            ->map(fn (InventoryBatch $batch): array => [
+                'name' => $batch->product?->name ?? 'Unknown product',
+                'value' => round($valuePerProduct[$batch->product_id], 2),
+            ])
+            ->all();
+
+        return ['total' => round($total, 2), 'items' => $items];
+    }
+
+    /**
+     * Best-selling products by total sold quantity.
+     *
+     * @return list<array{name: string, quantity: int}>
+     */
+    private function topProducts(?Business $business): array
+    {
+        if (! $business || ! Schema::hasTable('sale_items')) {
+            return [];
+        }
+
+        return SaleItem::query()
+            ->with('product')
+            ->whereHas('sale', fn ($query) => $query->where('business_id', $business->id))
+            ->select('product_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->groupBy('product_id')
+            ->orderByDesc('total_quantity')
+            ->take(5)
+            ->get()
+            ->map(fn (SaleItem $item): array => [
+                'name' => $item->product?->name ?? 'Unknown product',
+                'quantity' => (int) $item->total_quantity,
             ])
             ->all();
     }

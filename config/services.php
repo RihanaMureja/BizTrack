@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'chapa' => [
+        'secret_key' => env('CHAPA_SECRET_KEY'),
+        'base_url' => env('CHAPA_BASE_URL', 'https://api.chapa.co/v1'),
+        'return_url' => env('CHAPA_RETURN_URL'),
+    ],
+
 ];

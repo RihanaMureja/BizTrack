@@ -2,12 +2,12 @@
 
 use App\Enums\RecordStatus;
 use App\Enums\Role;
+use App\Events\CashierCreated;
 use App\Models\Business;
 use App\Models\BusinessRole;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
-use App\Events\CashierCreated;
 
 function cashierOwnerWithBusiness(int $maxCashiers = 3): array
 {
@@ -229,8 +229,7 @@ test('cashier navigation stays restricted', function () {
             ->where('navigation.1.items.1.title', 'Customers')
             ->where('navigation.1.items.2.title', 'Payments')
             ->where('navigation.2.label', 'Settings')
-            ->where('navigation.2.items.0.title', 'Notifications')
-            ->where('navigation.2.items.1.title', 'Profile')
+            ->where('navigation.2.items.0.title', 'Profile')
             ->missing('navigation.3.label')
         );
 });

@@ -1,11 +1,12 @@
-import { Button } from '@/components/ui/button';
-import { useCart } from '@/hooks/use-cart';
-import { cartSubtotal, type CartProduct } from '@/lib/cart';
-import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/hooks/use-cart';
+import AppLayout from '@/layouts/app-layout';
+import { cartSubtotal  } from '@/lib/cart';
+import type {CartProduct} from '@/lib/cart';
 
-type Customer = { id: number; full_name: string; current_balance: string; credit_limit: string };
+type Customer = { id: number; full_name: string; current_balance: string; credit_limit: string; default_discount: string };
 type Props = { products: CartProduct[]; customers: Customer[]; canOverrideDiscount: boolean };
 const methods = [['cash', 'Cash'], ['bank', 'Bank transfer'], ['telebirr', 'Telebirr'], ['chapa', 'Chapa']] as const;
 
@@ -13,13 +14,16 @@ export default function Checkout({ products, customers, canOverrideDiscount }: P
     const cart = useCart();
     const items = useMemo(() => cart.items.flatMap((item) => {
         const current = products.find((product) => product.id === item.id);
+
         return current && (current.inventory?.available_stock ?? 0) > 0 ? [{ ...current, quantity: Math.min(item.quantity, current.inventory?.available_stock ?? 0) }] : [];
     }), [cart.items, products]);
     const form = useForm({ customer_id: '', tax_amount: '0', notes: '', payment_method: 'cash', amount_received: '', enable_credit: false, discount_type: '', discount_value: '', payment_reference: '', payment_notes: '' });
     const subtotal = cartSubtotal(items);
     const tax = Math.max(0, Number(form.data.tax_amount) || 0);
     const manualDiscount = form.data.discount_type === 'manual' ? Math.min(subtotal + tax, Math.max(0, Number(form.data.discount_value) || 0)) : 0;
-    const total = Math.max(0, subtotal + tax - manualDiscount);
+    const selectedCustomer = customers.find((customer) => customer.id === Number(form.data.customer_id));
+    const customerDiscount = selectedCustomer && Number(selectedCustomer.default_discount) > 0 ? Math.min(subtotal + tax, subtotal * Number(selectedCustomer.default_discount) / 100) : 0;
+    const total = Math.max(0, subtotal + tax - manualDiscount - customerDiscount);
     const received = Math.max(0, Number(form.data.amount_received) || 0);
     const balance = Math.max(0, total - received);
     const change = form.data.payment_method === 'cash' ? Math.max(0, received - total) : 0;
@@ -45,7 +49,7 @@ export default function Checkout({ products, customers, canOverrideDiscount }: P
                     {form.data.payment_method !== 'cash' && <label className="grid gap-2 text-sm font-medium">Reference<input value={form.data.payment_reference} onChange={(event) => form.setData('payment_reference', event.target.value)} className="border-input h-10 rounded-md border bg-background px-3" /></label>}
                     <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={form.data.enable_credit} onChange={(event) => form.setData('enable_credit', event.target.checked)} disabled={!form.data.customer_id} />Enable customer credit</label>
                     <label className="grid gap-2 text-sm font-medium">Payment notes<textarea value={form.data.payment_notes} onChange={(event) => form.setData('payment_notes', event.target.value)} className="border-input min-h-20 rounded-md border bg-background p-3" /></label>
-                    <div className="space-y-2 border-t pt-3 text-sm"><div className="flex justify-between"><span>Subtotal</span><span>{subtotal.toFixed(2)} ETB</span></div><div className="flex justify-between"><span>Tax</span><span>{tax.toFixed(2)} ETB</span></div><div className="flex justify-between"><span>Discount</span><span>-{manualDiscount.toFixed(2)} ETB</span></div><div className="flex justify-between text-base font-semibold"><span>Total</span><span>{total.toFixed(2)} ETB</span></div><div className="flex justify-between"><span>Balance</span><span>{balance.toFixed(2)} ETB</span></div>{form.data.payment_method === 'cash' && <div className="flex justify-between"><span>Change due</span><span>{change.toFixed(2)} ETB</span></div>}</div>
+                    <div className="space-y-2 border-t pt-3 text-sm"><div className="flex justify-between"><span>Subtotal</span><span>{subtotal.toFixed(2)} ETB</span></div><div className="flex justify-between"><span>Tax</span><span>{tax.toFixed(2)} ETB</span></div>{customerDiscount > 0 && <div className="flex justify-between"><span>Customer discount ({selectedCustomer?.full_name})</span><span>-{customerDiscount.toFixed(2)} ETB</span></div>}<div className="flex justify-between"><span>Discount</span><span>-{(manualDiscount + customerDiscount).toFixed(2)} ETB</span></div><div className="flex justify-between text-base font-semibold"><span>Total</span><span>{total.toFixed(2)} ETB</span></div><div className="flex justify-between"><span>Balance</span><span>{balance.toFixed(2)} ETB</span></div>{form.data.payment_method === 'cash' && <div className="flex justify-between"><span>Change due</span><span>{change.toFixed(2)} ETB</span></div>}</div>
                     <Button type="button" onClick={submit} disabled={!canSubmit || form.processing} className="w-full">{form.processing ? 'Completing sale...' : 'Complete sale'}</Button>
                 </aside>
             </div>}

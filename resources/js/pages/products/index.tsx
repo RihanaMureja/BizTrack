@@ -1,5 +1,5 @@
-import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, Boxes, Pencil, Plus, Power, ScanBarcode } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { AlertTriangle, Boxes, ChartColumn, Pencil, Plus, Power, ScanBarcode } from 'lucide-react';
 import { useState } from 'react';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
@@ -27,7 +27,6 @@ type Product = {
     description: string | null;
     buy_price: string;
     selling_price: string;
-    unit: string | null;
     reorder_level: number;
     status: string;
     category: Category | null;
@@ -128,7 +127,7 @@ export default function ProductsIndex({ products, categories, filters, statuses 
             header: 'Stock',
             render: (product) => (
                 <div className="text-sm">
-                    <p>{product.inventory?.available_stock ?? 0} {product.unit ?? 'units'}</p>
+                    <p>{product.inventory?.available_stock ?? 0} units</p>
                     <p className="text-xs text-muted-foreground">Reorder at {product.reorder_level}</p>
                 </div>
             ),
@@ -144,6 +143,11 @@ export default function ProductsIndex({ products, categories, filters, statuses 
             className: 'text-right',
             render: (product) => (
                 <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" size="icon" asChild aria-label={`View insights for ${product.name}`}>
+                        <Link href={`/products/${product.id}/insights`}>
+                            <ChartColumn className="size-4" />
+                        </Link>
+                    </Button>
                     <Button type="button" variant="outline" size="icon" onClick={() => setEditingProduct(product)} aria-label={`Edit ${product.name}`}>
                         <Pencil className="size-4" />
                     </Button>

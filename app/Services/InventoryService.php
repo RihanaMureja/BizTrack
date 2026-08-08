@@ -6,9 +6,11 @@ use App\Enums\InventoryTransactionType;
 use App\Events\InventoryLow;
 use App\Models\Business;
 use App\Models\Inventory;
+use App\Models\InventoryBatch;
 use App\Models\InventoryTransaction;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -46,9 +48,60 @@ class InventoryService
             ->withQueryString();
     }
 
-    public function restock(Inventory $inventory, int $quantity, ?string $notes, User $user): InventoryTransaction
+    public function batchesForInventory(Inventory $inventory, int $perPage = 15): LengthAwarePaginator
     {
-        return $this->change($inventory, InventoryTransactionType::Restock, $quantity, $notes, $user);
+        return $inventory
+            ->batches()
+            ->with('user:id,name,role')
+            ->orderByDesc('received_at')
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    /**
+     * @return array{total_received: int, total_remaining: int}
+     */
+    public function batchSummaryForInventory(Inventory $inventory): array
+    {
+        $aggregate = InventoryBatch::query()
+            ->where('inventory_id', $inventory->id)
+            ->selectRaw('COALESCE(SUM(quantity), 0) as total_received, COALESCE(SUM(remaining_quantity), 0) as total_remaining')
+            ->first();
+
+        return [
+            'total_received' => (int) ($aggregate->total_received ?? 0),
+            'total_remaining' => (int) ($aggregate->total_remaining ?? 0),
+        ];
+    }
+
+    public function restock(Inventory $inventory, int $quantity, ?string $notes, User $user, ?float $unitCost = null, ?string $expiryDate = null): InventoryTransaction
+    {
+        return DB::transaction(function () use ($inventory, $quantity, $notes, $user, $unitCost, $expiryDate): InventoryTransaction {
+            $locked = Inventory::query()->whereKey($inventory->id)->lockForUpdate()->firstOrFail();
+            $before = (int) $locked->available_stock;
+            $after = $before + $quantity;
+
+            $transaction = $this->record($locked, InventoryTransactionType::Restock, $quantity, $before, $after, $notes, $user);
+
+            $receivedAt = now();
+
+            InventoryBatch::create([
+                'inventory_id' => $locked->id,
+                'product_id' => $locked->product_id,
+                'business_id' => $locked->product->business_id,
+                'user_id' => $user->id,
+                'batch_number' => InventoryBatch::generateBatchNumber($receivedAt),
+                'quantity' => $quantity,
+                'remaining_quantity' => $quantity,
+                'unit_cost' => $unitCost ?? (float) $locked->product->buy_price,
+                'received_at' => $receivedAt,
+                'expires_at' => $expiryDate ? Carbon::parse($expiryDate) : null,
+                'notes' => $notes,
+            ]);
+
+            return $transaction;
+        });
     }
 
     public function adjust(Inventory $inventory, InventoryTransactionType $type, int $quantity, ?string $notes, User $user): InventoryTransaction
@@ -86,6 +139,65 @@ class InventoryService
             $delta = $quantity - $before;
 
             return $this->record($locked, InventoryTransactionType::Adjustment, $delta, $before, $quantity, $notes, $user);
+        });
+    }
+
+    /**
+     * Deduct stock for a completed sale using FIFO over inventory batches.
+     */
+    public function deductForSale(Inventory $inventory, int $quantity, string $notes, User $user): void
+    {
+        DB::transaction(function () use ($inventory, $quantity, $notes, $user): void {
+            $locked = Inventory::query()->whereKey($inventory->id)->lockForUpdate()->firstOrFail();
+            $before = (int) $locked->available_stock;
+
+            if ($before < $quantity) {
+                throw ValidationException::withMessages([
+                    'items' => $locked->product?->name.' does not have enough stock.',
+                ]);
+            }
+
+            $after = $before - $quantity;
+
+            $locked->forceFill([
+                'quantity' => $after,
+                'available_stock' => $after,
+                'updated_at' => now(),
+            ])->save();
+
+            $locked->transactions()->create([
+                'product_id' => $locked->product_id,
+                'business_id' => $locked->product->business_id,
+                'user_id' => $user->id,
+                'type' => InventoryTransactionType::Sale,
+                'quantity_change' => -$quantity,
+                'quantity_before' => $before,
+                'quantity_after' => $after,
+                'notes' => $notes,
+            ]);
+
+            $remaining = $quantity;
+            $batches = InventoryBatch::query()
+                ->where('inventory_id', $locked->id)
+                ->where('remaining_quantity', '>', 0)
+                ->orderBy('received_at')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($batches as $batch) {
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                $take = min((int) $batch->remaining_quantity, $remaining);
+                $batch->forceFill(['remaining_quantity' => (int) $batch->remaining_quantity - $take])->save();
+                $remaining -= $take;
+            }
+
+            if ($after <= $locked->product->reorder_level) {
+                InventoryLow::dispatch($locked->refresh());
+            }
         });
     }
 

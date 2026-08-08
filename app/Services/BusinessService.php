@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\DB;
 
 class BusinessService
 {
-    public function __construct(private readonly BusinessVerificationService $businessVerificationService) {}
+    public function __construct(
+        private readonly BusinessVerificationService $businessVerificationService,
+        private readonly SubscriptionService $subscriptionService,
+    ) {}
 
     public function paginateForAdmin(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
@@ -32,6 +35,36 @@ class BusinessService
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    /**
+     * Return the props needed to render the owner's business profile page.
+     *
+     * @return array{
+     *     business: \App\Models\Business|null,
+     *     logoUrl: string|null,
+     *     usage: array{users_count: int, products_count: int, max_cashiers: int|null},
+     *     subscriptions: \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subscription>
+     * }
+     */
+    public function profileData(User $user): array
+    {
+        $business = $user->ownedBusiness?->load([
+            'subscription',
+            'verificationDocuments',
+            'verificationReviews.reviewer:id,first_name,last_name,email,role,status',
+        ]);
+
+        return [
+            'business' => $business,
+            'logoUrl' => $business?->logo ? route('businesses.logo', $business) : null,
+            'usage' => [
+                'users_count' => $business?->users()->count() ?? 0,
+                'products_count' => $business?->products()->count() ?? 0,
+                'max_cashiers' => $business?->subscription?->max_cashiers,
+            ],
+            'subscriptions' => $this->subscriptionService->activePlans(),
+        ];
     }
 
     /**

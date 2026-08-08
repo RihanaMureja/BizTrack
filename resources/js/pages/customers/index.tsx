@@ -16,10 +16,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 type Customer = {
     id: number;
     full_name: string;
+    customer_type: string;
+    company_name: string | null;
     phone: string | null;
     email: string | null;
     address: string | null;
     credit_limit: string;
+    default_discount: string;
     current_balance: string;
 };
 
@@ -36,9 +39,16 @@ type Props = {
     filters: {
         search: string | null;
     };
+    customerTypes: Array<{ value: string; label: string }>;
 };
 
-export default function CustomersIndex({ customers, filters }: Props) {
+const typeLabel: Record<string, string> = {
+    retail: 'Retail',
+    wholesale: 'Wholesale',
+    corporate: 'Corporate',
+};
+
+export default function CustomersIndex({ customers, filters, customerTypes }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
     const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null);
@@ -74,14 +84,26 @@ export default function CustomersIndex({ customers, filters }: Props) {
             render: (customer) => (
                 <div>
                     <p className="font-medium">{customer.full_name}</p>
-                    <p className="text-xs text-muted-foreground">{customer.phone || 'No phone'} | {customer.email || 'No email'}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {customer.company_name ?? (typeLabel[customer.customer_type] ?? customer.customer_type)} | {customer.phone || 'No phone'}
+                    </p>
                 </div>
             ),
+        },
+        {
+            key: 'customer_type',
+            header: 'Type',
+            render: (customer) => <Badge variant="secondary">{typeLabel[customer.customer_type] ?? customer.customer_type}</Badge>,
         },
         {
             key: 'credit_limit',
             header: 'Credit limit',
             render: (customer) => `${customer.credit_limit} ETB`,
+        },
+        {
+            key: 'default_discount',
+            header: 'Discount',
+            render: (customer) => `${customer.default_discount}%`,
         },
         {
             key: 'current_balance',
@@ -159,14 +181,14 @@ export default function CustomersIndex({ customers, filters }: Props) {
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader><DialogTitle>New customer</DialogTitle></DialogHeader>
-                    <CustomerForm customer={null} onSuccess={() => setCreateOpen(false)} />
+                    <CustomerForm customer={null} customerTypes={customerTypes} onSuccess={() => setCreateOpen(false)} />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={Boolean(editingCustomer)} onOpenChange={(open) => !open && setEditingCustomer(null)}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader><DialogTitle>Edit customer</DialogTitle></DialogHeader>
-                    <CustomerForm customer={editingCustomer} onSuccess={() => setEditingCustomer(null)} />
+                    <CustomerForm customer={editingCustomer} customerTypes={customerTypes} onSuccess={() => setEditingCustomer(null)} />
                 </DialogContent>
             </Dialog>
 

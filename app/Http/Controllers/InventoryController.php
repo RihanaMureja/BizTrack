@@ -55,6 +55,8 @@ class InventoryController extends Controller
             (int) $request->validated('quantity'),
             $request->validated('notes'),
             $request->user(),
+            $request->filled('unit_cost') ? (float) $request->validated('unit_cost') : null,
+            $request->validated('expiry_date'),
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Stock restocked.']);

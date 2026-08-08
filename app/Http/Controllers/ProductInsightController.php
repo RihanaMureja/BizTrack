@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProductInsightStatus;
+use App\Models\Product;
 use App\Models\ProductMovementInsight;
 use App\Services\ProductInsightService;
 use Illuminate\Http\RedirectResponse;
@@ -32,6 +33,18 @@ class ProductInsightController extends Controller
                 'search' => $filters['search'] ?? null,
                 'status' => $filters['status'] ?? null,
             ],
+        ]);
+    }
+
+    public function show(Request $request, Product $product): Response
+    {
+        $this->authorize('view', $product);
+
+        $product->load(['category', 'inventory']);
+
+        return Inertia::render('products/product-insights', [
+            ...$this->productInsightService->forProduct($product),
+            'backUrl' => route('products.index'),
         ]);
     }
 

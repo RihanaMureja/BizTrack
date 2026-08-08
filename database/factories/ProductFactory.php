@@ -27,7 +27,6 @@ class ProductFactory extends Factory
             'description' => fake()->optional()->sentence(),
             'buy_price' => $buyPrice,
             'selling_price' => $buyPrice + fake()->randomFloat(2, 5, 300),
-            'unit' => fake()->randomElement(['pcs', 'box', 'pack', 'kg', 'ltr']),
             'reorder_level' => fake()->numberBetween(5, 30),
             'status' => RecordStatus::Active,
         ];

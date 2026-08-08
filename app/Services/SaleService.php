@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Enums\InventoryTransactionType;
 use App\Enums\PaymentStatus;
 use App\Enums\SaleStatus;
-use App\Events\InventoryLow;
 use App\Events\SaleCompleted;
 use App\Models\Business;
+use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -23,6 +22,7 @@ class SaleService
         private readonly CustomerCreditService $customerCreditService,
         private readonly PaymentService $paymentService,
         private readonly DiscountService $discountService,
+        private readonly InventoryService $inventoryService,
     ) {}
 
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
@@ -75,12 +75,36 @@ class SaleService
             }
 
             $tax = (float) ($data['tax_amount'] ?? 0);
+            $customer = null;
+
+            if (! empty($data['customer_id'])) {
+                $customer = Customer::query()->where('business_id', $business->id)->find((int) $data['customer_id']);
+
+                if (! $customer) {
+                    throw ValidationException::withMessages(['customer_id' => 'The selected customer is invalid.']);
+                }
+            }
+
             $automaticDiscount = $this->discountService->calculate($business->loadMissing('owner'), collect($saleItems));
             $isManualDiscount = ($data['discount_type'] ?? null) === 'manual';
             $legacyManualDiscount = ! array_key_exists('enable_credit', $data) && (float) ($data['discount_amount'] ?? 0) > 0;
             if ($isManualDiscount && ! $legacyManualDiscount && ! $user->isOwner()) {
                 throw ValidationException::withMessages(['discount_value' => 'Only business owners can override discounts.']);
             }
+
+            if (! $isManualDiscount && ! $legacyManualDiscount && $customer && (float) $customer->default_discount > 0) {
+                $customerDiscount = round($subtotal * (float) $customer->default_discount / 100, 2);
+
+                if ($customerDiscount > $automaticDiscount['amount']) {
+                    $automaticDiscount = [
+                        'type' => 'customer',
+                        'value' => (float) $customer->default_discount,
+                        'rule_id' => 'customer-'.$customer->id,
+                        'amount' => $customerDiscount,
+                    ];
+                }
+            }
+
             $discount = $isManualDiscount
                 ? (float) ($data['discount_value'] ?? 0)
                 : ($legacyManualDiscount ? (float) $data['discount_amount'] : $automaticDiscount['amount']);
@@ -115,28 +139,12 @@ class SaleService
                     'line_total' => $item['lineTotal'],
                 ]);
 
-                $before = (int) $item['inventory']->available_stock;
-                $after = $before - $item['quantity'];
-                $item['inventory']->forceFill([
-                    'quantity' => $after,
-                    'available_stock' => $after,
-                    'updated_at' => now(),
-                ])->save();
-
-                $item['inventory']->transactions()->create([
-                    'product_id' => $item['product']->id,
-                    'business_id' => $business->id,
-                    'user_id' => $user->id,
-                    'type' => InventoryTransactionType::Sale,
-                    'quantity_change' => -$item['quantity'],
-                    'quantity_before' => $before,
-                    'quantity_after' => $after,
-                    'notes' => 'Sale '.$sale->invoice_number,
-                ]);
-
-                if ($after <= $item['product']->reorder_level) {
-                    InventoryLow::dispatch($item['inventory']->refresh());
-                }
+                $this->inventoryService->deductForSale(
+                    $item['inventory'],
+                    $item['quantity'],
+                    'Sale '.$sale->invoice_number,
+                    $user,
+                );
             }
 
             $sale = $sale->load(['customer', 'user', 'items.product']);

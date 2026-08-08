@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\BusinessType;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class BusinessSetupRequest extends FormRequest
 {
@@ -20,7 +18,7 @@ class BusinessSetupRequest extends FormRequest
     {
         return [
             'business_name' => ['required', 'string', 'max:150'],
-            'business_type' => ['required', Rule::enum(BusinessType::class)],
+            'business_type' => ['required', 'string', 'max:100'],
         ];
     }
 }

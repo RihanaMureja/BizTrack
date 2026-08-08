@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['owner_id', 'subscription_id', 'subscription_started_at', 'subscription_ends_at', 'subscription_status', 'business_name', 'business_type', 'email', 'phone', 'address', 'logo', 'national_id_fan_number', 'national_id_photo_path', 'trade_license_path', 'tin_certificate_path', 'is_vat_registered', 'vat_certificate_path', 'has_physical_shop', 'rental_agreement_path', 'submitted_for_review_at', 'status'])]
+#[Fillable(['owner_id', 'subscription_id', 'subscription_started_at', 'subscription_ends_at', 'subscription_status', 'business_name', 'business_type', 'email', 'phone', 'address', 'logo', 'brand_color', 'national_id_fan_number', 'national_id_photo_path', 'trade_license_path', 'tin_certificate_path', 'is_vat_registered', 'vat_certificate_path', 'has_physical_shop', 'rental_agreement_path', 'submitted_for_review_at', 'status'])]
 class Business extends Model
 {
     use HasFactory;
@@ -78,6 +78,11 @@ class Business extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function subscriptionPayments(): HasMany
+    {
+        return $this->hasMany(SubscriptionPayment::class);
     }
 
     public function expenseCategories(): HasMany

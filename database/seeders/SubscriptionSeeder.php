@@ -26,7 +26,7 @@ class SubscriptionSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Business',
+                'name' => 'Growth',
                 'price' => 499,
                 'duration_months' => 1,
                 'duration_days' => null,
@@ -40,7 +40,7 @@ class SubscriptionSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Professional',
+                'name' => 'Pro',
                 'price' => 999,
                 'duration_months' => 1,
                 'duration_days' => null,
@@ -48,7 +48,7 @@ class SubscriptionSeeder extends Seeder
                 'description' => 'For established teams that need larger staff capacity and the full BizTrack experience.',
                 'features' => [
                     '15 cashier accounts',
-                    'Everything in Business',
+                    'Everything in Growth',
                     'Multi-branch support',
                     'Dedicated support',
                 ],

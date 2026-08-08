@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CustomerType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,6 +23,8 @@ class CustomerRequest extends FormRequest
 
         return [
             'full_name' => ['required', 'string', 'max:150'],
+            'customer_type' => ['nullable', Rule::in(CustomerType::values())],
+            'company_name' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => [
                 'nullable',
@@ -33,6 +36,7 @@ class CustomerRequest extends FormRequest
             ],
             'address' => ['nullable', 'string', 'max:1000'],
             'credit_limit' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'default_discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'current_balance' => ['required', 'numeric', 'min:0', 'max:99999999.99', 'lte:credit_limit'],
         ];
     }

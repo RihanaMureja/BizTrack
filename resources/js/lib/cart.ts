@@ -3,7 +3,6 @@ export type CartProduct = {
     name: string;
     barcode: string | null;
     selling_price: string | number;
-    unit: string | null;
     inventory?: { available_stock: number } | null;
 };
 

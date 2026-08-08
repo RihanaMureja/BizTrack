@@ -94,7 +94,10 @@ class User extends Authenticatable implements PasskeyUser
 
     public function getRoleLabelAttribute(): string
     {
-        return $this->businessRole?->name ?? $this->role->label();
+        return $this->businessRole?->name
+            ?? $this->role?->label()
+            ?? $this->getAttributeFromArray('role')
+            ?? 'Member';
     }
 
     public function hasBusinessPermission(string|\BackedEnum $permission): bool

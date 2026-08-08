@@ -19,6 +19,8 @@ class RestockRequest extends FormRequest
     {
         return [
             'quantity' => ['required', 'integer', 'min:1', 'max:1000000'],
+            'unit_cost' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
+            'expiry_date' => ['nullable', 'date', 'after_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

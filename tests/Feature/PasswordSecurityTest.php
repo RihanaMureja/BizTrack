@@ -5,14 +5,25 @@ use App\Models\SecurityQuestion;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-test('registration requires a strong password', function () {
+test('registration rejects a password shorter than 8 characters', function () {
     $this->post(route('register.store'), [
         'first_name' => 'Weak',
         'last_name' => 'Owner',
         'email' => 'weak-owner@example.test',
+        'password' => 'shortpw',
+        'password_confirmation' => 'shortpw',
+    ])->assertSessionHasErrors('password');
+});
+
+test('registration accepts a password of at least 8 characters', function () {
+    $this->post(route('register.store'), [
+        'first_name' => 'Adequate',
+        'last_name' => 'Owner',
+        'email' => 'adequate-owner@example.test',
         'password' => 'password',
         'password_confirmation' => 'password',
-    ])->assertSessionHasErrors('password');
+    ])->assertSessionHasNoErrors()
+        ->assertRedirect(route('business.setup'));
 });
 
 test('temporary password users are redirected to force password reset', function () {

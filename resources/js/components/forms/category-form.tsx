@@ -10,7 +10,6 @@ import { Spinner } from '@/components/ui/spinner';
 export type CategoryFormCategory = {
     id?: number;
     name?: string;
-    barcode?: string | null;
     description?: string | null;
 };
 
@@ -24,7 +23,6 @@ export function CategoryForm({ category, onSuccess }: Props) {
 
     const form = useForm({
         name: category?.name ?? '',
-        barcode: category?.barcode ?? '',
         description: category?.description ?? '',
     });
 
@@ -59,17 +57,6 @@ export function CategoryForm({ category, onSuccess }: Props) {
                 />
                 <InputError message={form.errors.name} />
             </div>
-            <div className="grid gap-2">
-    <Label htmlFor="barcode">Category barcode</Label>
-    <Input
-        id="barcode"
-        value={form.data.barcode}
-        onChange={(event) => form.setData('barcode', event.target.value)}
-        placeholder="e.g. CAT-001"
-        required
-    />
-    <InputError message={form.errors.barcode} />
-</div>
 
             <div className="grid gap-2">
                 <Label htmlFor="description">Description</Label>

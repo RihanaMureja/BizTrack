@@ -11,13 +11,13 @@ use Illuminate\Database\Seeder;
 class ProductSeeder extends Seeder
 {
     /**
-     * @var list<array{name: string, barcode: string, buy_price: float, selling_price: float, unit: string, reorder_level: int}>
+     * @var list<array{name: string, barcode: string, buy_price: float, selling_price: float, reorder_level: int}>
      */
     private const PRODUCTS = [
-        ['name' => 'Bottled Water 500ml', 'barcode' => 'BT500001', 'buy_price' => 8, 'selling_price' => 12, 'unit' => 'bottle', 'reorder_level' => 20],
-        ['name' => 'Premium Coffee 250g', 'barcode' => 'CF250001', 'buy_price' => 180, 'selling_price' => 240, 'unit' => 'pack', 'reorder_level' => 8],
-        ['name' => 'Notebook A5', 'barcode' => 'NB500001', 'buy_price' => 35, 'selling_price' => 55, 'unit' => 'pcs', 'reorder_level' => 15],
-        ['name' => 'USB-C Cable', 'barcode' => 'UC100001', 'buy_price' => 95, 'selling_price' => 150, 'unit' => 'pcs', 'reorder_level' => 10],
+        ['name' => 'Bottled Water 500ml', 'barcode' => 'BT500001', 'buy_price' => 8, 'selling_price' => 12, 'reorder_level' => 20],
+        ['name' => 'Premium Coffee 250g', 'barcode' => 'CF250001', 'buy_price' => 180, 'selling_price' => 240, 'reorder_level' => 8],
+        ['name' => 'Notebook A5', 'barcode' => 'NB500001', 'buy_price' => 35, 'selling_price' => 55, 'reorder_level' => 15],
+        ['name' => 'USB-C Cable', 'barcode' => 'UC100001', 'buy_price' => 95, 'selling_price' => 150, 'reorder_level' => 10],
     ];
 
     public function run(): void

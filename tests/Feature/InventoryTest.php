@@ -8,6 +8,7 @@ use App\Models\Business;
 use App\Models\BusinessPermission;
 use App\Models\BusinessRole;
 use App\Models\Category;
+use App\Models\InventoryBatch;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\User;
@@ -142,6 +143,140 @@ test('owner can restock product inventory', function () {
 
     expect($inventory->available_stock)->toBe(12)
         ->and($inventory->transactions()->first()->type)->toBe(InventoryTransactionType::Restock);
+});
+
+test('restock creates a batch with an auto-generated unique batch number and restock date', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), ['quantity' => 12])
+        ->assertRedirect();
+
+    $batch = $inventory->batches()->first();
+
+    expect($batch)->not->toBeNull()
+        ->and($batch->batch_number)->toMatch('/^BATCH-\d{8}-\d{3}$/')
+        ->and($batch->quantity)->toBe(12)
+        ->and($batch->remaining_quantity)->toBe(12)
+        ->and($batch->received_at)->not->toBeNull();
+});
+
+test('multiple restocks create separate batches with sequential unique batch numbers', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), ['quantity' => 10])
+        ->assertRedirect();
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), ['quantity' => 20])
+        ->assertRedirect();
+
+    $batches = $inventory->batches()->orderBy('id')->get();
+
+    expect($batches)->toHaveCount(2)
+        ->and($batches->pluck('batch_number')->unique())->toHaveCount(2)
+        ->and($batches[0]->batch_number)->toMatch('/^BATCH-\d{8}-001$/')
+        ->and($batches[1]->batch_number)->toMatch('/^BATCH-\d{8}-002$/')
+        ->and($batches[0]->quantity)->toBe(10)
+        ->and($batches[1]->quantity)->toBe(20)
+        ->and($inventory->refresh()->available_stock)->toBe(30);
+});
+
+test('restock falls back to the product buy price as the default unit cost', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business, ['buy_price' => 45.5]);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), ['quantity' => 5])
+        ->assertRedirect();
+
+    expect((float) $inventory->batches()->first()->unit_cost)->toBe(45.5);
+});
+
+test('restock uses the provided unit cost for the batch', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business, ['buy_price' => 45.5]);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), ['quantity' => 5, 'unit_cost' => 22.75])
+        ->assertRedirect();
+
+    expect((float) $inventory->batches()->first()->unit_cost)->toBe(22.75);
+});
+
+test('restock stores the provided expiry date on the batch', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), [
+            'quantity' => 5,
+            'expiry_date' => now()->addYear()->format('Y-m-d'),
+        ])
+        ->assertRedirect();
+
+    expect($inventory->batches()->first()->expires_at?->format('Y-m-d'))
+        ->toBe(now()->addYear()->format('Y-m-d'));
+});
+
+test('expiry date earlier than the restock date is rejected', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), [
+            'quantity' => 5,
+            'expiry_date' => now()->subDay()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors('expiry_date');
+
+    expect($inventory->refresh()->available_stock)->toBe(0)
+        ->and($inventory->batches()->count())->toBe(0);
+});
+
+test('batches page exposes batch number and expiry date', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), [
+            'quantity' => 5,
+            'expiry_date' => now()->addYear()->format('Y-m-d'),
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($owner)
+        ->get(route('inventory.batches.index', $inventory))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('inventory/batches')
+            ->where('batches.total', 1)
+            ->where('batches.data.0.batch_number', $inventory->batches()->first()->batch_number)
+            ->where('batches.data.0.expires_at', $inventory->batches()->first()->expires_at->toJSON())
+        );
+});
+
+test('inventory batch numbers are unique across batches', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+    $inventory = $product->inventory;
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $inventory), ['quantity' => 3])
+        ->assertRedirect();
+
+    $batch = $inventory->batches()->first();
+
+    expect(InventoryBatch::query()->where('batch_number', $batch->batch_number)->count())->toBe(1);
 });
 
 test('owner can manually adjust stock to a target quantity', function () {

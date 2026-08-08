@@ -25,7 +25,6 @@ function validProductPayload(array $overrides = []): array
         'description' => 'Clean bottled water',
         'buy_price' => 8,
         'selling_price' => 12,
-        'unit' => 'bottle',
         'reorder_level' => 20,
         'status' => RecordStatus::Active->value,
         ...$overrides,

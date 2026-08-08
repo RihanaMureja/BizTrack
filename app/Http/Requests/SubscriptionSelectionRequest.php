@@ -24,6 +24,11 @@ class SubscriptionSelectionRequest extends FormRequest
                 'integer',
                 Rule::exists('subscriptions', 'id')->where(fn ($query) => $query->where('status', RecordStatus::Active->value)),
             ],
+            'back' => [
+                'nullable',
+                'string',
+                Rule::in(['/business/subscriptions', '/subscriptions']),
+            ],
         ];
     }
 }

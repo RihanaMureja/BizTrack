@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminBusinessVerificationController;
 use App\Http\Controllers\AdminSubscriptionController;
+use App\Http\Controllers\AdminSubscriptionPaymentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessLogoController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\CustomerCreditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\InventoryBatchController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\NotificationController;
@@ -27,6 +29,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionPaymentController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('subscriptions/{subscription}/activate', [AdminSubscriptionController::class, 'activate'])->name('subscriptions.activate');
         Route::post('subscriptions/{subscription}/deactivate', [AdminSubscriptionController::class, 'deactivate'])->name('subscriptions.deactivate');
         Route::resource('subscriptions', AdminSubscriptionController::class)->only(['index', 'store', 'update']);
+        Route::get('subscription-payments', [AdminSubscriptionPaymentController::class, 'index'])->name('subscription-payments.index');
         Route::resource('roles', RoleController::class)->only(['index']);
         Route::resource('permissions', PermissionController::class)->only(['index']);
     });
@@ -76,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::middleware('business.permission:manage_products')->group(function () {
             Route::get('products/insights', [ProductInsightController::class, 'index'])->name('products.insights');
+            Route::get('products/{product}/insights', [ProductInsightController::class, 'show'])->name('products.insights.show');
             Route::post('product-insights/{productMovementInsight}/dismiss', [ProductInsightController::class, 'dismiss'])->name('product-insights.dismiss');
             Route::post('product-insights/{productMovementInsight}/resolve', [ProductInsightController::class, 'resolve'])->name('product-insights.resolve');
             Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
@@ -86,6 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('inventory/{inventory}/restock', [InventoryController::class, 'restock'])->name('inventory.restock');
             Route::post('inventory/{inventory}/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
             Route::get('inventory/{inventory}/transactions', [InventoryTransactionController::class, 'index'])->name('inventory.transactions.index');
+            Route::get('inventory/{inventory}/batches', [InventoryBatchController::class, 'index'])->name('inventory.batches.index');
         });
 
         Route::middleware('business.permission:manage_employees')->group(function () {
@@ -143,6 +149,9 @@ Route::middleware('auth')->group(function () {
         Route::post('business/setup', [BusinessSetupController::class, 'store'])->name('business.setup.store');
         Route::get('subscriptions', [SubscriptionController::class, 'select'])->name('subscriptions.select');
         Route::post('subscriptions/select', [SubscriptionController::class, 'selectPlan'])->name('subscriptions.select.store');
+        Route::get('subscriptions/payment', [SubscriptionPaymentController::class, 'show'])->name('subscriptions.payment');
+        Route::post('subscriptions/payment/initialize', [SubscriptionPaymentController::class, 'initialize'])->name('subscriptions.payment.initialize');
+        Route::get('subscriptions/payment/callback', [SubscriptionPaymentController::class, 'callback'])->name('subscriptions.payment.callback');
     });
 });
 

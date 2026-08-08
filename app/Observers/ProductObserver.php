@@ -18,7 +18,7 @@ class ProductObserver
         app(AuditLogService::class)->log(
             action: 'product.created',
             auditable: $product,
-            newValues: $product->only(['name', 'barcode', 'buy_price', 'selling_price', 'unit', 'reorder_level', 'status']),
+            newValues: $product->only(['name', 'barcode', 'buy_price', 'selling_price', 'reorder_level', 'status']),
         );
     }
 

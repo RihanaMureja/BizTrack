@@ -6,6 +6,7 @@ use App\Enums\NotificationType;
 use App\Enums\ProductInsightStatus;
 use App\Enums\ProductInsightType;
 use App\Enums\RecordStatus;
+use App\Enums\SaleStatus;
 use App\Models\Business;
 use App\Models\Product;
 use App\Models\ProductMovementInsight;
@@ -141,6 +142,113 @@ class ProductInsightService
             'threshold_days' => max(1, (int) ($preferences['stagnant_product_days'] ?? 30)),
             'minimum_stock' => max(0, (int) ($preferences['stagnant_product_minimum_stock'] ?? 1)),
             'frequency_days' => max(1, (int) ($preferences['stagnant_product_notification_frequency'] ?? 7)),
+        ];
+    }
+
+    /**
+     * Per-product performance snapshot for the insights detail page.
+     *
+     * @return array<string, mixed>
+     */
+    public function forProduct(Product $product): array
+    {
+        $completed = fn () => SaleItem::query()
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->where('sale_items.product_id', $product->id)
+            ->where('sales.status', SaleStatus::Completed);
+
+        $lastSoldAt = $completed()->max('sales.sold_at');
+        $lastSoldAt = $lastSoldAt ? Carbon::parse($lastSoldAt) : null;
+
+        $summary = [
+            'units_sold' => (int) $completed()->sum('sale_items.quantity'),
+            'revenue' => round((float) $completed()->sum('sale_items.line_total'), 2),
+            'order_count' => (int) $completed()->distinct()->count('sale_items.sale_id'),
+            'last_sold_at' => $lastSoldAt?->toDateTimeString(),
+            'days_since_last_sale' => $lastSoldAt
+                ? (int) $lastSoldAt->startOfDay()->diffInDays(now()->startOfDay())
+                : null,
+        ];
+
+        $historyStart = now()->subDays(89)->startOfDay();
+
+        $salesByDate = $completed()
+            ->where('sales.sold_at', '>=', $historyStart)
+            ->get(['sales.sold_at', 'sale_items.quantity', 'sale_items.line_total'])
+            ->map(fn (SaleItem $item): array => [
+                'date' => Carbon::parse($item->sold_at)->toDateString(),
+                'quantity' => (int) $item->quantity,
+                'revenue' => (float) $item->line_total,
+            ])
+            ->groupBy('date')
+            ->map(fn (Collection $rows): array => [
+                'date' => $rows->first()['date'],
+                'quantity' => (int) $rows->sum('quantity'),
+                'revenue' => round((float) $rows->sum('revenue'), 2),
+            ])
+            ->keyBy('date');
+
+        $history = collect();
+        for ($i = 89; $i >= 0; $i--) {
+            $date = now()->subDays($i)->toDateString();
+            $history->push($salesByDate->get($date, [
+                'date' => $date,
+                'quantity' => 0,
+                'revenue' => 0.0,
+            ]));
+        }
+
+        $recentSales = SaleItem::query()
+            ->with('sale.customer')
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->where('sale_items.product_id', $product->id)
+            ->where('sales.status', SaleStatus::Completed)
+            ->orderByDesc('sales.sold_at')
+            ->limit(10)
+            ->get(['sale_items.*', 'sales.sold_at', 'sales.invoice_number'])
+            ->map(fn (SaleItem $item): array => [
+                'id' => $item->id,
+                'invoice_number' => $item->invoice_number,
+                'sold_at' => Carbon::parse($item->sold_at)->toDateTimeString(),
+                'customer' => $item->sale?->customer?->full_name ?? 'Walk-in customer',
+                'quantity' => (int) $item->quantity,
+                'unit_price' => (float) $item->unit_price,
+                'line_total' => (float) $item->line_total,
+            ])
+            ->values();
+
+        $openInsight = $product->movementInsights()
+            ->where('type', ProductInsightType::Stagnant)
+            ->where('status', ProductInsightStatus::Open)
+            ->latest('detected_at')
+            ->first();
+
+        $stockOnHand = (int) ($product->inventory?->available_stock ?? 0);
+
+        return [
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'barcode' => $product->barcode,
+                'category' => $product->category?->name ?? 'Uncategorized',
+                'status' => $product->status->value,
+                'buy_price' => (float) $product->buy_price,
+                'selling_price' => (float) $product->selling_price,
+                'reorder_level' => (int) $product->reorder_level,
+                'stock_on_hand' => $stockOnHand,
+                'low_stock' => $stockOnHand <= $product->reorder_level,
+            ],
+            'summary' => $summary,
+            'history' => $history->values(),
+            'recent_sales' => $recentSales,
+            'open_insight' => $openInsight
+                ? [
+                    'id' => $openInsight->id,
+                    'days_without_sale' => $openInsight->days_without_sale,
+                    'suggested_action' => $openInsight->suggested_action,
+                    'detected_at' => $openInsight->detected_at?->toDateTimeString(),
+                ]
+                : null,
         ];
     }
 

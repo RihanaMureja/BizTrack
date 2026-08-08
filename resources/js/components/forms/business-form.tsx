@@ -161,53 +161,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
             </div>
 
             <div className="rounded-md border bg-background p-4">
-                <h2 className="font-semibold">Owner verification</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    These documents are required before BizTrack unlocks products, inventory, sales, and reports.
-                </p>
-
-                <div className="mt-4 grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="national_id_fan_number">National ID FAN number</Label>
-                        <Input
-                            id="national_id_fan_number"
-                            value={form.data.national_id_fan_number}
-                            onChange={(event) => form.setData('national_id_fan_number', event.target.value)}
-                            required
-                        />
-                        <InputError message={form.errors.national_id_fan_number} />
-                    </div>
-
-                    <DocumentInput
-                        id="national_id_photo"
-                        label="National ID photo"
-                        existing={business?.national_id_photo_path}
-                        required={!business?.national_id_photo_path}
-                        error={form.errors.national_id_photo}
-                        onChange={(file) => form.setData('national_id_photo', file)}
-                    />
-
-                    <DocumentInput
-                        id="trade_license"
-                        label="Business license / trade license"
-                        existing={business?.trade_license_path}
-                        required={!business?.trade_license_path}
-                        error={form.errors.trade_license}
-                        onChange={(file) => form.setData('trade_license', file)}
-                    />
-
-                    <DocumentInput
-                        id="tin_certificate"
-                        label="Tax certificate / TIN"
-                        existing={business?.tin_certificate_path}
-                        required={!business?.tin_certificate_path}
-                        error={form.errors.tin_certificate}
-                        onChange={(file) => form.setData('tin_certificate', file)}
-                    />
-                </div>
-            </div>
-
-            <div className="rounded-md border bg-background p-4">
                 <h2 className="font-semibold">Conditional documents</h2>
                 <div className="mt-4 grid gap-4">
                     <label className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">

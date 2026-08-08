@@ -41,7 +41,6 @@ class ProductRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
             'buy_price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'selling_price' => ['required', 'numeric', 'min:0', 'max:99999999.99', 'gte:buy_price'],
-            'unit' => ['nullable', 'string', 'max:30'],
             'reorder_level' => ['required', 'integer', 'min:0', 'max:1000000'],
             'status' => ['required', Rule::enum(RecordStatus::class)],
         ];

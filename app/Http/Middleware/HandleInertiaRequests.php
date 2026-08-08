@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\RBACService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -41,6 +42,8 @@ class HandleInertiaRequests extends Middleware
         $business = $user?->ownedBusiness ?? $user?->business;
         $businessLogo = $business?->logo ? route('businesses.logo', $business) : null;
 
+        View::share('brand_color', $business?->brand_color ?? null);
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -52,6 +55,7 @@ class HandleInertiaRequests extends Middleware
                     'display_business_name' => $business?->business_name,
                 ] : null,
             ],
+            'brandColor' => $business?->brand_color ?? null,
             'navigation' => $user
                 ? app(RBACService::class)->navigationFor($user)
                 : [],

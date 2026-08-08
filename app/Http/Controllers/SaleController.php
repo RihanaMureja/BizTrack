@@ -45,7 +45,7 @@ class SaleController extends Controller
                     ->where('business_id', $business->id)
                     ->where('status', RecordStatus::Active)
                     ->orderBy('name')
-                    ->get(['id', 'name', 'barcode', 'selling_price', 'unit'])
+                    ->get(['id', 'name', 'barcode', 'selling_price'])
                 : [],
             'customers' => $business
                 ? Customer::query()->where('business_id', $business->id)->orderBy('full_name')->get(['id', 'full_name'])
@@ -59,8 +59,8 @@ class SaleController extends Controller
         $business = $request->user()->ownedBusiness ?? $request->user()->business;
 
         return Inertia::render('sales/checkout', [
-            'products' => $business ? Product::query()->with('inventory')->where('business_id', $business->id)->where('status', RecordStatus::Active)->get(['id', 'name', 'barcode', 'selling_price', 'unit']) : [],
-            'customers' => $business ? Customer::query()->where('business_id', $business->id)->orderBy('full_name')->get(['id', 'full_name', 'current_balance', 'credit_limit']) : [],
+            'products' => $business ? Product::query()->with('inventory')->where('business_id', $business->id)->where('status', RecordStatus::Active)->get(['id', 'name', 'barcode', 'selling_price']) : [],
+            'customers' => $business ? Customer::query()->where('business_id', $business->id)->orderBy('full_name')->get(['id', 'full_name', 'current_balance', 'credit_limit', 'default_discount', 'customer_type']) : [],
             'canOverrideDiscount' => $request->user()->isOwner(),
         ]);
     }

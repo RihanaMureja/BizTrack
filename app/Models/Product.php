@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['business_id', 'category_id', 'name', 'barcode', 'description', 'buy_price', 'selling_price', 'unit', 'reorder_level', 'status'])]
+#[Fillable(['business_id', 'category_id', 'name', 'barcode', 'description', 'buy_price', 'selling_price', 'reorder_level', 'status'])]
 class Product extends Model
 {
     use HasFactory;
@@ -42,6 +42,11 @@ class Product extends Model
     public function inventoryTransactions(): HasMany
     {
         return $this->hasMany(InventoryTransaction::class);
+    }
+
+    public function inventoryBatches(): HasMany
+    {
+        return $this->hasMany(InventoryBatch::class);
     }
 
     public function movementInsights(): HasMany

@@ -27,6 +27,7 @@ class RBACService
                         ['title' => 'Businesses', 'href' => '/admin/businesses', 'icon' => 'Building2'],
                         ['title' => 'Users', 'href' => '/admin/users', 'icon' => 'Users'],
                         ['title' => 'Subscriptions', 'href' => '/admin/subscriptions', 'icon' => 'CreditCard'],
+                        ['title' => 'Subscription Payments', 'href' => '/admin/subscription-payments', 'icon' => 'BadgeDollarSign'],
                         ['title' => 'Roles & Permissions', 'href' => '/admin/roles', 'icon' => 'ShieldCheck'],
                         ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
                     ],
@@ -75,8 +76,6 @@ class RBACService
                 [
                     'label' => 'Settings',
                     'items' => [
-                        ['title' => 'Business Profile', 'href' => '/business/profile', 'icon' => 'Building2'],
-                        ['title' => 'Notifications', 'href' => '/notifications', 'icon' => 'Bell'],
                         ['title' => 'Settings', 'href' => '/settings/profile', 'icon' => 'Settings'],
                     ],
                 ],
@@ -178,14 +177,6 @@ class RBACService
                     'title' => 'Employees',
                     'href' => '/cashiers',
                     'icon' => 'UserRound',
-                ],
-            ],
-            BusinessPermissionKey::ViewNotifications->value => [
-                'group' => 'Settings',
-                'item' => [
-                    'title' => 'Notifications',
-                    'href' => '/notifications',
-                    'icon' => 'Bell',
                 ],
             ],
         ] as $permission => $entry) {

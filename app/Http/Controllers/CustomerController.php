@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CustomerType;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
@@ -32,6 +33,12 @@ class CustomerController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'customerTypes' => collect(CustomerType::cases())
+                ->map(fn (CustomerType $type) => [
+                    'value' => $type->value,
+                    'label' => $type->label(),
+                ])
+                ->values(),
         ]);
     }
 

@@ -57,9 +57,28 @@ test('business setup requires a business type', function () {
     $this->actingAs($owner)
         ->post(route('business.setup.store'), [
             'business_name' => 'Merkato Fresh Mart',
-            'business_type' => 'not-a-real-type',
         ])
         ->assertSessionHasErrors('business_type');
+});
+
+test('owner can set up their business with a custom business type', function () {
+    $owner = onboardingOwner();
+
+    $this->actingAs($owner)
+        ->post(route('business.setup.store'), [
+            'business_name' => 'Merkato Fresh Mart',
+            'business_type' => 'Bakery',
+        ])
+        ->assertRedirect(route('subscriptions.select'));
+
+    $this->assertDatabaseHas('businesses', [
+        'owner_id' => $owner->id,
+        'business_name' => 'Merkato Fresh Mart',
+        'business_type' => 'Bakery',
+        'status' => RecordStatus::Active->value,
+    ]);
+
+    expect($owner->refresh()->business_id)->not->toBeNull();
 });
 
 test('owner with a business but no active subscription is sent to subscription selection', function () {
@@ -109,7 +128,7 @@ test('owner can start a free trial subscription and reach the dashboard', functi
     $this->actingAs($owner)->get(route('dashboard'))->assertOk();
 });
 
-test('paid plan selection creates a pending subscription', function () {
+test('paid plan selection sends the owner to the payment page', function () {
     $owner = onboardingOwner();
     $business = onboardingBusiness($owner);
     $paidPlan = Subscription::factory()->create([
@@ -119,10 +138,9 @@ test('paid plan selection creates a pending subscription', function () {
 
     $this->actingAs($owner)
         ->post(route('subscriptions.select.store'), ['plan_id' => $paidPlan->id])
-        ->assertRedirect(route('subscriptions.select'))
-        ->assertSessionHas('status');
+        ->assertRedirect(route('subscriptions.payment', ['plan' => $paidPlan->id]));
 
-    expect($business->refresh()->subscription_status)->toBe(BusinessSubscriptionStatus::Pending);
+    expect($business->refresh()->subscription_status)->toBe(BusinessSubscriptionStatus::None);
 });
 
 test('plan selection requires an active plan', function () {

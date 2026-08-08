@@ -42,6 +42,7 @@ export type SharedNotification = {
 export type SharedData = {
     name: string;
     auth: Auth;
+    brandColor?: string | null;
     navigation: ServerNavGroup[];
     notificationSummary: {
         unreadCount: number;

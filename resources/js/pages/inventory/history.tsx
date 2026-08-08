@@ -24,7 +24,6 @@ type Props = {
         available_stock: number;
         product: {
             name: string;
-            unit: string | null;
             category: { name: string } | null;
         };
     };

@@ -19,10 +19,15 @@ class SubscriptionController extends Controller
         private readonly BusinessService $businessService,
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $business = $request->user()?->ownedBusiness;
+
         return Inertia::render('business/subscriptions', [
             'subscriptions' => $this->subscriptionService->activePlans(),
+            'currentPlanId' => $business?->subscription_id,
+            'selectedPlanId' => $request->integer('plan') ?: null,
+            'subscriptionStatus' => $business?->subscription_status?->value ?? BusinessSubscriptionStatus::None->value,
         ]);
     }
 
@@ -45,6 +50,7 @@ class SubscriptionController extends Controller
                 'business_type' => $business->business_type,
             ],
             'plans' => $this->subscriptionService->activePlans(),
+            'selectedPlanId' => $request->integer('plan') ?: null,
             'subscriptionStatus' => $business->subscription_status?->value ?? BusinessSubscriptionStatus::None->value,
         ]);
     }
@@ -57,10 +63,10 @@ class SubscriptionController extends Controller
         $plan = Subscription::findOrFail($request->integer('plan_id'));
 
         if ((float) $plan->price > 0) {
-            $this->businessService->pendingSubscription($business, $plan);
-
-            return redirect()->route('subscriptions.select')
-                ->with('status', 'Your subscription request has been received. An admin will activate your plan once payment is confirmed.');
+            return redirect()->route('subscriptions.payment', [
+                'plan' => $plan->id,
+                'back' => $request->validated('back'),
+            ]);
         }
 
         $this->businessService->activateSubscription($business, $plan);

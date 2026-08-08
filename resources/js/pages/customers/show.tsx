@@ -1,16 +1,19 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Bell, Mail, Phone, ReceiptText, UserRound } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type Props = {
     customer: {
         id: number;
         full_name: string;
+        customer_type: string;
+        company_name: string | null;
         phone: string | null;
         email: string | null;
         address: string | null;
         credit_limit: string;
+        default_discount: string;
         current_balance: string;
         credits: Credit[];
     };
@@ -28,6 +31,12 @@ type Credit = {
     sale: { invoice_number: string } | null;
 };
 
+const typeLabel: Record<string, string> = {
+    retail: 'Retail',
+    wholesale: 'Wholesale',
+    corporate: 'Corporate',
+};
+
 export default function CustomerShow({ customer, purchaseHistory }: Props) {
     const activeCredits = customer.credits.filter((credit) => Number(credit.remaining_balance) > 0);
 
@@ -42,7 +51,10 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                         </div>
                         <div>
                             <h1 className="text-xl font-semibold">{customer.full_name}</h1>
-                            <p className="text-sm text-muted-foreground">Customer profile, credit balance, and purchase history.</p>
+                            <p className="text-sm text-muted-foreground">
+                                {typeLabel[customer.customer_type] ?? customer.customer_type}
+                                {customer.company_name ? ` · ${customer.company_name}` : ''} · Customer profile, credit balance, and purchase history.
+                            </p>
                         </div>
                     </div>
                     <Button variant="outline" asChild>
@@ -63,7 +75,7 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardHeader><CardTitle>Credit</CardTitle></CardHeader>
+                        <CardHeader><CardTitle>Credit & discount</CardTitle></CardHeader>
                         <CardContent className="grid gap-3 text-sm">
                             <div>
                                 <p className="text-muted-foreground">Credit limit</p>
@@ -72,6 +84,10 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                             <div>
                                 <p className="text-muted-foreground">Current balance</p>
                                 <p className="text-2xl font-semibold">{customer.current_balance} ETB</p>
+                            </div>
+                            <div>
+                                <p className="text-muted-foreground">Default discount</p>
+                                <p className="text-2xl font-semibold">{customer.default_discount}%</p>
                             </div>
                         </CardContent>
                     </Card>
