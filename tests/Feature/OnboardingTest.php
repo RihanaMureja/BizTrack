@@ -143,6 +143,56 @@ test('paid plan selection sends the owner to the payment page', function () {
     expect($business->refresh()->subscription_status)->toBe(BusinessSubscriptionStatus::None);
 });
 
+test('owner with an active subscription choosing a different paid plan is sent to the payment page', function () {
+    $owner = onboardingOwner();
+    $currentPlan = Subscription::factory()->create([
+        'price' => 499,
+        'status' => RecordStatus::Active,
+    ]);
+    $business = onboardingBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $currentPlan->id,
+    ]);
+    $newPlan = Subscription::factory()->create([
+        'price' => 999,
+        'status' => RecordStatus::Active,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('subscriptions.select.store'), [
+            'plan_id' => $newPlan->id,
+            'back' => '/business/subscriptions',
+        ])
+        ->assertRedirect(route('subscriptions.payment', [
+            'plan' => $newPlan->id,
+            'back' => '/business/subscriptions',
+        ]));
+
+    expect($business->refresh()->subscription_id)->toBe($currentPlan->id);
+});
+
+test('owner with an active subscription choosing a different free plan activates it directly', function () {
+    $owner = onboardingOwner();
+    $currentPlan = Subscription::factory()->create([
+        'price' => 499,
+        'status' => RecordStatus::Active,
+    ]);
+    $business = onboardingBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $currentPlan->id,
+    ]);
+    $freePlan = Subscription::factory()->create([
+        'price' => 0,
+        'status' => RecordStatus::Active,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('subscriptions.select.store'), ['plan_id' => $freePlan->id])
+        ->assertRedirect(route('dashboard'));
+
+    expect($business->refresh()->subscription_id)->toBe($freePlan->id);
+});
+
 test('plan selection requires an active plan', function () {
     $owner = onboardingOwner();
     onboardingBusiness($owner);

@@ -21,7 +21,11 @@ class ProductFactory extends Factory
 
         return [
             'business_id' => Business::factory(),
-            'category_id' => null,
+            'category_id' => function (array $attributes) {
+                return Category::factory()->create([
+                    'business_id' => $attributes['business_id'],
+                ])->id;
+            },
             'name' => fake()->words(3, true),
             'barcode' => fake()->unique()->ean13(),
             'description' => fake()->optional()->sentence(),

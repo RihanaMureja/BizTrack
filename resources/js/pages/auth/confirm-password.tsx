@@ -9,6 +9,7 @@ import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { home } from '@/routes';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
@@ -63,4 +64,5 @@ ConfirmPassword.layout = {
     title: 'Confirm password',
     description:
         'This is a secure area of the application. Please confirm your password before continuing.',
+    backHref: home(),
 };

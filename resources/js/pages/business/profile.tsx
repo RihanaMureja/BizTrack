@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import { Building2, CreditCard, Crown, Pencil, Sparkles } from 'lucide-react';
+import { Building2, CreditCard, Crown, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import DeleteUser from '@/components/delete-user';
 import { BusinessForm } from '@/components/forms/business-form';
-import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
+import type { BusinessFormBusiness } from '@/components/forms/business-form';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -31,7 +32,6 @@ type Props = {
         products_count: number;
         max_cashiers: number | null;
     };
-    subscriptions: BusinessFormSubscription[];
 };
 
 const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -44,7 +44,7 @@ const statusConfig: Record<string, { label: string; variant: 'default' | 'second
 
 const formatDate = (date: Date) => date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 
-export default function BusinessProfile({ business, logoUrl, usage, subscriptions }: Props) {
+export default function BusinessProfile({ business, logoUrl, usage }: Props) {
     const [editOpen, setEditOpen] = useState(false);
 
     const name = business?.business_name ?? '';
@@ -87,17 +87,11 @@ export default function BusinessProfile({ business, logoUrl, usage, subscription
         <>
             <Head title="Business Profile" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                        <Building2 className="size-5" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-semibold">Business Profile</h1>
-                        <p className="text-sm text-muted-foreground">
-                            Manage your business information and subscription.
-                        </p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Business Profile"
+                    description="Manage your business information and subscription."
+                    icon={Building2}
+                />
 
                 <section className="rounded-md border bg-card p-5 shadow-sm">
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -190,12 +184,6 @@ export default function BusinessProfile({ business, logoUrl, usage, subscription
                                     Manage Subscription
                                 </Link>
                             </Button>
-                            <Button asChild variant="outline">
-                                <Link href="/business/subscriptions">
-                                    <Sparkles className="size-4" />
-                                    Compare Plans
-                                </Link>
-                            </Button>
                         </div>
                     </div>
                 </section>
@@ -208,7 +196,7 @@ export default function BusinessProfile({ business, logoUrl, usage, subscription
                     <DialogHeader>
                         <DialogTitle>Edit business profile</DialogTitle>
                     </DialogHeader>
-                    <BusinessForm business={business} subscriptions={subscriptions} />
+                    <BusinessForm business={business} />
                 </DialogContent>
             </Dialog>
         </>

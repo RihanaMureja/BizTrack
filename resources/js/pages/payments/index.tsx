@@ -1,14 +1,16 @@
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { CreditCard, Eye, Plus } from 'lucide-react';
+import type { FormEvent} from 'react';
+import { useState } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { CreditCard, Eye, Plus } from 'lucide-react';
-import { FormEvent, useState } from 'react';
 
 type Payment = {
     id: number;
@@ -28,8 +30,14 @@ type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; t
 type Props = { payments: Paginated<Payment> | null; sales: SaleOption[]; methods: MethodOption[]; filters: { search: string | null } };
 
 const statusVariant = (status: string) => {
-    if (status === 'completed') return 'default';
-    if (status === 'failed') return 'destructive';
+    if (status === 'completed') {
+return 'default';
+}
+
+    if (status === 'failed') {
+return 'destructive';
+}
+
     return 'secondary';
 };
 
@@ -81,23 +89,17 @@ export default function PaymentsIndex({ payments, sales, methods, filters }: Pro
         <>
             <Head title="Payments" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <CreditCard className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Payments</h1>
-                            <p className="text-sm text-muted-foreground">Record sale payments, track status, and verify digital transfers.</p>
-                        </div>
-                    </div>
-                    {payments && (
+                <PageHeader
+                    title="Payments"
+                    description="Record sale payments, track status, and verify digital transfers."
+                    icon={CreditCard}
+                    actions={payments && (
                         <Button type="button" onClick={() => setCreateOpen(true)}>
                             <Plus className="size-4" />
                             Record payment
                         </Button>
                     )}
-                </div>
+                />
 
                 {payments && (
                     <div className="flex flex-col gap-4">

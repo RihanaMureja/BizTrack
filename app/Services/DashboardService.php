@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Enums\Role;
 use App\Enums\BusinessPermissionKey;
+use App\Enums\Role;
 use App\Helpers\BusinessDashboardConfig;
 use App\Models\Business;
 use App\Models\Customer;
-use App\Models\Expense;
 use App\Models\InventoryBatch;
 use App\Models\Product;
 use App\Models\Sale;
@@ -22,6 +21,7 @@ class DashboardService
     public function __construct(
         private readonly RevenueService $revenueService,
         private readonly ProductInsightService $productInsightService,
+        private readonly SubscriptionRecommendationService $recommendationService,
     ) {}
 
     /**
@@ -66,6 +66,7 @@ class DashboardService
             'expiringProducts' => $this->expiringProducts($business),
             'stockValue' => $this->stockValue($business),
             'topProducts' => $this->topProducts($business),
+            'subscription' => $this->recommendationService->recommendationFor($business),
             'nextSteps' => [
                 'Complete product categories',
                 'Add products and opening stock',

@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut } from 'lucide-react';
+import { LogOut, UserRound } from 'lucide-react';
 import {
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -8,6 +8,7 @@ import {
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
+import { edit as editProfile } from '@/routes/profile';
 import type { User } from '@/types';
 
 type Props = {
@@ -29,6 +30,16 @@ export function UserMenuContent({ user }: Props) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+                <Link
+                    className="block w-full cursor-pointer"
+                    href={editProfile()}
+                >
+                    <UserRound className="mr-2" />
+                    Account settings
+                </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
                 <Link

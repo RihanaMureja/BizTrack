@@ -5,6 +5,7 @@ import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { CashierForm } from '@/components/forms/cashier-form';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
@@ -117,23 +118,17 @@ export default function CashiersIndex({ cashiers, filters, cashierLimit, passwor
         <>
             <Head title="Employees" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <UserRoundCog className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Employees</h1>
-                            <p className="text-sm text-muted-foreground">Manage employee accounts, access roles, status, and temporary password resets.</p>
-                        </div>
-                    </div>
-                    {cashiers && (
+                <PageHeader
+                    title="Employees"
+                    description="Manage employee accounts, access roles, status, and temporary password resets."
+                    icon={UserRoundCog}
+                    actions={cashiers && (
                         <Button type="button" onClick={() => setCreateOpen(true)} disabled={cashierLimit > 0 && cashiers.total >= cashierLimit}>
                             <Plus className="size-4" />
                             New employee
                         </Button>
                     )}
-                </div>
+                />
 
                 {cashiers && cashierLimit > 0 && cashiers.total >= cashierLimit && (
                     <Alert>

@@ -98,12 +98,14 @@ test('selling price must be greater than or equal to buy price', function () {
 
 test('owner can update their own product', function () {
     [$owner, $business] = productOwnerWithBusiness();
+    $category = Category::factory()->create(['business_id' => $business->id]);
     $product = Product::factory()->create(['business_id' => $business->id]);
 
     $this->actingAs($owner)
         ->put(route('products.update', $product), validProductPayload([
             'name' => 'Updated Product',
             'barcode' => $product->barcode,
+            'category_id' => $category->id,
         ]))
         ->assertRedirect();
 
@@ -111,11 +113,14 @@ test('owner can update their own product', function () {
 });
 
 test('owner cannot update another business product', function () {
-    [$owner] = productOwnerWithBusiness();
+    [$owner, $business] = productOwnerWithBusiness();
+    $category = Category::factory()->create(['business_id' => $business->id]);
     $otherProduct = Product::factory()->create();
 
     $this->actingAs($owner)
-        ->put(route('products.update', $otherProduct), validProductPayload())
+        ->put(route('products.update', $otherProduct), validProductPayload([
+            'category_id' => $category->id,
+        ]))
         ->assertForbidden();
 });
 

@@ -5,18 +5,10 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 
 export type BusinessFormBusiness = {
     id?: number;
-    subscription_id?: number | null;
     business_name?: string;
     business_type?: string | null;
     email?: string | null;
@@ -33,25 +25,10 @@ export type BusinessFormBusiness = {
     rental_agreement_path?: string | null;
 };
 
-export type BusinessFormSubscription = {
-    id: number;
-    name: string;
-    price: string | number;
-    duration_months: number;
-    max_cashiers: number;
-    description?: string | null;
-};
-
-type Props = {
-    business: BusinessFormBusiness | null;
-    subscriptions: BusinessFormSubscription[];
-};
-
-export function BusinessForm({ business, subscriptions }: Props) {
+export function BusinessForm({ business }: { business: BusinessFormBusiness | null }) {
     const form = useForm({
         business_name: business?.business_name ?? '',
         business_type: business?.business_type ?? '',
-        subscription_id: business?.subscription_id ? String(business.subscription_id) : '',
         email: business?.email ?? '',
         phone: business?.phone ?? '',
         address: business?.address ?? '',
@@ -106,26 +83,6 @@ export function BusinessForm({ business, subscriptions }: Props) {
                     />
                     <InputError message={form.errors.phone} />
                 </div>
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="subscription_id">Subscription plan</Label>
-                <Select
-                    value={form.data.subscription_id}
-                    onValueChange={(value) => form.setData('subscription_id', value)}
-                >
-                    <SelectTrigger id="subscription_id" className="w-full">
-                        <SelectValue placeholder="Choose a plan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {subscriptions.map((subscription) => (
-                            <SelectItem key={subscription.id} value={String(subscription.id)}>
-                                {subscription.name} - {Number(subscription.price).toLocaleString()} ETB / month
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <InputError message={form.errors.subscription_id} />
             </div>
 
             <div className="grid gap-2">

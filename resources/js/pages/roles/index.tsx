@@ -1,6 +1,11 @@
+import { Head, router, useForm } from '@inertiajs/react';
+import { Pencil, Plus, ShieldCheck } from 'lucide-react';
+import { useState  } from 'react';
+import type {FormEvent} from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import InputError from '@/components/input-error';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
@@ -9,9 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, router, useForm } from '@inertiajs/react';
-import { Pencil, Plus, ShieldCheck } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
 
 type Permission = { id: number; key: string; name: string; group: string; description: string | null };
 type BusinessRole = {
@@ -39,20 +41,23 @@ export default function BusinessRolesIndex({ roles, permissions, filters }: Prop
         { key: 'permissions_count', header: 'Permissions' },
         { key: 'users_count', header: 'Employees' },
         { key: 'is_default', header: 'Default', render: (role) => role.is_default ? <Badge>Default</Badge> : <Badge variant="secondary">Custom</Badge> },
-        { key: 'actions', header: '', className: 'text-right', render: (role) => <Button type="button" variant="outline" size="icon" onClick={() => { setEditing(role); setOpen(true); }}><Pencil className="size-4" /></Button> },
+        { key: 'actions', header: '', className: 'text-right', render: (role) => <Button type="button" variant="outline" size="icon" onClick={() => {
+ setEditing(role); setOpen(true); 
+}}><Pencil className="size-4" /></Button> },
     ];
 
     return (
         <>
             <Head title="Employee Roles" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm"><ShieldCheck className="size-5" /></div>
-                        <div><h1 className="text-xl font-semibold">Employee Roles</h1><p className="text-sm text-muted-foreground">Create custom employee roles and decide which modules they can access.</p></div>
-                    </div>
-                    <Button type="button" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="size-4" /> New role</Button>
-                </div>
+                <PageHeader
+                    title="Employee Roles"
+                    description="Create custom employee roles and decide which modules they can access."
+                    icon={ShieldCheck}
+                    actions={<Button type="button" onClick={() => {
+ setEditing(null); setOpen(true); 
+}}><Plus className="size-4" /> New role</Button>}
+                />
 
                 <SearchBox defaultValue={filters.search ?? ''} placeholder="Search roles..." onSearch={(search) => router.get('/business-roles', search ? { search } : {}, { preserveState: true, preserveScroll: true, replace: true })} />
 
@@ -66,11 +71,19 @@ export default function BusinessRolesIndex({ roles, permissions, filters }: Prop
                 )}
             </div>
 
-            <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) setEditing(null); }}>
+            <Dialog open={open} onOpenChange={(next) => {
+ setOpen(next);
+
+ if (!next) {
+setEditing(null);
+} 
+}}>
                 <DialogContent className="max-h-[85vh] max-w-3xl grid-rows-[auto_minmax(0,1fr)]">
                     <DialogHeader><DialogTitle>{editing ? 'Edit role' : 'New role'}</DialogTitle></DialogHeader>
                     <div className="min-h-0 overflow-y-auto pr-1">
-                        <RoleForm role={editing} permissions={permissions} onSuccess={() => { setOpen(false); setEditing(null); }} />
+                        <RoleForm role={editing} permissions={permissions} onSuccess={() => {
+ setOpen(false); setEditing(null); 
+}} />
                     </div>
                 </DialogContent>
             </Dialog>
@@ -88,6 +101,7 @@ function RoleForm({ role, permissions, onSuccess }: { role: BusinessRole | null;
 
     const grouped = permissions.reduce<Record<string, Permission[]>>((groups, permission) => {
         groups[permission.group] = [...(groups[permission.group] ?? []), permission];
+
         return groups;
     }, {});
 
@@ -100,7 +114,12 @@ function RoleForm({ role, permissions, onSuccess }: { role: BusinessRole | null;
     const submit = (event: FormEvent) => {
         event.preventDefault();
         const options = { preserveScroll: true, onSuccess };
-        role ? form.put(`/business-roles/${role.id}`, options) : form.post('/business-roles', options);
+
+        if (role) {
+            form.put(`/business-roles/${role.id}`, options);
+        } else {
+            form.post('/business-roles', options);
+        }
     };
 
     return (

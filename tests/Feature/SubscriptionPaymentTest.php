@@ -98,10 +98,33 @@ test('payment page rejects free plans and inactive plans', function () {
         ->assertRedirect(route('subscriptions.select'));
 });
 
-test('payment page redirects an owner with an active subscription to the dashboard', function () {
+test('payment page renders for an active subscription upgrading to a different paid plan', function () {
     $owner = paymentOwner();
-    paymentBusiness($owner, ['subscription_status' => BusinessSubscriptionStatus::Active]);
+    $currentPlan = paymentPlan(499);
+    paymentBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $currentPlan->id,
+    ]);
+    $newPlan = paymentPlan(999);
+
+    $this->actingAs($owner)
+        ->get(route('subscriptions.payment', ['plan' => $newPlan->id, 'back' => '/business/subscriptions']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('auth/subscription-payment')
+            ->where('plan.id', $newPlan->id)
+            ->where('plan.price', '999.00')
+            ->where('returnTo', '/business/subscriptions')
+        );
+});
+
+test('payment page redirects to the dashboard when the selected plan is the current active plan', function () {
+    $owner = paymentOwner();
     $plan = paymentPlan(499);
+    paymentBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $plan->id,
+    ]);
 
     $this->actingAs($owner)
         ->get(route('subscriptions.payment', ['plan' => $plan->id]))
@@ -166,6 +189,71 @@ test('failed payment initialization marks the payment failed and does not activa
     ]);
 
     expect($business->refresh()->subscription_status)->toBe(BusinessSubscriptionStatus::None);
+});
+
+test('owner with an active subscription can initialize payment to upgrade to a different paid plan', function () {
+    $owner = paymentOwner();
+    $currentPlan = paymentPlan(499);
+    $business = paymentBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $currentPlan->id,
+    ]);
+    $newPlan = paymentPlan(999);
+    chapaInitOk();
+
+    $this->actingAs($owner)
+        ->withHeader('X-Inertia', 'true')
+        ->post(route('subscriptions.payment.initialize'), ['plan_id' => $newPlan->id])
+        ->assertStatus(409)
+        ->assertHeader('X-Inertia-Location', 'https://checkout.chapa.example/pay/abc');
+
+    $this->assertDatabaseHas('subscription_payments', [
+        'business_id' => $business->id,
+        'subscription_id' => $newPlan->id,
+        'status' => SubscriptionPaymentStatus::Pending->value,
+    ]);
+
+    expect($business->refresh()->subscription_id)->toBe($currentPlan->id);
+});
+
+test('payment initialization for the current active plan is blocked and returns to the dashboard', function () {
+    $owner = paymentOwner();
+    $plan = paymentPlan(499);
+    paymentBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $plan->id,
+    ]);
+    chapaInitOk();
+
+    $this->actingAs($owner)
+        ->post(route('subscriptions.payment.initialize'), ['plan_id' => $plan->id])
+        ->assertRedirect(route('dashboard'));
+
+    $this->assertDatabaseCount('subscription_payments', 0);
+});
+
+test('failed payment initialization preserves the manage subscription destination', function () {
+    $owner = paymentOwner();
+    $currentPlan = paymentPlan(499);
+    $business = paymentBusiness($owner, [
+        'subscription_status' => BusinessSubscriptionStatus::Active,
+        'subscription_id' => $currentPlan->id,
+    ]);
+    $newPlan = paymentPlan(999);
+
+    Http::fake([
+        'https://chapa.test/v1/transaction/initialize' => Http::response(['message' => 'bad key'], 401),
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('subscriptions.payment.initialize'), [
+            'plan_id' => $newPlan->id,
+            'back' => '/business/subscriptions',
+        ])
+        ->assertRedirect(route('subscriptions.payment', ['plan' => $newPlan->id, 'back' => '/business/subscriptions']))
+        ->assertSessionHas('error');
+
+    expect($business->refresh()->subscription_id)->toBe($currentPlan->id);
 });
 
 test('verified payment activates the subscription', function () {

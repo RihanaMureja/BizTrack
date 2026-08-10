@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import InputError from '@/components/input-error';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
@@ -366,18 +367,11 @@ export default function InventoryIndex({
         <>
             <Head title="Inventory" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                        <Boxes className="size-5" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-semibold">Inventory</h1>
-                        <p className="text-sm text-muted-foreground">
-                            Track stock levels, restocks, damages, returns, and
-                            low-stock alerts.
-                        </p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Inventory"
+                    description="Track stock levels, restocks, damages, returns, and low-stock alerts."
+                    icon={Boxes}
+                />
 
                 {!inventory ? (
                     <Alert variant="destructive">

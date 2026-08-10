@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CashierLimitExceededException;
 use App\Http\Requests\StoreCashierRequest;
 use App\Http\Requests\UpdateCashierRequest;
 use App\Models\User;
@@ -9,9 +10,9 @@ use App\Services\CashierService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Validation\Rules\Password;
 
 class CashierController extends Controller
 {
@@ -51,7 +52,16 @@ class CashierController extends Controller
 
         $this->authorize('create', User::class);
 
-        $cashier = $this->cashierService->create($business, $request->validated());
+        try {
+            $cashier = $this->cashierService->create($business, $request->validated());
+        } catch (CashierLimitExceededException $exception) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => $exception->getMessage().' Review your plan to add more employees.',
+            ]);
+
+            return to_route('business.subscriptions');
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => $cashier->name.' employee created.']);
 

@@ -25,14 +25,14 @@ class SubscriptionPaymentController extends Controller
             return redirect()->route('business.setup');
         }
 
-        if ($business->hasActiveSubscription()) {
-            return redirect()->route('dashboard');
-        }
-
         $plan = $request->integer('plan') ? Subscription::find($request->integer('plan')) : null;
 
         if (! $plan || $plan->status !== RecordStatus::Active || (float) $plan->price <= 0) {
             return redirect()->route('subscriptions.select');
+        }
+
+        if ($this->isCurrentPlan($business, $plan)) {
+            return redirect()->route('dashboard');
         }
 
         $returnTo = $request->string('back')->toString();
@@ -53,14 +53,14 @@ class SubscriptionPaymentController extends Controller
         $business = $request->user()->ownedBusiness;
         abort_unless($business, 403);
 
-        if ($business->hasActiveSubscription()) {
-            return redirect()->route('dashboard');
-        }
-
         $plan = Subscription::findOrFail($request->integer('plan_id'));
 
         if ($plan->status !== RecordStatus::Active || (float) $plan->price <= 0) {
             return redirect()->route('subscriptions.select');
+        }
+
+        if ($this->isCurrentPlan($business, $plan)) {
+            return redirect()->route('dashboard');
         }
 
         $payment = $this->paymentService->createPending($plan, $business, $request->user());
@@ -69,7 +69,13 @@ class SubscriptionPaymentController extends Controller
             return Inertia::location($payment->checkout_url);
         }
 
-        return redirect()->route('subscriptions.payment', ['plan' => $plan->id])
+        $back = $request->string('back')->toString();
+
+        if (! in_array($back, ['/business/subscriptions', '/subscriptions'], true)) {
+            $back = null;
+        }
+
+        return redirect()->route('subscriptions.payment', $back ? ['plan' => $plan->id, 'back' => $back] : ['plan' => $plan->id])
             ->with('error', 'Unable to start the payment right now. Please try again.');
     }
 
@@ -94,6 +100,17 @@ class SubscriptionPaymentController extends Controller
 
         return redirect()->route('subscriptions.payment', ['plan' => $payment->subscription_id])
             ->with('error', 'Payment was not completed or could not be verified. You can try again.');
+    }
+
+    /**
+     * An owner must not be able to pay for the plan they are already on.
+     * Any other plan is an upgrade/downgrade that may use the payment flow.
+     */
+    private function isCurrentPlan(Business $business, Subscription $plan): bool
+    {
+        return $business->hasActiveSubscription()
+            && $business->subscription_id !== null
+            && (int) $business->subscription_id === (int) $plan->id;
     }
 
     /**

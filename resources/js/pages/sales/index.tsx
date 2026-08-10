@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Plus, Receipt } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
@@ -23,13 +24,12 @@ export default function SalesIndex({ sales, filters }: Props) {
         <>
             <Head title="Sales" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground"><Receipt className="size-5" /></div>
-                        <div><h1 className="text-xl font-semibold">Sales</h1><p className="text-sm text-muted-foreground">Review invoices and open the POS workspace.</p></div>
-                    </div>
-                    <Button asChild><Link href="/sales/pos"><Plus className="size-4" />New sale</Link></Button>
-                </div>
+                <PageHeader
+                    title="Sales"
+                    description="Review invoices and open the POS workspace."
+                    icon={Receipt}
+                    actions={<Button asChild><Link href="/sales/pos"><Plus className="size-4" />New sale</Link></Button>}
+                />
                 {sales && (
                     <div className="flex flex-col gap-4">
                         <SearchBox defaultValue={filters.search ?? ''} placeholder="Search invoice..." onSearch={(search) => router.get('/sales', search ? { search } : {}, { preserveState: true, preserveScroll: true, replace: true })} />

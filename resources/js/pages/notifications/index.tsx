@@ -1,12 +1,13 @@
+import { Head, router } from '@inertiajs/react';
+import { Bell, Check, CheckCheck } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, router } from '@inertiajs/react';
-import { Bell, Check, CheckCheck } from 'lucide-react';
 
 type Notification = {
     id: number;
@@ -71,21 +72,17 @@ export default function NotificationsIndex({ notifications, unreadCount, types, 
         <>
             <Head title="Notifications" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <Bell className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Notifications</h1>
-                            <p className="text-sm text-muted-foreground">Review low stock alerts, payments, credit reminders, and daily summaries.</p>
-                        </div>
-                    </div>
-                    <Button type="button" variant="outline" onClick={() => router.post('/notifications/mark-all-read', {}, { preserveScroll: true })} disabled={unreadCount === 0}>
-                        <CheckCheck className="size-4" />
-                        Mark all read
-                    </Button>
-                </div>
+                <PageHeader
+                    title="Notifications"
+                    description="Review low stock alerts, payments, credit reminders, and daily summaries."
+                    icon={Bell}
+                    actions={(
+                        <Button type="button" variant="outline" onClick={() => router.post('/notifications/mark-all-read', {}, { preserveScroll: true })} disabled={unreadCount === 0}>
+                            <CheckCheck className="size-4" />
+                            Mark all read
+                        </Button>
+                    )}
+                />
 
                 <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem_10rem]">
                     <SearchBox defaultValue={filters.search ?? ''} placeholder="Search notifications..." onSearch={(search) => applyFilters({ search })} />

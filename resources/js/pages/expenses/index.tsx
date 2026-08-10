@@ -1,8 +1,12 @@
+import { Head, router } from '@inertiajs/react';
+import { AlertTriangle, FileText, Pencil, Plus, Tags, Trash2, WalletCards } from 'lucide-react';
+import { useState } from 'react';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { ExpenseCategoryForm } from '@/components/forms/expense-category-form';
 import { ExpenseForm } from '@/components/forms/expense-form';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
@@ -10,9 +14,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, FileText, Pencil, Plus, Tags, Trash2, WalletCards } from 'lucide-react';
-import { useState } from 'react';
 
 type ExpenseCategory = { id: number; name: string; description: string | null; expenses_count: number };
 type Expense = {
@@ -39,8 +40,14 @@ type Props = {
 };
 
 const statusVariant = (status: string) => {
-    if (status === 'paid' || status === 'approved') return 'default';
-    if (status === 'rejected') return 'destructive';
+    if (status === 'paid' || status === 'approved') {
+return 'default';
+}
+
+    if (status === 'rejected') {
+return 'destructive';
+}
+
     return 'secondary';
 };
 
@@ -63,7 +70,10 @@ export default function ExpensesIndex({ expenses, categories, statuses, total, f
     };
 
     const confirmDelete = () => {
-        if (!deletingExpense) return;
+        if (!deletingExpense) {
+return;
+}
+
         setDeleting(true);
         router.delete(`/expenses/${deletingExpense.id}`, {
             preserveScroll: true,
@@ -115,18 +125,12 @@ export default function ExpensesIndex({ expenses, categories, statuses, total, f
         <>
             <Head title="Expenses" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <WalletCards className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Expenses</h1>
-                            <p className="text-sm text-muted-foreground">Record business costs, organize categories, and track receipts.</p>
-                        </div>
-                    </div>
-                    {expenses && (
-                        <div className="flex flex-wrap gap-2">
+                <PageHeader
+                    title="Expenses"
+                    description="Record business costs, organize categories, and track receipts."
+                    icon={WalletCards}
+                    actions={expenses && (
+                        <>
                             <Button type="button" variant="outline" onClick={() => setCategoryOpen(true)}>
                                 <Tags className="size-4" />
                                 Category
@@ -135,9 +139,9 @@ export default function ExpensesIndex({ expenses, categories, statuses, total, f
                                 <Plus className="size-4" />
                                 New expense
                             </Button>
-                        </div>
+                        </>
                     )}
-                </div>
+                />
 
                 {!expenses ? (
                     <Alert variant="destructive">

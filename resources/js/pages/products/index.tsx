@@ -5,6 +5,7 @@ import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { ProductForm } from '@/components/forms/product-form';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { ProductCard } from '@/components/product-card/product-card';
@@ -163,26 +164,17 @@ export default function ProductsIndex({ products, categories, filters, statuses 
         <>
             <Head title="Products" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <Boxes className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Products</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Manage catalog items, barcodes, pricing, and reorder settings.
-                            </p>
-                        </div>
-                    </div>
-
-                    {products && (
+                <PageHeader
+                    title="Products"
+                    description="Manage catalog items, barcodes, pricing, and reorder settings."
+                    icon={Boxes}
+                    actions={products && (
                         <Button type="button" onClick={() => setCreateOpen(true)}>
                             <Plus className="size-4" />
                             New product
                         </Button>
                     )}
-                </div>
+                />
 
                 {!products ? (
                     <Alert variant="destructive">

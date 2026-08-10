@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { home } from '@/routes';
@@ -8,18 +8,53 @@ export default function AuthSimpleLayout({
     children,
     title,
     description,
+    backHref,
 }: AuthLayoutProps) {
+    const goBack = () => {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            router.visit(backHref ?? home());
+        }
+    };
+
     return (
         <div className="relative flex min-h-svh bg-background">
-            <Link href={home()} className="absolute top-5 left-5 flex items-center md:top-8 md:left-8">
-                <img src="/brand/biztrack-logo.jpg" alt="BizTrack" className="h-12 w-auto max-w-44 rounded-sm object-contain object-left" />
+            <Link
+                href={home()}
+                className="absolute top-5 left-5 flex items-center md:top-8 md:left-8"
+            >
+                <img
+                    src="/brand/biztrack-logo.jpg"
+                    alt="BizTrack"
+                    className="h-12 w-auto max-w-44 rounded-sm object-contain object-left"
+                />
             </Link>
 
-            <Button variant="ghost" size="icon" asChild className="absolute top-20 left-5 md:top-24 md:left-8">
-                <Link href={home()} aria-label="Go back">
+            {backHref ? (
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    onClick={goBack}
+                    aria-label="Go back"
+                    title="Go back"
+                    className="absolute top-20 left-5 md:top-24 md:left-8"
+                >
                     <ArrowLeft className="size-4" />
-                </Link>
-            </Button>
+                </Button>
+            ) : (
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="absolute top-20 left-5 md:top-24 md:left-8"
+                >
+                    <Link href={home()} aria-label="Go back">
+                        <ArrowLeft className="size-4" />
+                    </Link>
+                </Button>
+            )}
 
             <main className="flex min-h-svh w-full items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
                 <div className="w-full max-w-md">

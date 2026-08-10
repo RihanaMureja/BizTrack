@@ -21,7 +21,6 @@ class BusinessProfileRequest extends FormRequest
         return [
             'business_name' => ['required', 'string', 'max:150'],
             'business_type' => ['nullable', 'string', 'max:100'],
-            'subscription_id' => ['nullable', Rule::exists('subscriptions', 'id')->where('status', 'active')],
             'email' => [
                 'nullable',
                 'email',

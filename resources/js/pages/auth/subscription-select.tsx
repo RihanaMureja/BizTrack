@@ -1,22 +1,21 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Clock3, Sparkles } from 'lucide-react';
+import {
+    AlertTriangle,
+    ArrowLeft,
+    CheckCircle2,
+    Clock3,
+    Sparkles,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { businessTypeLabel } from '@/lib/business-types';
 import { cn } from '@/lib/utils';
-
-type OnboardingPlan = {
-    id: number;
-    name: string;
-    price: string | number;
-    duration_months: number;
-    duration_days: number | null;
-    max_cashiers: number;
-    description: string | null;
-    features: string[] | null;
-};
+import type {
+    SubscriptionPlan,
+    SubscriptionRecommendation,
+} from '@/types/subscriptions';
 
 type Props = {
     business: {
@@ -24,9 +23,10 @@ type Props = {
         business_name: string;
         business_type: string | null;
     };
-    plans: OnboardingPlan[];
+    plans: SubscriptionPlan[];
     selectedPlanId?: number | null;
     subscriptionStatus: string;
+    recommendation?: SubscriptionRecommendation | null;
 };
 
 export default function SubscriptionSelect({
@@ -34,15 +34,18 @@ export default function SubscriptionSelect({
     plans,
     selectedPlanId,
     subscriptionStatus,
+    recommendation = null,
 }: Props) {
     const { flash } = usePage().props as { flash?: { status?: string } };
     const [processingId, setProcessingId] = useState<number | null>(null);
 
     const isPending = subscriptionStatus === 'pending';
+    const isExpired = subscriptionStatus === 'expired';
     const recommendedId =
-        plans.length > 2
+        recommendation?.recommendedPlan?.id ??
+        (plans.length > 2
             ? plans[Math.floor(plans.length / 2)].id
-            : plans[plans.length - 1]?.id;
+            : plans[plans.length - 1]?.id);
 
     const goBack = () => {
         if (window.history.length > 1) {
@@ -52,7 +55,7 @@ export default function SubscriptionSelect({
         }
     };
 
-    const choose = (plan: OnboardingPlan) => {
+    const choose = (plan: SubscriptionPlan) => {
         setProcessingId(plan.id);
         router.post('/subscriptions/select', {
             plan_id: plan.id,
@@ -170,6 +173,21 @@ export default function SubscriptionSelect({
                     );
                 })}
             </div>
+
+            {isExpired && (
+                <div className="mt-6 flex items-start gap-3 rounded-lg border border-rose-500/40 bg-rose-500/10 p-4 text-sm">
+                    <AlertTriangle className="mt-0.5 size-5 shrink-0 text-rose-600 dark:text-rose-400" />
+                    <div>
+                        <p className="font-semibold">
+                            Your subscription has expired
+                        </p>
+                        <p className="mt-1 text-muted-foreground">
+                            Choose a plan below to reactivate your business
+                            right away.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {isPending && (
                 <div className="mt-6 flex items-start gap-3 rounded-lg border bg-muted/50 p-4 text-sm">

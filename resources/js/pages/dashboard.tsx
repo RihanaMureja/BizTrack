@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowRight,
@@ -21,10 +21,12 @@ import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { RevenueOverview } from '@/components/charts/revenue-overview';
 import { StatCard } from '@/components/stat-card/stat-card';
+import { Button } from '@/components/ui/button';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { businessTypeLabel } from '@/lib/business-types';
 import { cn, formatMoney } from '@/lib/utils';
 import { dashboard as dashboardRoute } from '@/routes';
+import type { SubscriptionRecommendation } from '@/types/subscriptions';
 
 type DashboardStat = {
     key?: string;
@@ -64,6 +66,7 @@ type DashboardData = {
         items: Array<{ name: string; value: number }>;
     };
     topProducts?: Array<{ name: string; quantity: number }>;
+    subscription?: SubscriptionRecommendation | null;
     nextSteps?: string[];
     queue?: string[];
     recentBusinesses?: Array<{
@@ -251,6 +254,30 @@ function OwnerDashboard({ dashboard: data }: Props) {
                     </div>
                 )}
 
+                {data.subscription?.isExpiring && (
+                    <SubscriptionBanner
+                        tone="amber"
+                        icon={Clock3}
+                        title={`Your ${data.subscription.currentPlan?.name ?? 'subscription'} expires in ${data.subscription.daysRemaining} day${data.subscription.daysRemaining === 1 ? '' : 's'}`}
+                        message="Review your plan now so your access continues without interruption."
+                        actionLabel={
+                            data.subscription.isRenewal
+                                ? 'Renew plan'
+                                : 'Review plan'
+                        }
+                    />
+                )}
+                {data.subscription?.limitReached &&
+                    !data.subscription.isExpiring && (
+                        <SubscriptionBanner
+                            tone="primary"
+                            icon={AlertTriangle}
+                            title={`Cashier limit reached on ${data.subscription.currentPlan?.name ?? 'your plan'}`}
+                            message={`You are at ${data.subscription.maxCashiers} of ${data.subscription.maxCashiers} cashier accounts. Upgrade to keep adding staff.`}
+                            actionLabel="Upgrade plan"
+                        />
+                    )}
+
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {data.stats.map((stat, index) => (
                         <StatCard
@@ -269,6 +296,49 @@ function OwnerDashboard({ dashboard: data }: Props) {
                 {sections}
             </DashboardLayout>
         </>
+    );
+}
+
+function SubscriptionBanner({
+    tone,
+    icon: Icon,
+    title,
+    message,
+    actionLabel,
+}: {
+    tone: 'amber' | 'primary';
+    icon: LucideIcon;
+    title: string;
+    message: string;
+    actionLabel: string;
+}) {
+    return (
+        <div
+            className={cn(
+                'mb-4 flex flex-col gap-3 rounded-lg border p-4 text-sm sm:flex-row sm:items-center sm:justify-between',
+                tone === 'amber'
+                    ? 'border-amber-500/40 bg-amber-500/10'
+                    : 'border-primary/30 bg-primary/5',
+            )}
+        >
+            <div className="flex items-start gap-3">
+                <Icon
+                    className={cn(
+                        'mt-0.5 size-5 shrink-0',
+                        tone === 'amber'
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-primary',
+                    )}
+                />
+                <div>
+                    <p className="font-semibold">{title}</p>
+                    <p className="mt-1 text-muted-foreground">{message}</p>
+                </div>
+            </div>
+            <Link href="/business/subscriptions" className="shrink-0">
+                <Button size="sm">{actionLabel}</Button>
+            </Link>
+        </div>
     );
 }
 

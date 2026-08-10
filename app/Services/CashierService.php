@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Events\CashierCreated;
+use App\Exceptions\CashierLimitExceededException;
 use App\Models\Business;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class CashierService
 {
@@ -122,9 +122,7 @@ class CashierService
             ->count();
 
         if ($limit > 0 && $count >= $limit) {
-            throw ValidationException::withMessages([
-                'cashiers' => 'Your current subscription allows up to '.$limit.' cashier account(s).',
-            ]);
+            throw new CashierLimitExceededException($business, $limit);
         }
     }
 }

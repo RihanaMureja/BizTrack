@@ -100,7 +100,10 @@ test('cashier count is limited by subscription', function () {
 
     $this->actingAs($owner)
         ->post(route('cashiers.store'), validCashierPayload())
-        ->assertSessionHasErrors('cashiers');
+        ->assertRedirect(route('business.subscriptions'))
+        ->assertInertiaFlash('toast.type', 'error');
+
+    expect(User::query()->where('email', 'liya.cashier@biztrack.test')->doesntExist())->toBeTrue();
 });
 
 test('owner can update their cashier', function () {

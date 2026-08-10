@@ -67,7 +67,7 @@ test('owner can submit a business profile for review without receiving approval 
 
     $this->assertDatabaseHas('businesses', [
         'owner_id' => $owner->id,
-        'subscription_id' => $subscription->id,
+        'subscription_id' => null,
         'business_name' => 'Merkato Fresh Mart',
         'email' => 'hello@merkato.test',
         'status' => RecordStatus::PendingReview->value,
@@ -431,21 +431,29 @@ test('business email must be unique', function () {
         ->assertSessionHasErrors('email');
 });
 
-test('subscription must be an active plan', function () {
+test('business profile submission ignores subscription plan selection', function () {
+    Notification::fake();
+    Storage::fake('public');
+
     $owner = User::factory()->create([
         'role' => Role::Owner,
     ]);
 
-    $inactiveSubscription = Subscription::factory()->create([
-        'status' => RecordStatus::Inactive,
+    $subscription = Subscription::factory()->create([
+        'status' => RecordStatus::Active,
     ]);
 
     $this->actingAs($owner)
-        ->post(route('business.profile.store'), [
-            'business_name' => 'Inactive Plan Shop',
-            'subscription_id' => $inactiveSubscription->id,
-        ])
-        ->assertSessionHasErrors('subscription_id');
+        ->post(route('business.profile.store'), businessPayload([
+            'subscription_id' => $subscription->id,
+        ]))
+        ->assertRedirect(route('business.profile', absolute: false))
+        ->assertSessionHasNoErrors();
+
+    $this->assertDatabaseHas('businesses', [
+        'owner_id' => $owner->id,
+        'subscription_id' => null,
+    ]);
 });
 
 test('vat certificate is required only for vat registered businesses', function () {

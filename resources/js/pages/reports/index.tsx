@@ -1,11 +1,12 @@
-import { RevenueOverview } from '@/components/charts/revenue-overview';
-import { DataTable } from '@/components/data-table/data-table';
-import type { DataTableColumn } from '@/components/data-table/data-table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Head, router, useForm } from '@inertiajs/react';
 import { BarChart3, Download, FileText, Save } from 'lucide-react';
 import type { FormEvent } from 'react';
+import { RevenueOverview } from '@/components/charts/revenue-overview';
+import { DataTable } from '@/components/data-table/data-table';
+import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 type SummaryPoint = { label: string; value: string };
 type ChartPoint = { label: string; value: number };
@@ -54,21 +55,17 @@ export default function ReportsIndex({ report, recentReports, types, filters }: 
         <>
             <Head title="Reports" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <BarChart3 className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Reports</h1>
-                            <p className="text-sm text-muted-foreground">Generate sales, expense, profit, inventory, and tax summaries.</p>
-                        </div>
-                    </div>
-                    <Button type="button" variant="outline" onClick={() => downloadCsv(report.title, report.rows)} disabled={report.rows.length === 0}>
-                        <Download className="size-4" />
-                        Export CSV
-                    </Button>
-                </div>
+                <PageHeader
+                    title="Reports"
+                    description="Generate sales, expense, profit, inventory, and tax summaries."
+                    icon={BarChart3}
+                    actions={(
+                        <Button type="button" variant="outline" onClick={() => downloadCsv(report.title, report.rows)} disabled={report.rows.length === 0}>
+                            <Download className="size-4" />
+                            Export CSV
+                        </Button>
+                    )}
+                />
 
                 <form onSubmit={generate} className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[12rem_10rem_10rem_auto_auto]">
                     <select value={form.data.type} onChange={(event) => form.setData('type', event.target.value)} onBlur={applyFilters} className="border-input bg-background h-10 rounded-md border px-3 text-sm">
@@ -141,7 +138,10 @@ export default function ReportsIndex({ report, recentReports, types, filters }: 
 }
 
 function formatCell(value: string | number | null) {
-    if (typeof value === 'number') return value.toFixed(2);
+    if (typeof value === 'number') {
+return value.toFixed(2);
+}
+
     return value ?? '-';
 }
 
@@ -150,7 +150,10 @@ function withKeys(rows: ReportRow[]) {
 }
 
 function downloadCsv(title: string, rows: ReportRow[]) {
-    if (rows.length === 0) return;
+    if (rows.length === 0) {
+return;
+}
+
     const headers = Object.keys(rows[0]);
     const csv = [
         headers.join(','),

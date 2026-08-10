@@ -12,47 +12,61 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
-
-type SubscriptionPlan = {
-    id: number;
-    name: string;
-    price: string | number;
-    duration_months: number;
-    duration_days: number | null;
-    max_cashiers: number;
-    description: string | null;
-    features: string[] | null;
-};
+import type {
+    SubscriptionPlan,
+    SubscriptionRecommendation,
+} from '@/types/subscriptions';
 
 type Props = {
     subscriptions: SubscriptionPlan[];
     currentPlanId?: number | null;
     selectedPlanId?: number | null;
     subscriptionStatus?: string;
+    cashiersCount?: number;
+    recommendation?: SubscriptionRecommendation | null;
 };
 
 const STATUS_ACTIVE = 'active';
 const STATUS_PENDING = 'pending';
+const STATUS_NONE = 'none';
 
 export default function BusinessSubscriptions({
     subscriptions,
     currentPlanId,
     selectedPlanId,
     subscriptionStatus,
+    cashiersCount = 0,
+    recommendation = null,
 }: Props) {
     const { flash } = usePage().props as { flash?: { status?: string } };
     const [processingId, setProcessingId] = useState<number | null>(null);
 
     const isCurrentPlanActive =
         subscriptionStatus === STATUS_ACTIVE && currentPlanId != null;
-    const currentPrice = Number(
-        subscriptions.find((plan) => plan.id === currentPlanId)?.price ?? 0,
-    );
+    const currentPlan =
+        subscriptions.find((plan) => plan.id === currentPlanId) ?? null;
+    const currentPrice = Number(currentPlan?.price ?? 0);
     const hasFreeTrial = subscriptions.some((plan) => Number(plan.price) === 0);
+    const isEligibleForFreeTrial = subscriptionStatus === STATUS_NONE;
+    const currentMaxCashiers = currentPlan?.max_cashiers ?? 0;
+    const hasCurrentPlan = currentPlan != null;
+    const isAtCashierLimit =
+        hasCurrentPlan &&
+        currentMaxCashiers > 0 &&
+        cashiersCount >= currentMaxCashiers;
+    const recommendedPlan = recommendation?.recommendedPlan ?? null;
     const recommendedId =
-        subscriptions.length > 2
-            ? subscriptions[Math.floor(subscriptions.length / 2)].id
-            : subscriptions[subscriptions.length - 1]?.id;
+        recommendedPlan?.id ??
+        subscriptions.find(
+            (plan) =>
+                plan.id !== currentPlanId &&
+                Number(plan.price) > 0 &&
+                plan.max_cashiers >= Math.max(1, cashiersCount),
+        )?.id ??
+        subscriptions.find(
+            (plan) => plan.id !== currentPlanId && Number(plan.price) > 0,
+        )?.id ??
+        subscriptions[subscriptions.length - 1]?.id;
 
     const choose = (plan: SubscriptionPlan) => {
         setProcessingId(plan.id);
@@ -90,6 +104,156 @@ export default function BusinessSubscriptions({
                             </p>
                         </div>
                     </div>
+
+                    {hasCurrentPlan && (
+                        <div className="mt-6 rounded-lg border bg-card p-4 shadow-sm">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase">
+                                        Current plan
+                                    </p>
+                                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                                        <p className="text-lg font-semibold">
+                                            {currentPlan.name}
+                                        </p>
+                                        {isCurrentPlanActive && (
+                                            <Badge variant="secondary">
+                                                <Check className="size-3" />
+                                                Active
+                                            </Badge>
+                                        )}
+                                        {subscriptionStatus ===
+                                            STATUS_PENDING && (
+                                            <Badge variant="outline">
+                                                <Clock3 className="size-3" />
+                                                Pending
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <p className="mt-0.5 text-sm text-muted-foreground">
+                                        {Number(currentPlan.price) > 0
+                                            ? `${Number(currentPlan.price).toLocaleString()} ETB / month`
+                                            : 'Free plan'}
+                                    </p>
+                                </div>
+                                <div className="sm:text-right">
+                                    <p className="text-sm font-medium">
+                                        Cashiers:{' '}
+                                        {cashiersCount.toLocaleString()} /{' '}
+                                        {currentMaxCashiers.toLocaleString()}
+                                    </p>
+                                    {currentMaxCashiers > 0 && (
+                                        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-secondary sm:w-56">
+                                            <div
+                                                className={cn(
+                                                    'h-full rounded-full',
+                                                    isAtCashierLimit
+                                                        ? 'bg-destructive'
+                                                        : 'bg-primary',
+                                                )}
+                                                style={{
+                                                    width: `${Math.min(
+                                                        100,
+                                                        Math.round(
+                                                            (cashiersCount /
+                                                                currentMaxCashiers) *
+                                                                100,
+                                                        ),
+                                                    )}%`,
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                    {isAtCashierLimit && (
+                                        <p className="mt-1 text-xs text-destructive">
+                                            Cashier limit reached for this plan.
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {recommendation?.isExpiring && (
+                        <div className="mt-4 flex flex-col gap-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <Clock3 className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                                <div>
+                                    <p className="font-semibold">
+                                        Your{' '}
+                                        {recommendation.currentPlan?.name ??
+                                            'subscription'}{' '}
+                                        expires in{' '}
+                                        {recommendation.daysRemaining} day
+                                        {recommendation.daysRemaining === 1
+                                            ? ''
+                                            : 's'}
+                                    </p>
+                                    <p className="mt-1 text-muted-foreground">
+                                        {recommendation.isRenewal
+                                            ? `Renew your ${recommendation.currentPlan?.name ?? 'plan'} to keep using all its features without interruption.`
+                                            : `Switch to ${recommendation.recommendedPlan?.name ?? 'the recommended plan'} to avoid any interruption.`}
+                                    </p>
+                                </div>
+                            </div>
+                            {recommendedPlan && (
+                                <Button
+                                    type="button"
+                                    className="shrink-0"
+                                    disabled={
+                                        processingId === recommendedPlan.id
+                                    }
+                                    onClick={() => choose(recommendedPlan)}
+                                >
+                                    {processingId === recommendedPlan.id && (
+                                        <Spinner />
+                                    )}
+                                    {recommendation.isRenewal
+                                        ? `Renew ${recommendedPlan.name}`
+                                        : `Upgrade to ${recommendedPlan.name}`}
+                                </Button>
+                            )}
+                        </div>
+                    )}
+
+                    {recommendation?.limitReached && (
+                        <div className="mt-4 flex flex-col gap-4 rounded-lg border bg-primary/5 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <Sparkles className="mt-0.5 size-5 shrink-0 text-primary" />
+                                <div>
+                                    <p className="font-semibold">
+                                        Recommended for your business
+                                    </p>
+                                    <p className="mt-1 text-muted-foreground">
+                                        You have{' '}
+                                        {cashiersCount.toLocaleString()}{' '}
+                                        cashiers but the{' '}
+                                        {currentPlan?.name ?? 'current plan'}{' '}
+                                        plan allows{' '}
+                                        {currentMaxCashiers.toLocaleString()}.
+                                        {recommendedPlan
+                                            ? ` Upgrade to ${recommendedPlan.name} for up to ${recommendedPlan.max_cashiers} cashier accounts.`
+                                            : ' Upgrade to a plan with more cashier accounts to keep adding staff.'}
+                                    </p>
+                                </div>
+                            </div>
+                            {recommendedPlan && (
+                                <Button
+                                    type="button"
+                                    className="shrink-0"
+                                    disabled={
+                                        processingId === recommendedPlan.id
+                                    }
+                                    onClick={() => choose(recommendedPlan)}
+                                >
+                                    {processingId === recommendedPlan.id && (
+                                        <Spinner />
+                                    )}
+                                    Upgrade to {recommendedPlan.name}
+                                </Button>
+                            )}
+                        </div>
+                    )}
 
                     <div className="mt-8 text-center">
                         <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -136,6 +300,8 @@ export default function BusinessSubscriptions({
                             const isCurrentPending =
                                 isCurrentPlan &&
                                 subscriptionStatus === STATUS_PENDING;
+                            const isFreeTrialUnavailable =
+                                isFree && !isEligibleForFreeTrial;
                             const isSelectedForPurchase =
                                 plan.id === selectedPlanId &&
                                 plan.id !== currentPlanId;
@@ -151,11 +317,13 @@ export default function BusinessSubscriptions({
                                 ? 'Current Plan'
                                 : isCurrentPending
                                   ? 'Request pending'
-                                  : isFree
-                                    ? 'Start Free Trial'
-                                    : isCurrentPlanActive
-                                      ? `${price > currentPrice ? 'Upgrade' : 'Downgrade'} to ${plan.name}`
-                                      : `Choose ${plan.name}`;
+                                  : isFreeTrialUnavailable
+                                    ? 'Free trial unavailable'
+                                    : isFree
+                                      ? 'Start Free Trial'
+                                      : isCurrentPlanActive
+                                        ? `${price > currentPrice ? 'Upgrade' : 'Downgrade'} to ${plan.name}`
+                                        : `Choose ${plan.name}`;
 
                             return (
                                 <article
@@ -254,6 +422,14 @@ export default function BusinessSubscriptions({
                                                 )}
                                                 {ctaLabel}
                                             </Button>
+                                        ) : isFreeTrialUnavailable ? (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full"
+                                                disabled
+                                            >
+                                                {ctaLabel}
+                                            </Button>
                                         ) : (
                                             <Button
                                                 variant={
@@ -275,7 +451,7 @@ export default function BusinessSubscriptions({
                         })}
                     </div>
 
-                    {hasFreeTrial && (
+                    {hasFreeTrial && isEligibleForFreeTrial && (
                         <div className="mx-auto mt-10 flex max-w-2xl items-center justify-center gap-2 text-center text-sm text-muted-foreground">
                             <Sparkles className="size-4 shrink-0 text-primary" />
                             <p>

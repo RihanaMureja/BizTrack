@@ -5,6 +5,7 @@ import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { CategoryForm } from '@/components/forms/category-form';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
@@ -112,26 +113,17 @@ export default function CategoriesIndex({ categories, filters }: Props) {
         <>
             <Head title="Categories" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <Tags className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Categories</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Group your products so they're easy to browse and report on.
-                            </p>
-                        </div>
-                    </div>
-
-                    {categories && (
+                <PageHeader
+                    title="Categories"
+                    description="Group your products so they're easy to browse and report on."
+                    icon={Tags}
+                    actions={categories && (
                         <Button type="button" onClick={() => setCreateOpen(true)}>
                             <Plus className="size-4" />
                             New category
                         </Button>
                     )}
-                </div>
+                />
 
                 {!categories ? (
                     <Alert variant="destructive">

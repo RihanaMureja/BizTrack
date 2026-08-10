@@ -43,8 +43,7 @@ class BusinessService
      * @return array{
      *     business: \App\Models\Business|null,
      *     logoUrl: string|null,
-     *     usage: array{users_count: int, products_count: int, max_cashiers: int|null},
-     *     subscriptions: \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subscription>
+     *     usage: array{users_count: int, products_count: int, max_cashiers: int|null}
      * }
      */
     public function profileData(User $user): array
@@ -63,7 +62,6 @@ class BusinessService
                 'products_count' => $business?->products()->count() ?? 0,
                 'max_cashiers' => $business?->subscription?->max_cashiers,
             ],
-            'subscriptions' => $this->subscriptionService->activePlans(),
         ];
     }
 
@@ -76,6 +74,7 @@ class BusinessService
             $existingBusiness = $owner->ownedBusiness;
             $payload = Arr::except($data, [
                 'logo',
+                'subscription_id',
                 'national_id_photo',
                 'trade_license',
                 'tin_certificate',

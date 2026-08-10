@@ -28,7 +28,10 @@ export default function SubscriptionPayment({
     returnTo,
 }: Props) {
     const { flash } = usePage().props as { flash?: { error?: string } };
-    const { data, post, processing } = useForm({ plan_id: plan.id });
+    const { data, post, processing } = useForm({
+        plan_id: plan.id,
+        back: returnTo ?? '/subscriptions',
+    });
 
     const goBack = () => {
         const fallback =
@@ -139,6 +142,11 @@ export default function SubscriptionPayment({
                             type="hidden"
                             name="plan_id"
                             value={data.plan_id}
+                        />
+                        <input
+                            type="hidden"
+                            name="back"
+                            value={data.back}
                         />
                         <Button
                             type="submit"

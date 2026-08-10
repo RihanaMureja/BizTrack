@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BusinessSubscriptionStatus;
+use App\Enums\Role;
 use App\Http\Requests\SubscriptionSelectionRequest;
 use App\Models\Subscription;
 use App\Services\BusinessService;
+use App\Services\SubscriptionRecommendationService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,18 +18,26 @@ class SubscriptionController extends Controller
 {
     public function __construct(
         private readonly SubscriptionService $subscriptionService,
+        private readonly SubscriptionRecommendationService $recommendationService,
         private readonly BusinessService $businessService,
     ) {}
 
     public function index(Request $request): Response
     {
         $business = $request->user()?->ownedBusiness;
+        $subscriptionStatus = $business
+            ? $this->recommendationService->effectiveStatus($business)->value
+            : BusinessSubscriptionStatus::None->value;
 
         return Inertia::render('business/subscriptions', [
             'subscriptions' => $this->subscriptionService->activePlans(),
             'currentPlanId' => $business?->subscription_id,
             'selectedPlanId' => $request->integer('plan') ?: null,
-            'subscriptionStatus' => $business?->subscription_status?->value ?? BusinessSubscriptionStatus::None->value,
+            'subscriptionStatus' => $subscriptionStatus,
+            'cashiersCount' => $business?->users()
+                ->where('role', Role::Cashier)
+                ->count() ?? 0,
+            'recommendation' => $this->recommendationService->recommendationFor($business),
         ]);
     }
 
@@ -51,7 +61,8 @@ class SubscriptionController extends Controller
             ],
             'plans' => $this->subscriptionService->activePlans(),
             'selectedPlanId' => $request->integer('plan') ?: null,
-            'subscriptionStatus' => $business->subscription_status?->value ?? BusinessSubscriptionStatus::None->value,
+            'subscriptionStatus' => $this->recommendationService->effectiveStatus($business)->value,
+            'recommendation' => $this->recommendationService->recommendationFor($business),
         ]);
     }
 
