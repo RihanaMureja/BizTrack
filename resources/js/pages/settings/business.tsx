@@ -9,9 +9,10 @@ type Props = {
         verification_documents?: Array<{ id: number; label: string; status: string; notes: string | null }>;
     }) | null;
     subscriptions: BusinessFormSubscription[];
+    businessCategories: Array<{ value: string; label: string }>;
 };
 
-export default function BusinessSettings({ business, subscriptions }: Props) {
+export default function BusinessSettings({ business, subscriptions, businessCategories }: Props) {
     return (
         <>
             <Head title="Business settings" />
@@ -24,7 +25,7 @@ export default function BusinessSettings({ business, subscriptions }: Props) {
                 />
 
                 <section className="rounded-md border bg-card p-5 shadow-sm">
-                    <BusinessForm business={business} subscriptions={subscriptions} action="/settings/business" />
+                    <BusinessForm business={business} subscriptions={subscriptions} businessCategories={businessCategories} action="/settings/business" />
                 </section>
 
                 <section className="rounded-md border bg-card p-5 shadow-sm">

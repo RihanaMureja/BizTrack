@@ -93,5 +93,83 @@ test('credit sale is blocked when it exceeds available credit', function () {
             'is_credit_sale' => true,
             'items' => [['product_id' => $product->id, 'quantity' => 1]],
         ])
-        ->assertSessionHasErrors('is_credit_sale');
+        ->assertSessionHasErrors('credit_amount');
+});
+
+test('owner can choose any cash and credit split within available credit', function () {
+    [$owner, $business] = creditSaleBusinessContext();
+    $customer = Customer::factory()->create([
+        'business_id' => $business->id,
+        'credit_limit' => 500,
+        'current_balance' => 0,
+    ]);
+    $product = creditSaleStockedProduct($business, 10, 100);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'customer_id' => $customer->id,
+            'is_credit_sale' => true,
+            'cash_amount' => 80,
+            'credit_amount' => 120,
+            'checkout_method' => 'cash',
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        ])
+        ->assertRedirect();
+
+    $sale = \App\Models\Sale::query()->firstOrFail();
+    $credit = CustomerCredit::query()->firstOrFail();
+    $payment = \App\Models\Payment::query()->firstOrFail();
+
+    expect((float) $sale->refresh()->paid_amount)->toBe(80.0)
+        ->and((float) $sale->balance_due)->toBe(120.0)
+        ->and((float) $payment->amount)->toBe(80.0)
+        ->and((float) $credit->credit_amount)->toBe(120.0)
+        ->and((float) $credit->remaining_balance)->toBe(120.0)
+        ->and((float) $customer->refresh()->current_balance)->toBe(120.0);
+});
+
+test('split payment is rejected when cash and credit do not equal grand total', function () {
+    [$owner, $business] = creditSaleBusinessContext();
+    $customer = Customer::factory()->create([
+        'business_id' => $business->id,
+        'credit_limit' => 500,
+        'current_balance' => 0,
+    ]);
+    $product = creditSaleStockedProduct($business, 10, 100);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'customer_id' => $customer->id,
+            'is_credit_sale' => true,
+            'cash_amount' => 25,
+            'credit_amount' => 50,
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+        ])
+        ->assertSessionHasErrors('cash_amount');
+});
+
+test('sale can be entered as full credit when it fits available credit', function () {
+    [$owner, $business] = creditSaleBusinessContext();
+    $customer = Customer::factory()->create([
+        'business_id' => $business->id,
+        'credit_limit' => 500,
+        'current_balance' => 0,
+    ]);
+    $product = creditSaleStockedProduct($business, 10, 100);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'customer_id' => $customer->id,
+            'is_credit_sale' => true,
+            'cash_amount' => 0,
+            'credit_amount' => 200,
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        ])
+        ->assertRedirect(route('sales.index'));
+
+    $sale = \App\Models\Sale::query()->firstOrFail();
+
+    expect((float) $sale->paid_amount)->toBe(0.0)
+        ->and((float) $sale->balance_due)->toBe(200.0)
+        ->and((float) $customer->refresh()->current_balance)->toBe(200.0);
 });

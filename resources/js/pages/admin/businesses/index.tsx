@@ -20,16 +20,14 @@ type Business = {
     owner: { email: string; first_name: string | null; last_name: string | null } | null;
     subscription: { name: string } | null;
 };
-type Subscription = { id: number; name: string; price: string; status: string };
 type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; to: number | null; total: number };
 type Props = {
     businesses: Paginated<Business>;
-    subscriptions: Subscription[];
     statuses: Array<{ value: string; label: string }>;
     filters: { search: string | null; status: string | null };
 };
 
-export default function AdminBusinessesIndex({ businesses, subscriptions, statuses, filters }: Props) {
+export default function AdminBusinessesIndex({ businesses, statuses, filters }: Props) {
     const applyFilters = (next: Record<string, string | null>) => router.get('/admin/businesses', {
         search: filters.search ?? '',
         status: filters.status ?? '',
@@ -48,23 +46,6 @@ export default function AdminBusinessesIndex({ businesses, subscriptions, status
                 <Badge variant={business.access_mode === 'active' || business.access_mode === 'trial' ? 'default' : 'secondary'}>
                     {business.access_mode.replace('_', ' ')}
                 </Badge>
-            ),
-        },
-        {
-            key: 'actions',
-            header: '',
-            className: 'text-right',
-            render: (business) => (
-                <div className="flex flex-wrap justify-end gap-2">
-                    <select
-                        defaultValue=""
-                        onChange={(event) => event.target.value && router.put(`/admin/businesses/${business.id}/subscription`, { subscription_id: event.target.value }, { preserveScroll: true })}
-                        className="border-input bg-background h-9 rounded-md border px-2 text-xs"
-                    >
-                        <option value="">Change plan</option>
-                        {subscriptions.map((subscription) => <option key={subscription.id} value={subscription.id}>{subscription.name}</option>)}
-                    </select>
-                </div>
             ),
         },
     ];

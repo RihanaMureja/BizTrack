@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BusinessCategory;
 use App\Http\Requests\StoreBusinessRequest;
 use App\Http\Requests\UpdateBusinessRequest;
 use App\Services\BusinessService;
@@ -26,6 +27,7 @@ class BusinessController extends Controller
                 'verificationDocuments',
             ]),
             'subscriptions' => $this->subscriptionService->activePlans(),
+            'businessCategories' => $this->businessCategories(),
         ]);
     }
 
@@ -43,5 +45,13 @@ class BusinessController extends Controller
 
         return to_route($business->hasCompletedOnboarding() ? 'settings.business.edit' : 'onboarding.verify-phone')
             ->with('success', $business->business_name.' profile updated.');
+    }
+
+    private function businessCategories(): array
+    {
+        return collect(BusinessCategory::cases())->map(fn (BusinessCategory $category): array => [
+            'value' => $category->value,
+            'label' => $category->label(),
+        ])->values()->all();
     }
 }

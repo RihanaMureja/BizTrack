@@ -30,10 +30,26 @@ test('products navigation is a single item without product insights', function (
         ->get(route('dashboard'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->where('navigation', fn ($navigation) => collect($navigation)
+            ->where('navigation', fn ($navigation) => collect($navigation)->flatMap(fn ($group) => $group['items'])
                 ->where('title', 'Products')
                 ->count() === 1
-                && ! collect($navigation)->pluck('title')->contains('Product Insights')));
+                && ! collect($navigation)->flatMap(fn ($group) => $group['items'])->pluck('title')->contains('Product Insights')));
+});
+
+test('owner sidebar groups catalog in workflow order', function () {
+    [$owner] = catalogOwnerContext();
+
+    $this->actingAs($owner)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('navigation.0.label', 'Workspace')
+            ->where('navigation.1.label', 'Catalog')
+            ->where('navigation.1.items.0.title', 'Categories')
+            ->where('navigation.1.items.1.title', 'Products')
+            ->where('navigation.1.items.2.title', 'Inventory')
+            ->where('navigation.2.label', 'Operations')
+            ->where('navigation.3.label', 'Team'));
 });
 
 test('product catalog returns card data with 30 day sales trend', function () {

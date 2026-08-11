@@ -59,9 +59,12 @@ const icons = {
 
 export function AppSidebar() {
     const { navigation = [] } = usePage<SharedData>().props;
-    const mainNavItems = navigation.map((item) => ({
-        ...item,
-        icon: icons[item.icon as keyof typeof icons] ?? LayoutGrid,
+    const mainNavGroups = navigation.map((group) => ({
+        ...group,
+        items: group.items.map((item) => ({
+            ...item,
+            icon: icons[item.icon as keyof typeof icons] ?? LayoutGrid,
+        })),
     }));
 
     return (
@@ -79,7 +82,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain groups={mainNavGroups} />
             </SidebarContent>
 
             <SidebarFooter>

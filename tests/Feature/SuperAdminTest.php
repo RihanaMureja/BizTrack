@@ -15,7 +15,7 @@ function superAdminUser(): User
 
 function ownerBusinessContext(): array
 {
-    [$owner] = ownerBusinessContext();
+    $owner = User::factory()->create(['role' => Role::Owner]);
     $business = Business::factory()->create(['owner_id' => $owner->id]);
     $owner->forceFill(['business_id' => $business->id])->save();
 
@@ -26,6 +26,13 @@ test('only super admins can access the admin dashboard', function () {
     $this->get(route('admin.dashboard'))->assertRedirect(route('login'));
 
     $owner = User::factory()->create(['role' => Role::Owner]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Active,
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
     $this->actingAs($owner)->get(route('admin.dashboard'))->assertForbidden();
 
     $this->actingAs(superAdminUser())
@@ -48,21 +55,17 @@ test('super admin can view and filter businesses', function () {
             ->where('businesses.data.0.business_name', 'Alpha Market'));
 });
 
-test('super admin can change business subscription without approving or deactivating access', function () {
+test('super admin cannot change business subscription from businesses directory', function () {
     $admin = superAdminUser();
     [, $business] = ownerBusinessContext();
     $subscription = Subscription::factory()->create();
-    $business->forceFill([
-        'status' => RecordStatus::Active,
-        'access_mode' => BusinessAccessMode::Onboarding,
-    ])->save();
+    $originalSubscriptionId = $business->subscription_id;
 
     $this->actingAs($admin)
-        ->put(route('admin.businesses.subscription.update', $business), ['subscription_id' => $subscription->id])
-        ->assertRedirect();
+        ->put("/admin/businesses/{$business->id}/subscription", ['subscription_id' => $subscription->id])
+        ->assertNotFound();
 
-    expect($business->refresh()->subscription_id)->toBe($subscription->id)
-        ->and($business->access_mode)->toBe(BusinessAccessMode::Onboarding);
+    expect($business->refresh()->subscription_id)->toBe($originalSubscriptionId);
 });
 
 test('super admin can view users and update non super admin status only', function () {
@@ -121,6 +124,22 @@ test('super admin cannot update own row or another super admin row', function ()
 
     expect($admin->refresh()->status)->toBe(RecordStatus::Active)
         ->and($otherAdmin->refresh()->status)->toBe(RecordStatus::Active);
+});
+
+test('super admin cannot update cashier status from platform users page', function () {
+    $admin = superAdminUser();
+    $cashier = User::factory()->create([
+        'role' => Role::Cashier,
+        'status' => RecordStatus::Active,
+    ]);
+
+    $this->actingAs($admin)
+        ->put(route('admin.users.update', $cashier), [
+            'status' => RecordStatus::Suspended->value,
+        ])
+        ->assertStatus(422);
+
+    expect($cashier->refresh()->status)->toBe(RecordStatus::Active);
 });
 
 test('super admin can create update and deactivate subscription plans', function () {

@@ -29,8 +29,8 @@ class CustomerCreditService
             return null;
         }
 
-        $creditAmount = (float) $sale->grand_total;
-        $paidAmount = min((float) $sale->paid_amount, $creditAmount);
+        $creditAmount = (float) $sale->balance_due;
+        $paidAmount = $existing ? min((float) $existing->paid_amount, $creditAmount) : 0.0;
         $remainingBalance = max(0, $creditAmount - $paidAmount);
 
         if (! $existing && $remainingBalance <= 0) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\BusinessCategory;
 use App\Enums\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -9,6 +10,13 @@ use Illuminate\Validation\Validator;
 
 class BusinessProfileRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('business_category')) {
+            $this->merge(['business_category' => BusinessCategory::RetailShop->value]);
+        }
+    }
+
     public function authorize(): bool
     {
         return $this->user()?->role === Role::Owner;
@@ -24,6 +32,7 @@ class BusinessProfileRequest extends FormRequest
         return [
             'business_name' => ['required', 'string', 'max:150'],
             'business_type' => ['nullable', 'string', 'max:100'],
+            'business_category' => ['required', Rule::enum(BusinessCategory::class)],
             'subscription_id' => ['nullable', Rule::exists('subscriptions', 'id')->where('status', 'active')],
             'email' => [
                 'nullable',

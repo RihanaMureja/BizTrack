@@ -54,6 +54,7 @@ class UserManagementController extends Controller
         abort_unless($request->user()->isSuperAdmin(), 403);
         abort_if($request->user()->is($user), 422, 'You cannot update your own super admin account from this screen.');
         abort_if($user->isSuperAdmin(), 422, 'Super admin accounts cannot be changed from this screen.');
+        abort_if($user->role === Role::Cashier, 422, 'Employee status is managed by the business owner, not the platform admin.');
 
         $data = $request->validate([
             'status' => ['required', Rule::enum(RecordStatus::class)],

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Services\RBACService;
 use App\Services\NotificationService;
+use App\Services\Theme\BusinessThemeService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,6 +41,7 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user()?->loadMissing('business', 'ownedBusiness');
         $business = $user?->ownedBusiness ?? $user?->business;
         $businessLogo = $business?->logo ? route('businesses.logo', $business) : null;
+        $theme = app(BusinessThemeService::class)->themeFor($business);
 
         return [
             ...parent::share($request),
@@ -50,8 +52,11 @@ class HandleInertiaRequests extends Middleware
                     'avatar' => $businessLogo,
                     'business_logo' => $businessLogo,
                     'display_business_name' => $business?->business_name,
+                    'business_category' => $business?->business_category?->value,
+                    'business_theme' => $theme,
                 ] : null,
             ],
+            'tenantTheme' => $theme,
             'navigation' => $user
                 ? app(RBACService::class)->navigationFor($user)
                 : [],

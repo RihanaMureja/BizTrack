@@ -65,7 +65,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:super_admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/', SuperAdminController::class)->name('dashboard');
         Route::get('businesses', [BusinessManagementController::class, 'index'])->name('businesses.index');
-        Route::put('businesses/{business}/subscription', [BusinessManagementController::class, 'updateSubscription'])->name('businesses.subscription.update');
         Route::get('users', [UserManagementController::class, 'index'])->name('users.index');
         Route::put('users/{user}', [UserManagementController::class, 'update'])->name('users.update');
         Route::post('subscriptions/{subscription}/activate', [AdminSubscriptionController::class, 'activate'])->name('subscriptions.activate');

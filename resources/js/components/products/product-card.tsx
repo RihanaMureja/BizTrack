@@ -1,8 +1,9 @@
 import { ProductCardSparkline } from '@/components/products/product-card-sparkline';
+import { visualForBusinessCategory } from '@/components/business/category-visuals';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
-import { Barcode, Lightbulb, Package, Power } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { Barcode, Lightbulb, Power } from 'lucide-react';
 import type { MouseEvent } from 'react';
 
 export type CatalogProduct = {
@@ -37,6 +38,9 @@ type Props = {
 export function ProductCard({ product, onEdit, onDeactivate }: Props) {
     const stock = product.inventory?.available_stock ?? 0;
     const lowStock = stock <= product.reorder_level;
+    const { auth } = usePage<{ auth: { user?: { business_category?: string | null } | null } }>().props;
+    const visual = visualForBusinessCategory(auth.user?.business_category);
+    const Icon = visual.Icon;
 
     const stop = (event: MouseEvent) => {
         event.stopPropagation();
@@ -57,8 +61,8 @@ export function ProductCard({ product, onEdit, onDeactivate }: Props) {
         >
             <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 gap-3">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                        <Package className="size-5" />
+                    <div className={`flex size-10 shrink-0 items-center justify-center rounded-md ${visual.className}`}>
+                        <Icon className="size-5" />
                     </div>
                     <div className="min-w-0">
                         <h3 className="truncate text-sm font-semibold">{product.name}</h3>

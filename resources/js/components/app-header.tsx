@@ -46,15 +46,22 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <SheetHeader className="border-b border-sidebar-border pb-4 text-left">
                                     <AppLogo />
                                 </SheetHeader>
-                                <nav className="grid gap-1 p-4">
-                                    {navigation.map((item) => (
-                                        <Link
-                                            key={item.title}
-                                            href={item.href}
-                                            className="rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent"
-                                        >
-                                            {item.title}
-                                        </Link>
+                                <nav className="grid gap-4 p-4">
+                                    {navigation.map((group) => (
+                                        <div key={group.label} className="grid gap-1">
+                                            <p className="px-3 text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">
+                                                {group.label}
+                                            </p>
+                                            {group.items.map((item) => (
+                                                <Link
+                                                    key={`${group.label}-${item.title}`}
+                                                    href={item.href}
+                                                    className="rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent"
+                                                >
+                                                    {item.title}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     ))}
                                 </nav>
                             </SheetContent>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Onboarding;
 
+use App\Enums\BusinessCategory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BusinessProfileRequest;
 use App\Models\Subscription;
@@ -32,6 +33,10 @@ class OnboardingController extends Controller
     {
         return Inertia::render('onboarding/business-profile', [
             'business' => $request->user()->ownedBusiness,
+            'businessCategories' => collect(BusinessCategory::cases())->map(fn (BusinessCategory $category): array => [
+                'value' => $category->value,
+                'label' => $category->label(),
+            ])->values(),
         ]);
     }
 

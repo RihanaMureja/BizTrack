@@ -148,26 +148,36 @@
     }
 }
 
-@keyframes landing-hero-fade {
-    0%,
-    20% {
-        opacity: 1;
-        transform: scale(1);
-    }
+.landing-page-background-slide {
+    filter: blur(1px) saturate(1.18) contrast(1.08);
+    transition:
+        opacity 900ms ease,
+        transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+}
 
-    25%,
-    95% {
+.landing-caption-swipe {
+    animation: landing-caption-swipe 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes landing-caption-swipe {
+    from {
         opacity: 0;
-        transform: scale(1.035);
+        transform: translateX(1.25rem);
     }
 
-    100% {
+    to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateX(0);
     }
 }
 
-.landing-hero-image {
-    animation: landing-hero-fade 20s infinite;
-    opacity: 0;
+@media (prefers-reduced-motion: reduce) {
+    .landing-page-background-slide {
+        transition: none;
+    }
+
+    .landing-caption-swipe {
+        animation: none;
+    }
 }

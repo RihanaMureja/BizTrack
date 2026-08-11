@@ -19,6 +19,7 @@ export type BusinessFormBusiness = {
     subscription_id?: number | null;
     business_name?: string;
     business_type?: string | null;
+    business_category?: string | null;
     email?: string | null;
     phone?: string | null;
     address?: string | null;
@@ -45,13 +46,29 @@ export type BusinessFormSubscription = {
 type Props = {
     business: BusinessFormBusiness | null;
     subscriptions: BusinessFormSubscription[];
+    businessCategories?: Array<{ value: string; label: string }>;
     action?: string;
 };
 
-export function BusinessForm({ business, subscriptions, action = '/settings/business' }: Props) {
+const fallbackCategories = [
+    { value: 'retail_shop', label: 'Retail shop' },
+    { value: 'supermarket', label: 'Supermarket' },
+    { value: 'pharmacy', label: 'Pharmacy' },
+    { value: 'boutique', label: 'Boutique' },
+    { value: 'restaurant', label: 'Restaurant' },
+    { value: 'electronics', label: 'Electronics' },
+    { value: 'cosmetics', label: 'Cosmetics' },
+    { value: 'wholesale', label: 'Wholesale' },
+    { value: 'service_business', label: 'Service business' },
+    { value: 'online_store', label: 'Online store' },
+    { value: 'other', label: 'Other' },
+];
+
+export function BusinessForm({ business, subscriptions, businessCategories = fallbackCategories, action = '/settings/business' }: Props) {
     const form = useForm({
         business_name: business?.business_name ?? '',
         business_type: business?.business_type ?? '',
+        business_category: business?.business_category ?? 'retail_shop',
         subscription_id: business?.subscription_id ? String(business.subscription_id) : '',
         email: business?.email ?? '',
         phone: business?.phone ?? '',
@@ -98,6 +115,28 @@ export function BusinessForm({ business, subscriptions, action = '/settings/busi
                     <InputError message={form.errors.business_type} />
                 </div>
 
+                <div className="grid gap-2">
+                    <Label htmlFor="business_category">Business category</Label>
+                    <Select
+                        value={form.data.business_category}
+                        onValueChange={(value) => form.setData('business_category', value)}
+                    >
+                        <SelectTrigger id="business_category" className="w-full">
+                            <SelectValue placeholder="Choose category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {businessCategories.map((category) => (
+                                <SelectItem key={category.value} value={category.value}>
+                                    {category.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <InputError message={form.errors.business_category} />
+                </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
                     <Label htmlFor="phone">Phone</Label>
                     <Input
