@@ -42,6 +42,7 @@ class BusinessService
         return DB::transaction(function () use ($owner, $data): Business {
             $existingBusiness = $owner->ownedBusiness;
             $payload = collect($data)->except([
+                'subscription_id',
                 'logo',
                 'national_id_photo',
                 'trade_license',

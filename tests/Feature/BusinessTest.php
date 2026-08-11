@@ -236,19 +236,131 @@ test('business email must be unique', function () {
         ->assertSessionHasErrors('email');
 });
 
-test('subscription must be an active plan when selected', function () {
+test('business profile save never changes subscription id', function () {
     $owner = User::factory()->create([
         'role' => Role::Owner,
     ]);
 
+    $currentSubscription = Subscription::factory()->create([
+        'status' => RecordStatus::Active,
+    ]);
+    $newSubscription = Subscription::factory()->create([
+        'status' => RecordStatus::Active,
+    ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'subscription_id' => $currentSubscription->id,
+        'access_mode' => BusinessAccessMode::Active,
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->put(route('settings.business.update'), businessPayload([
+            'business_name' => 'Profile Only Shop',
+            'subscription_id' => $newSubscription->id,
+        ]))
+        ->assertRedirect(route('settings.business.edit', absolute: false));
+
+    expect($business->refresh()->subscription_id)->toBe($currentSubscription->id);
+});
+
+test('settings plan confirmation changes subscription after demo payment step', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+    $currentSubscription = Subscription::factory()->create([
+        'status' => RecordStatus::Active,
+    ]);
+    $newSubscription = Subscription::factory()->create([
+        'status' => RecordStatus::Active,
+    ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'subscription_id' => $currentSubscription->id,
+        'access_mode' => BusinessAccessMode::Active,
+        'status' => RecordStatus::Active,
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->post(route('settings.business.plans.confirm-payment', $newSubscription))
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('businesses', [
+        'id' => $business->id,
+        'subscription_id' => $newSubscription->id,
+        'access_mode' => BusinessAccessMode::Active->value,
+        'status' => RecordStatus::Active->value,
+    ]);
+});
+
+test('inactive plan cannot be confirmed from settings payment step', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
     $inactiveSubscription = Subscription::factory()->create([
         'status' => RecordStatus::Inactive,
     ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'access_mode' => BusinessAccessMode::Active,
+    ]);
+    $originalSubscriptionId = $business->subscription_id;
+    $owner->forceFill(['business_id' => $business->id])->save();
 
     $this->actingAs($owner)
-        ->post(route('settings.business.store'), [
-            'business_name' => 'Inactive Plan Shop',
-            'subscription_id' => $inactiveSubscription->id,
-        ])
-        ->assertSessionHasErrors('subscription_id');
+        ->post(route('settings.business.plans.confirm-payment', $inactiveSubscription))
+        ->assertNotFound();
+
+    expect($business->refresh()->subscription_id)->toBe($originalSubscriptionId);
+});
+
+test('settings business page has plan cards separate from profile form', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+    ]);
+    $subscription = Subscription::factory()->create([
+        'status' => RecordStatus::Active,
+    ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'subscription_id' => $subscription->id,
+        'access_mode' => BusinessAccessMode::Active,
+        'status' => RecordStatus::Active,
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->get(route('settings.business.edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('settings/business')
+            ->has('subscriptions', 1)
+            ->where('business.subscription_id', $subscription->id));
+});
+
+test('inactive paid plan cannot be confirmed during onboarding', function () {
+    $owner = User::factory()->create([
+        'role' => Role::Owner,
+        'phone' => '0911223344',
+    ]);
+    $business = Business::factory()->create([
+        'owner_id' => $owner->id,
+        'access_mode' => BusinessAccessMode::Onboarding,
+    ]);
+    $originalSubscriptionId = $business->subscription_id;
+    $inactiveSubscription = Subscription::factory()->create([
+        'status' => RecordStatus::Inactive,
+    ]);
+    $owner->forceFill(['business_id' => $business->id])->save();
+
+    $this->actingAs($owner)
+        ->post(route('onboarding.plans.activate', $inactiveSubscription))
+        ->assertNotFound();
+
+    $this->assertDatabaseHas('businesses', [
+        'id' => $business->id,
+        'subscription_id' => $originalSubscriptionId,
+        'access_mode' => BusinessAccessMode::Onboarding->value,
+    ]);
 });

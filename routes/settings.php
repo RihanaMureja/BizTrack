@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Settings\AppearanceController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -27,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('settings/business', [BusinessController::class, 'settings'])->name('settings.business.edit');
         Route::post('settings/business', [BusinessController::class, 'store'])->name('settings.business.store');
         Route::put('settings/business', [BusinessController::class, 'update'])->name('settings.business.update');
+        Route::post('settings/business/plans/{subscription}/confirm-payment', [SubscriptionController::class, 'confirmChange'])->name('settings.business.plans.confirm-payment');
     });
 
     Route::get('settings/security', [SecurityController::class, 'edit'])

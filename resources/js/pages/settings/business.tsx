@@ -1,11 +1,15 @@
 import { BusinessForm } from '@/components/forms/business-form';
 import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
 import Heading from '@/components/heading';
-import { Head } from '@inertiajs/react';
-import { Building2, Eye } from 'lucide-react';
+import { DemoPlanPaymentModal, type DemoPaymentPlan } from '@/components/subscriptions/demo-plan-payment-modal';
+import { PlanSelectionCard } from '@/components/subscriptions/plan-selection-card';
+import { Head, useForm } from '@inertiajs/react';
+import { Building2, CreditCard, Eye } from 'lucide-react';
+import { useState } from 'react';
 
 type Props = {
     business: (BusinessFormBusiness & {
+        subscription_id?: number | null;
         verification_documents?: Array<{ id: number; label: string; status: string; notes: string | null }>;
     }) | null;
     subscriptions: BusinessFormSubscription[];
@@ -13,6 +17,20 @@ type Props = {
 };
 
 export default function BusinessSettings({ business, subscriptions, businessCategories }: Props) {
+    const [selectedPlan, setSelectedPlan] = useState<DemoPaymentPlan | null>(null);
+    const planForm = useForm({});
+
+    const confirmPlanChange = () => {
+        if (!selectedPlan) {
+            return;
+        }
+
+        planForm.post(`/settings/business/plans/${selectedPlan.id}/confirm-payment`, {
+            preserveScroll: true,
+            onSuccess: () => setSelectedPlan(null),
+        });
+    };
+
     return (
         <>
             <Head title="Business settings" />
@@ -25,7 +43,33 @@ export default function BusinessSettings({ business, subscriptions, businessCate
                 />
 
                 <section className="rounded-md border bg-card p-5 shadow-sm">
-                    <BusinessForm business={business} subscriptions={subscriptions} businessCategories={businessCategories} action="/settings/business" />
+                    <BusinessForm business={business} businessCategories={businessCategories} action="/settings/business" />
+                </section>
+
+                <section className="rounded-md border bg-card p-5 shadow-sm">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <CreditCard className="size-5 text-primary" />
+                                <h2 className="font-semibold">Plan and billing</h2>
+                            </div>
+                            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                                Change plans through a visible demo payment confirmation. This keeps billing separate from business profile edits and ready for a real gateway later.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 grid gap-4 xl:grid-cols-3">
+                        {subscriptions.map((subscription) => (
+                            <PlanSelectionCard
+                                key={subscription.id}
+                                plan={subscription}
+                                current={business?.subscription_id === subscription.id}
+                                actionLabel="Change plan"
+                                onSelect={setSelectedPlan}
+                            />
+                        ))}
+                    </div>
                 </section>
 
                 <section className="rounded-md border bg-card p-5 shadow-sm">
@@ -62,6 +106,15 @@ export default function BusinessSettings({ business, subscriptions, businessCate
                     )}
                 </section>
             </div>
+
+            <DemoPlanPaymentModal
+                open={Boolean(selectedPlan)}
+                plan={selectedPlan}
+                context="change-plan"
+                processing={planForm.processing}
+                onOpenChange={(open) => !open && setSelectedPlan(null)}
+                onConfirm={confirmPlanChange}
+            />
         </>
     );
 }

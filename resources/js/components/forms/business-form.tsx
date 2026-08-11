@@ -1,22 +1,37 @@
 import InputError from '@/components/input-error';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
-import { Save } from 'lucide-react';
-import type { FormEvent } from 'react';
+import {
+    Building2,
+    Laptop,
+    Pill,
+    Scissors,
+    Shirt,
+    ShoppingBag,
+    ShoppingBasket,
+    Sparkles,
+    Store,
+    Truck,
+    Utensils,
+    Save,
+} from 'lucide-react';
+import type { ComponentType, FormEvent } from 'react';
+import { useState } from 'react';
 
 export type BusinessFormBusiness = {
     id?: number;
-    subscription_id?: number | null;
     business_name?: string;
     business_type?: string | null;
     business_category?: string | null;
@@ -45,7 +60,6 @@ export type BusinessFormSubscription = {
 
 type Props = {
     business: BusinessFormBusiness | null;
-    subscriptions: BusinessFormSubscription[];
     businessCategories?: Array<{ value: string; label: string }>;
     action?: string;
 };
@@ -64,263 +78,208 @@ const fallbackCategories = [
     { value: 'other', label: 'Other' },
 ];
 
-export function BusinessForm({ business, subscriptions, businessCategories = fallbackCategories, action = '/settings/business' }: Props) {
+const categoryDetails: Record<string, { description: string; icon: ComponentType<{ className?: string }> }> = {
+    retail_shop: { description: 'Daily sales, shelves, and customer walk-ins.', icon: Store },
+    supermarket: { description: 'High-volume items, cashiers, and stock flow.', icon: ShoppingBasket },
+    pharmacy: { description: 'Medicine inventory, expiry tracking, and receipts.', icon: Pill },
+    boutique: { description: 'Fashion items, sizes, styles, and repeat buyers.', icon: Shirt },
+    restaurant: { description: 'Fast sales, daily expenses, and staff access.', icon: Utensils },
+    electronics: { description: 'Catalog items, warranties, and price control.', icon: Laptop },
+    cosmetics: { description: 'Beauty products, bundles, and customer loyalty.', icon: Sparkles },
+    wholesale: { description: 'Bulk stock movement and larger customer accounts.', icon: Truck },
+    service_business: { description: 'Service revenue, expenses, and customer records.', icon: Scissors },
+    online_store: { description: 'Online orders, stock visibility, and payments.', icon: ShoppingBag },
+    other: { description: 'Use a custom category for this business.', icon: Building2 },
+};
+
+export function BusinessForm({ business, businessCategories = fallbackCategories, action = '/settings/business' }: Props) {
     const form = useForm({
         business_name: business?.business_name ?? '',
-        business_type: business?.business_type ?? '',
+        business_type: business?.business_category === 'other' ? (business?.business_type ?? '') : '',
         business_category: business?.business_category ?? 'retail_shop',
-        subscription_id: business?.subscription_id ? String(business.subscription_id) : '',
-        email: business?.email ?? '',
-        phone: business?.phone ?? '',
-        address: business?.address ?? '',
-        national_id_fan_number: business?.national_id_fan_number ?? '',
-        national_id_photo: null as File | null,
-        trade_license: null as File | null,
-        tin_certificate: null as File | null,
-        is_vat_registered: business?.is_vat_registered ?? false,
-        vat_certificate: null as File | null,
-        has_physical_shop: business?.has_physical_shop ?? false,
-        rental_agreement: null as File | null,
         logo: null as File | null,
         _method: business?.id ? 'put' : 'post',
     });
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [customCategory, setCustomCategory] = useState(form.data.business_type);
+    const [customCategoryError, setCustomCategoryError] = useState('');
+
+    const selectCategory = (value: string) => {
+        if (value === 'other') {
+            setCustomCategory(form.data.business_type);
+            setCustomCategoryError('');
+            setDialogOpen(true);
+            return;
+        }
+
+        form.setData((data) => ({
+            ...data,
+            business_category: value,
+            business_type: '',
+        }));
+        form.clearErrors('business_category', 'business_type');
+    };
+
+    const confirmCustomCategory = () => {
+        const value = customCategory.trim();
+
+        if (!value) {
+            setCustomCategoryError('Please enter your business category.');
+            return;
+        }
+
+        form.setData((data) => ({
+            ...data,
+            business_category: 'other',
+            business_type: value,
+        }));
+        form.clearErrors('business_category', 'business_type');
+        setDialogOpen(false);
+    };
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
+
+        if (!form.data.business_name.trim()) {
+            form.setError('business_name', 'Please enter your business name.');
+            return;
+        }
+
+        if (form.data.business_category === 'other' && !form.data.business_type.trim()) {
+            setDialogOpen(true);
+            form.setError('business_type', 'Please enter your business category.');
+            return;
+        }
+
         form.post(action, { forceFormData: true });
     };
 
     return (
-        <form onSubmit={submit} className="grid gap-5">
-            <div className="grid gap-2">
-                <Label htmlFor="business_name">Business name</Label>
-                <Input
-                    id="business_name"
-                    value={form.data.business_name}
-                    onChange={(event) => form.setData('business_name', event.target.value)}
-                    required
-                />
-                <InputError message={form.errors.business_name} />
-            </div>
+        <>
+            <form onSubmit={submit} noValidate className="grid gap-7">
+                <div>
+                    <h2 className="font-semibold">Business profile</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Keep the profile simple. More operational settings live in their own sections.
+                    </p>
+                </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
-                    <Label htmlFor="business_type">Business type</Label>
+                    <Label htmlFor="business_name">Business name</Label>
                     <Input
-                        id="business_type"
-                        value={form.data.business_type}
-                        onChange={(event) => form.setData('business_type', event.target.value)}
-                        placeholder="Retail, service, cafe..."
+                        id="business_name"
+                        value={form.data.business_name}
+                        onChange={(event) => form.setData('business_name', event.target.value)}
+                        required
                     />
-                    <InputError message={form.errors.business_type} />
+                    <InputError message={form.errors.business_name} />
                 </div>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="business_category">Business category</Label>
-                    <Select
-                        value={form.data.business_category}
-                        onValueChange={(value) => form.setData('business_category', value)}
-                    >
-                        <SelectTrigger id="business_category" className="w-full">
-                            <SelectValue placeholder="Choose category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {businessCategories.map((category) => (
-                                <SelectItem key={category.value} value={category.value}>
-                                    {category.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <InputError message={form.errors.business_category} />
-                </div>
-            </div>
+                <div>
+                    <Label>Business category</Label>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        {businessCategories.map(({ value, label }) => {
+                            const details = categoryDetails[value] ?? categoryDetails.other;
+                            const Icon = details.icon;
+                            const selected = form.data.business_category === value;
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="grid gap-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                        id="phone"
-                        value={form.data.phone}
-                        onChange={(event) => form.setData('phone', event.target.value)}
-                    />
-                    <InputError message={form.errors.phone} />
-                </div>
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="subscription_id">Subscription plan</Label>
-                <Select
-                    value={form.data.subscription_id}
-                    onValueChange={(value) => form.setData('subscription_id', value)}
-                >
-                    <SelectTrigger id="subscription_id" className="w-full">
-                        <SelectValue placeholder="Choose a plan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {subscriptions.map((subscription) => (
-                            <SelectItem key={subscription.id} value={String(subscription.id)}>
-                                {subscription.name} - {Number(subscription.price).toLocaleString()} ETB / month
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <InputError message={form.errors.subscription_id} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="email">Business email</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    value={form.data.email}
-                    onChange={(event) => form.setData('email', event.target.value)}
-                />
-                <InputError message={form.errors.email} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                    id="address"
-                    value={form.data.address}
-                    onChange={(event) => form.setData('address', event.target.value)}
-                />
-                <InputError message={form.errors.address} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="logo">Logo</Label>
-                <Input
-                    id="logo"
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => form.setData('logo', event.target.files?.[0] ?? null)}
-                />
-                <InputError message={form.errors.logo} />
-            </div>
-
-            <div className="rounded-md border bg-background p-4">
-                <h2 className="font-semibold">Owner verification</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    These documents are optional records you can keep with your profile. They do not block access.
-                </p>
-
-                <div className="mt-4 grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="national_id_fan_number">National ID FAN number</Label>
-                        <Input
-                            id="national_id_fan_number"
-                            value={form.data.national_id_fan_number}
-                            onChange={(event) => form.setData('national_id_fan_number', event.target.value)}
-                        />
-                        <InputError message={form.errors.national_id_fan_number} />
+                            return (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    aria-pressed={selected}
+                                    onClick={() => selectCategory(value)}
+                                    className={cn(
+                                        'group flex min-h-28 flex-col items-start gap-3 rounded-lg border p-4 text-left transition focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
+                                        selected
+                                            ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                                            : 'border-border bg-background hover:border-primary/40 hover:bg-accent',
+                                    )}
+                                >
+                                    <div
+                                        className={cn(
+                                            'flex size-10 items-center justify-center rounded-md transition',
+                                            selected
+                                                ? 'bg-primary text-primary-foreground'
+                                                : 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary',
+                                        )}
+                                    >
+                                        <Icon className="size-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-semibold">{label}</div>
+                                        <p className="mt-1 text-xs leading-5 text-muted-foreground">{details.description}</p>
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    <DocumentInput
-                        id="national_id_photo"
-                        label="National ID photo"
-                        existing={business?.national_id_photo_path}
-                        error={form.errors.national_id_photo}
-                        onChange={(file) => form.setData('national_id_photo', file)}
-                    />
-
-                    <DocumentInput
-                        id="trade_license"
-                        label="Business license / trade license"
-                        existing={business?.trade_license_path}
-                        error={form.errors.trade_license}
-                        onChange={(file) => form.setData('trade_license', file)}
-                    />
-
-                    <DocumentInput
-                        id="tin_certificate"
-                        label="Tax certificate / TIN"
-                        existing={business?.tin_certificate_path}
-                        error={form.errors.tin_certificate}
-                        onChange={(file) => form.setData('tin_certificate', file)}
-                    />
-                </div>
-            </div>
-
-            <div className="rounded-md border bg-background p-4">
-                <h2 className="font-semibold">Conditional documents</h2>
-                <div className="mt-4 grid gap-4">
-                    <label className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
-                        <span>VAT registered business</span>
-                        <input
-                            type="checkbox"
-                            checked={form.data.is_vat_registered}
-                            onChange={(event) => form.setData('is_vat_registered', event.target.checked)}
-                            className="size-4 accent-primary"
-                        />
-                    </label>
-                    {form.data.is_vat_registered && (
-                        <DocumentInput
-                            id="vat_certificate"
-                            label="VAT certificate"
-                            existing={business?.vat_certificate_path}
-                            error={form.errors.vat_certificate}
-                            onChange={(file) => form.setData('vat_certificate', file)}
-                        />
+                    {form.data.business_category === 'other' && form.data.business_type && (
+                        <p className="mt-3 text-sm text-muted-foreground">
+                            Custom category: <span className="font-semibold text-foreground">{form.data.business_type}</span>
+                        </p>
                     )}
-
-                    <label className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
-                        <span>Business has a physical shop</span>
-                        <input
-                            type="checkbox"
-                            checked={form.data.has_physical_shop}
-                            onChange={(event) => form.setData('has_physical_shop', event.target.checked)}
-                            className="size-4 accent-primary"
-                        />
-                    </label>
-                    {form.data.has_physical_shop && (
-                        <DocumentInput
-                            id="rental_agreement"
-                            label="Rental agreement / shop ownership proof"
-                            existing={business?.rental_agreement_path}
-                            error={form.errors.rental_agreement}
-                            onChange={(file) => form.setData('rental_agreement', file)}
-                        />
-                    )}
+                    <InputError message={form.errors.business_category ?? form.errors.business_type} className="mt-2" />
                 </div>
-            </div>
 
-            <Button type="submit" className="w-fit" disabled={form.processing}>
-                {form.processing ? <Spinner /> : <Save className="size-4" />}
-                Save business
-            </Button>
-        </form>
-    );
-}
+                <div className="grid gap-2">
+                    <Label htmlFor="logo">Business logo optional</Label>
+                    <Input
+                        id="logo"
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => form.setData('logo', event.target.files?.[0] ?? null)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                        Upload a logo to refresh the sidebar identity and business color palette.
+                    </p>
+                    <InputError message={form.errors.logo} />
+                </div>
 
-function DocumentInput({
-    id,
-    label,
-    existing,
-    required,
-    error,
-    onChange,
-}: {
-    id: string;
-    label: string;
-    existing?: string | null;
-    required?: boolean;
-    error?: string;
-    onChange: (file: File | null) => void;
-}) {
-    return (
-        <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
-            {existing && <p className="text-xs text-muted-foreground">Uploaded document on file. Upload a new file only if you need to replace it.</p>}
-            <Input
-                id={id}
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                required={required}
-                onChange={(event) => onChange(event.target.files?.[0] ?? null)}
-            />
-            <InputError message={error} />
-        </div>
+                <Button type="submit" className="w-fit" disabled={form.processing}>
+                    {form.processing ? <Spinner /> : <Save className="size-4" />}
+                    Save business
+                </Button>
+            </form>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Enter your business category</DialogTitle>
+                        <DialogDescription>
+                            Add your own category if the listed options do not describe this business.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="custom_business_category">Business category</Label>
+                        <Input
+                            id="custom_business_category"
+                            value={customCategory}
+                            onChange={(event) => {
+                                setCustomCategory(event.target.value);
+                                setCustomCategoryError('');
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    confirmCustomCategory();
+                                }
+                            }}
+                            placeholder="e.g. Bakery, furniture shop, auto parts..."
+                            autoFocus
+                        />
+                        {customCategoryError && <InputError message={customCategoryError} />}
+                    </div>
+
+                    <DialogFooter>
+                        <Button type="button" onClick={confirmCustomCategory} className="w-full sm:w-auto">
+                            Use this category
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }

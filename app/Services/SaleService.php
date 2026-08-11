@@ -107,6 +107,8 @@ class SaleService
                 'user_id' => $user->id,
                 'invoice_number' => $this->nextInvoiceNumber($business),
                 'is_credit_sale' => $isCreditSale,
+                'cash_amount' => $split['cash'],
+                'credit_amount' => $split['credit'],
                 'subtotal' => $subtotal,
                 'tax_amount' => $tax,
                 'discount_amount' => $discount,

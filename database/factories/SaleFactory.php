@@ -22,6 +22,8 @@ class SaleFactory extends Factory
             'user_id' => User::factory(),
             'invoice_number' => 'INV-TEST-'.fake()->unique()->numerify('####'),
             'is_credit_sale' => false,
+            'cash_amount' => 0,
+            'credit_amount' => 0,
             'subtotal' => 100,
             'tax_amount' => 0,
             'discount_amount' => 0,
