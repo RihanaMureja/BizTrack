@@ -9,6 +9,7 @@ enum BusinessPermissionKey: string
     case ManageCategories = 'manage_categories';
     case ManageInventory = 'manage_inventory';
     case ManageCustomers = 'manage_customers';
+    case ManageCredit = 'manage_credit';
     case CreateSales = 'create_sales';
     case ViewSales = 'view_sales';
     case ManagePayments = 'manage_payments';
@@ -29,6 +30,7 @@ enum BusinessPermissionKey: string
             self::ManageProducts, self::ManageCategories => 'Catalog',
             self::ManageInventory => 'Inventory',
             self::ManageCustomers => 'Customers',
+            self::ManageCredit => 'Credit',
             self::CreateSales, self::ViewSales => 'Sales',
             self::ManagePayments => 'Payments',
             self::ManageExpenses => 'Expenses',

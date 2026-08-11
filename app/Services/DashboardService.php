@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\BusinessPermissionKey;
 use App\Enums\Role;
+use App\Enums\SaleStatus;
 use App\Helpers\BusinessDashboardConfig;
 use App\Models\Business;
 use App\Models\Customer;
@@ -44,7 +45,8 @@ class DashboardService
         $business = $user->ownedBusiness ?? $user->business;
         $config = BusinessDashboardConfig::for($business?->business_type);
 
-        $stats = $this->ownerStats($business);
+        $topSellingProduct = $this->topSellingProduct($business);
+        $stats = $this->ownerStats($business, $topSellingProduct);
         $orderedStats = array_values(
             array_map(
                 fn (array $spec): array => $stats[$spec['key']],
@@ -65,6 +67,7 @@ class DashboardService
             'stagnantProducts' => $this->productInsightService->previewForBusiness($business),
             'expiringProducts' => $this->expiringProducts($business),
             'stockValue' => $this->stockValue($business),
+            'topSellingProduct' => $topSellingProduct,
             'topProducts' => $this->topProducts($business),
             'subscription' => $this->recommendationService->recommendationFor($business),
             'nextSteps' => [
@@ -137,12 +140,13 @@ class DashboardService
      *
      * @return array<string, array{key: string, label: string, value: string, trend: string}>
      */
-    private function ownerStats(?Business $business): array
+    private function ownerStats(?Business $business, ?array $topSellingProduct = null): array
     {
         return [
             'revenue_today' => ['key' => 'revenue_today', 'label' => 'Revenue today', 'value' => $this->money($this->revenueService->todayRevenue($business)), 'trend' => 'Completed sales'],
             'sales_today' => ['key' => 'sales_today', 'label' => 'Sales today', 'value' => (string) $this->todaySalesCount($business), 'trend' => 'POS activity'],
-            'expenses_today' => ['key' => 'expenses_today', 'label' => 'Expenses today', 'value' => $this->money($this->revenueService->todayExpenses($business)), 'trend' => 'Recorded costs'],
+            'expenses_today' => ['key' => 'expenses_today', 'label' => "Today's expense", 'value' => $this->money($this->revenueService->todayExpenses($business)), 'trend' => 'Recorded costs'],
+            'top_selling_product' => ['key' => 'top_selling_product', 'label' => 'Top selling product', 'value' => $topSellingProduct ? $topSellingProduct['name'] : 'No sales yet', 'trend' => $topSellingProduct ? "{$topSellingProduct['units_sold']} units sold" : 'No completed sales'],
             'products' => ['key' => 'products', 'label' => 'Products', 'value' => (string) $this->businessCount(Product::class, $business), 'trend' => 'Active catalog items'],
             'low_stock' => ['key' => 'low_stock', 'label' => 'Low stock', 'value' => (string) count($this->lowStock($business)), 'trend' => 'Items to reorder'],
             'expiring_soon' => ['key' => 'expiring_soon', 'label' => 'Expiring soon', 'value' => (string) count($this->expiringProducts($business)), 'trend' => 'Within 30 days'],
@@ -266,6 +270,41 @@ class DashboardService
             ->all();
 
         return ['total' => round($total, 2), 'items' => $items];
+    }
+
+    /**
+     * Best-selling product by total quantity sold across completed sales.
+     *
+     * @return array{name: string, category: string, units_sold: int, unit_price: float, revenue: float}|null
+     */
+    private function topSellingProduct(?Business $business): ?array
+    {
+        if (! $business || ! Schema::hasTable('sale_items')) {
+            return null;
+        }
+
+        $row = SaleItem::query()
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->where('sales.business_id', $business->id)
+            ->where('sales.status', SaleStatus::Completed)
+            ->select('sale_items.product_id', DB::raw('SUM(sale_items.quantity) as units_sold'), DB::raw('SUM(sale_items.line_total) as revenue'))
+            ->groupBy('sale_items.product_id')
+            ->orderByDesc('units_sold')
+            ->orderByDesc('revenue')
+            ->with('product.category')
+            ->first();
+
+        if (! $row?->product_id) {
+            return null;
+        }
+
+        return [
+            'name' => $row->product?->name ?? 'Unknown product',
+            'category' => $row->product?->category?->name ?? 'Uncategorized',
+            'units_sold' => (int) $row->units_sold,
+            'unit_price' => (float) ($row->product?->selling_price ?? 0.0),
+            'revenue' => round((float) $row->revenue, 2),
+        ];
     }
 
     /**

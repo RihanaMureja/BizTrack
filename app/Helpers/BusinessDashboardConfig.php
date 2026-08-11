@@ -15,9 +15,13 @@ namespace App\Helpers;
 class BusinessDashboardConfig
 {
     public const GROUP_PERISHABLE = 'perishable';
+
     public const GROUP_CATALOG = 'catalog';
+
     public const GROUP_VALUE = 'value';
+
     public const GROUP_SALES = 'sales';
+
     public const GROUP_GENERAL = 'general';
 
     /**
@@ -63,23 +67,28 @@ class BusinessDashboardConfig
     ];
 
     private const STAT_REVENUE = ['key' => 'revenue_today', 'label' => 'Revenue today', 'trend' => 'Completed sales'];
+
     private const STAT_SALES = ['key' => 'sales_today', 'label' => 'Sales today', 'trend' => 'POS activity'];
-    private const STAT_EXPENSES = ['key' => 'expenses_today', 'label' => 'Expenses today', 'trend' => 'Recorded costs'];
+
+    private const STAT_EXPENSES = ['key' => 'expenses_today', 'label' => "Today's expense", 'trend' => 'Recorded costs'];
+
+    private const STAT_TOP_SELLING_PRODUCT = ['key' => 'top_selling_product', 'label' => 'Top selling product', 'trend' => 'Best seller by units sold'];
+
     private const STAT_PRODUCTS = ['key' => 'products', 'label' => 'Products', 'trend' => 'Active catalog items'];
-    private const STAT_LOW_STOCK = ['key' => 'low_stock', 'label' => 'Low stock', 'trend' => 'Items to reorder'];
+
     private const STAT_EXPIRING = ['key' => 'expiring_soon', 'label' => 'Expiring soon', 'trend' => 'Within 30 days'];
-    private const STAT_STOCK_VALUE = ['key' => 'stock_value', 'label' => 'Stock value', 'trend' => 'Cost on hand'];
+
     private const STAT_STAGNANT = ['key' => 'stagnant_count', 'label' => 'Stagnant', 'trend' => 'Need attention'];
 
     /**
      * @var array<string, list<array{key: string, label: string, trend: string}>>
      */
     private const STATS = [
-        self::GROUP_PERISHABLE => [self::STAT_REVENUE, self::STAT_LOW_STOCK, self::STAT_EXPIRING, self::STAT_SALES],
-        self::GROUP_CATALOG => [self::STAT_PRODUCTS, self::STAT_SALES, self::STAT_REVENUE, self::STAT_STAGNANT],
-        self::GROUP_VALUE => [self::STAT_REVENUE, self::STAT_STOCK_VALUE, self::STAT_SALES, self::STAT_PRODUCTS],
-        self::GROUP_SALES => [self::STAT_REVENUE, self::STAT_SALES, self::STAT_EXPENSES, self::STAT_PRODUCTS],
-        self::GROUP_GENERAL => [self::STAT_REVENUE, self::STAT_SALES, self::STAT_EXPENSES, self::STAT_PRODUCTS],
+        self::GROUP_PERISHABLE => [self::STAT_REVENUE, self::STAT_EXPENSES, self::STAT_EXPIRING, self::STAT_SALES],
+        self::GROUP_CATALOG => [self::STAT_TOP_SELLING_PRODUCT, self::STAT_SALES, self::STAT_REVENUE, self::STAT_STAGNANT],
+        self::GROUP_VALUE => [self::STAT_REVENUE, self::STAT_EXPENSES, self::STAT_SALES, self::STAT_PRODUCTS],
+        self::GROUP_SALES => [self::STAT_REVENUE, self::STAT_SALES, self::STAT_EXPENSES, self::STAT_TOP_SELLING_PRODUCT],
+        self::GROUP_GENERAL => [self::STAT_REVENUE, self::STAT_SALES, self::STAT_EXPENSES, self::STAT_TOP_SELLING_PRODUCT],
     ];
 
     /**
@@ -88,7 +97,7 @@ class BusinessDashboardConfig
     private const SECTIONS = [
         self::GROUP_PERISHABLE => ['lowStock', 'expiring', 'chart', 'topProducts', 'setup'],
         self::GROUP_CATALOG => ['topProducts', 'chart', 'stagnant', 'lowStock', 'setup'],
-        self::GROUP_VALUE => ['stockValue', 'chart', 'lowStock', 'stagnant', 'setup'],
+        self::GROUP_VALUE => ['topSellingProduct', 'chart', 'lowStock', 'stagnant', 'setup'],
         self::GROUP_SALES => ['chart', 'lowStock', 'stagnant', 'setup'],
         self::GROUP_GENERAL => ['chart', 'lowStock', 'stagnant', 'setup'],
     ];

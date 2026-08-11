@@ -1,12 +1,13 @@
+import { Head, router } from '@inertiajs/react';
+import { CheckCircle2, Lightbulb, XCircle } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, router } from '@inertiajs/react';
-import { CheckCircle2, Lightbulb, XCircle } from 'lucide-react';
 
 type Insight = {
     id: number;
@@ -76,18 +77,12 @@ export default function ProductInsights({ insights, statuses, preferences, filte
         <>
             <Head title="Product Insights" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <Lightbulb className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">Product insights</h1>
-                            <p className="text-sm text-muted-foreground">Find products that are sitting in stock without recent sales movement.</p>
-                        </div>
-                    </div>
-                    <Badge variant={preferences.enabled ? 'default' : 'secondary'}>{preferences.threshold_days} day threshold</Badge>
-                </div>
+                <PageHeader
+                    icon={Lightbulb}
+                    title="Product insights"
+                    description="Find products that are sitting in stock without recent sales movement."
+                    actions={<Badge variant={preferences.enabled ? 'default' : 'secondary'}>{preferences.threshold_days} day threshold</Badge>}
+                />
 
                 <section className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-3">
                     <div>

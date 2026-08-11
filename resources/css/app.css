@@ -157,6 +157,11 @@
         @apply bg-background text-foreground antialiased;
     }
 
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 5.5rem;
+    }
+
     .dark body {
         background:
             radial-gradient(
@@ -194,4 +199,16 @@
 .landing-hero-image {
     animation: landing-hero-fade 20s infinite;
     opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

@@ -1,17 +1,16 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, Boxes, ChartColumn, Pencil, Plus, Power, ScanBarcode } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { AlertTriangle, Boxes, PackageSearch, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
-import { DataTable } from '@/components/data-table/data-table';
-import type { DataTableColumn } from '@/components/data-table/data-table';
+import { EmptyState } from '@/components/empty-state/empty-state';
 import { ProductForm } from '@/components/forms/product-form';
 import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { ProductCard } from '@/components/product-card/product-card';
+import type { ProductCardProduct } from '@/components/product-card/product-card';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -20,16 +19,9 @@ type Category = {
     name: string;
 };
 
-type Product = {
-    id: number;
+type Product = ProductCardProduct & {
     category_id: number | null;
-    name: string;
-    barcode: string | null;
     description: string | null;
-    buy_price: string;
-    selling_price: string;
-    reorder_level: number;
-    status: string;
     category: Category | null;
     inventory: {
         quantity: number;
@@ -92,73 +84,7 @@ export default function ProductsIndex({ products, categories, filters, statuses 
         });
     };
 
-    const columns: DataTableColumn<Product>[] = [
-        {
-            key: 'name',
-            header: 'Product',
-            render: (product) => (
-                <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">{product.category?.name ?? 'Uncategorized'}</p>
-                </div>
-            ),
-        },
-        {
-            key: 'barcode',
-            header: 'Barcode',
-            render: (product) => (
-                <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <ScanBarcode className="size-4" />
-                    {product.barcode || 'No barcode'}
-                </span>
-            ),
-        },
-        {
-            key: 'prices',
-            header: 'Prices',
-            render: (product) => (
-                <div className="text-sm">
-                    <p>{product.selling_price} ETB</p>
-                    <p className="text-xs text-muted-foreground">Buy {product.buy_price} ETB</p>
-                </div>
-            ),
-        },
-        {
-            key: 'stock',
-            header: 'Stock',
-            render: (product) => (
-                <div className="text-sm">
-                    <p>{product.inventory?.available_stock ?? 0} units</p>
-                    <p className="text-xs text-muted-foreground">Reorder at {product.reorder_level}</p>
-                </div>
-            ),
-        },
-        {
-            key: 'status',
-            header: 'Status',
-            render: (product) => <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>{product.status}</Badge>,
-        },
-        {
-            key: 'actions',
-            header: '',
-            className: 'text-right',
-            render: (product) => (
-                <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" size="icon" asChild aria-label={`View insights for ${product.name}`}>
-                        <Link href={`/products/${product.id}/insights`}>
-                            <ChartColumn className="size-4" />
-                        </Link>
-                    </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => setEditingProduct(product)} aria-label={`Edit ${product.name}`}>
-                        <Pencil className="size-4" />
-                    </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => setDeactivatingProduct(product)} aria-label={`Deactivate ${product.name}`}>
-                        <Power className="size-4" />
-                    </Button>
-                </div>
-            ),
-        },
-    ];
+    const hasActiveFilters = Boolean(filters.search || filters.category_id || filters.status);
 
     return (
         <>
@@ -168,12 +94,14 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                     title="Products"
                     description="Manage catalog items, barcodes, pricing, and reorder settings."
                     icon={Boxes}
-                    actions={products && (
-                        <Button type="button" onClick={() => setCreateOpen(true)}>
-                            <Plus className="size-4" />
-                            New product
-                        </Button>
-                    )}
+                    actions={
+                        products && (
+                            <Button type="button" onClick={() => setCreateOpen(true)}>
+                                <Plus className="size-4" />
+                                Add product
+                            </Button>
+                        )
+                    }
                 />
 
                 {!products ? (
@@ -214,18 +142,34 @@ export default function ProductsIndex({ products, categories, filters, statuses 
                             </select>
                         </div>
 
-                        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                            {products.data.slice(0, 4).map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
-                        </div>
-
-                        <DataTable
-                            columns={columns}
-                            data={products.data}
-                            rowKey={(product) => product.id}
-                            emptyMessage="No products yet. Add the first product to start building your catalog."
-                        />
+                        {products.data.length === 0 ? (
+                            hasActiveFilters ? (
+                                <EmptyState
+                                    icon={PackageSearch}
+                                    title="No products match your filters"
+                                    description="Try adjusting the search terms or filters to see more products."
+                                    action={<Button type="button" variant="outline" onClick={() => updateFilters({ search: undefined, category_id: undefined, status: undefined })}>Clear filters</Button>}
+                                />
+                            ) : (
+                                <EmptyState
+                                    icon={PackageSearch}
+                                    title="No products yet"
+                                    description="Add the first product to start building your catalog. Products appear here as cards."
+                                    action={<Button type="button" onClick={() => setCreateOpen(true)}><Plus className="size-4" />Add product</Button>}
+                                />
+                            )
+                        ) : (
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                                {products.data.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        onEdit={() => setEditingProduct(product)}
+                                        onDeactivate={() => setDeactivatingProduct(product)}
+                                    />
+                                ))}
+                            </div>
+                        )}
 
                         <Pagination links={products.links} from={products.from} to={products.to} total={products.total} />
                     </div>

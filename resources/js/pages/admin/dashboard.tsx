@@ -1,9 +1,10 @@
-import { DataTable } from '@/components/data-table/data-table';
-import type { DataTableColumn } from '@/components/data-table/data-table';
-import { StatCard } from '@/components/stat-card/stat-card';
-import { Badge } from '@/components/ui/badge';
 import { Head } from '@inertiajs/react';
 import { Activity, Building2, CreditCard, Users, WalletCards } from 'lucide-react';
+import { DataTable } from '@/components/data-table/data-table';
+import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
+import { StatCard } from '@/components/stat-card/stat-card';
+import { Badge } from '@/components/ui/badge';
 
 type Stat = { label: string; value: string; trend: string };
 type Business = { id: number; business_name: string; business_type: string | null; status: string; owner: { email: string } | null; subscription: { name: string } | null };
@@ -27,15 +28,11 @@ export default function AdminDashboard({ stats, recentBusinesses, recentActivity
         <>
             <Head title="Super Admin" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                        <Activity className="size-5" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-semibold">Super Admin</h1>
-                        <p className="text-sm text-muted-foreground">Monitor platform health, businesses, users, plans, and recent system activity.</p>
-                    </div>
-                </div>
+                <PageHeader
+                    icon={Activity}
+                    title="Super Admin"
+                    description="Monitor platform health, businesses, users, plans, and recent system activity."
+                />
 
                 <div className="grid gap-4 md:grid-cols-4">
                     {stats.map((stat, index) => (

@@ -41,7 +41,7 @@ class BusinessService
      * Return the props needed to render the owner's business profile page.
      *
      * @return array{
-     *     business: \App\Models\Business|null,
+     *     business: Business|null,
      *     logoUrl: string|null,
      *     usage: array{users_count: int, products_count: int, max_cashiers: int|null}
      * }
@@ -56,13 +56,27 @@ class BusinessService
 
         return [
             'business' => $business,
-            'logoUrl' => $business?->logo ? route('businesses.logo', $business) : null,
+            'logoUrl' => $business ? $this->logoUrl($business) : null,
             'usage' => [
                 'users_count' => $business?->users()->count() ?? 0,
                 'products_count' => $business?->products()->count() ?? 0,
                 'max_cashiers' => $business?->subscription?->max_cashiers,
             ],
         ];
+    }
+
+    /**
+     * Public URL for a business logo. A version query string derived from the
+     * stored file name is appended so the browser never serves a stale cached
+     * image after the logo is replaced.
+     */
+    public function logoUrl(Business $business): ?string
+    {
+        if (! $business->logo) {
+            return null;
+        }
+
+        return route('businesses.logo', $business).'?v='.urlencode(basename($business->logo));
     }
 
     /**
@@ -98,6 +112,8 @@ class BusinessService
                 }
             }
 
+            $requiresReview = ! $existingBusiness || $existingBusiness->status !== RecordStatus::Active;
+
             /** @var Business $business */
             $business = Business::updateOrCreate(
                 ['owner_id' => $owner->id],
@@ -107,8 +123,8 @@ class BusinessService
                     'email' => $payload['email'] ?? $owner->email,
                     'is_vat_registered' => (bool) ($payload['is_vat_registered'] ?? false),
                     'has_physical_shop' => (bool) ($payload['has_physical_shop'] ?? false),
-                    'status' => RecordStatus::PendingReview,
-                    'submitted_for_review_at' => now(),
+                    'status' => $requiresReview ? RecordStatus::PendingReview : RecordStatus::Active,
+                    'submitted_for_review_at' => $requiresReview ? now() : $existingBusiness?->submitted_for_review_at,
                 ],
             );
 

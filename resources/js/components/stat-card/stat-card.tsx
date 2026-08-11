@@ -1,15 +1,17 @@
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+export type StatTone = 'emerald' | 'blue' | 'amber' | 'rose';
+
 type Props = {
     label: string;
     value: string;
     trend?: string;
     icon: LucideIcon;
-    tone?: 'emerald' | 'blue' | 'amber' | 'rose';
+    tone?: StatTone;
 };
 
-const tones = {
+export const tones = {
     emerald: {
         bg: 'from-emerald-500/10 to-emerald-500/5',
         icon: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',

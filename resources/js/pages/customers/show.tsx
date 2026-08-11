@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Bell, Mail, Phone, ReceiptText, UserRound } from 'lucide-react';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -44,26 +45,12 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
         <>
             <Head title={customer.full_name} />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <UserRound className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">{customer.full_name}</h1>
-                            <p className="text-sm text-muted-foreground">
-                                {typeLabel[customer.customer_type] ?? customer.customer_type}
-                                {customer.company_name ? ` · ${customer.company_name}` : ''} · Customer profile, credit balance, and purchase history.
-                            </p>
-                        </div>
-                    </div>
-                    <Button variant="outline" asChild>
-                        <Link href="/customers">
-                            <ArrowLeft className="size-4" />
-                            Back to customers
-                        </Link>
-                    </Button>
-                </div>
+                <PageHeader
+                    icon={UserRound}
+                    title={customer.full_name}
+                    description={`${typeLabel[customer.customer_type] ?? customer.customer_type}${customer.company_name ? ` · ${customer.company_name}` : ''} · Customer profile, credit balance, and purchase history.`}
+                    actions={<Button variant="outline" asChild><Link href="/customers"><ArrowLeft className="size-4" />Back to customers</Link></Button>}
+                />
 
                 <div className="grid gap-4 lg:grid-cols-3">
                     <Card>

@@ -20,7 +20,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { RevenueOverview } from '@/components/charts/revenue-overview';
-import { StatCard } from '@/components/stat-card/stat-card';
+import { StatCard, tones, type StatTone } from '@/components/stat-card/stat-card';
 import { Button } from '@/components/ui/button';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { businessTypeLabel } from '@/lib/business-types';
@@ -65,6 +65,13 @@ type DashboardData = {
         total: number;
         items: Array<{ name: string; value: number }>;
     };
+    topSellingProduct?: {
+        name: string;
+        category: string;
+        units_sold: number;
+        unit_price: number;
+        revenue: number;
+    } | null;
     topProducts?: Array<{ name: string; quantity: number }>;
     subscription?: SubscriptionRecommendation | null;
     nextSteps?: string[];
@@ -89,6 +96,7 @@ const statIconByKey: Record<string, LucideIcon> = {
     revenue_today: WalletCards,
     sales_today: Receipt,
     expenses_today: TrendingDown,
+    top_selling_product: Trophy,
     products: Package,
     low_stock: AlertTriangle,
     expiring_soon: Clock3,
@@ -101,6 +109,7 @@ const listSectionKeys = new Set([
     'stagnant',
     'expiring',
     'topProducts',
+    'topSellingProduct',
     'stockValue',
     'setup',
 ]);
@@ -186,6 +195,13 @@ function OwnerDashboard({ dashboard: data }: Props) {
                         )}
                         icon={Trophy}
                         tone="blue"
+                    />
+                );
+            case 'topSellingProduct':
+                return (
+                    <TopSellingProductCard
+                        label="Top selling product"
+                        product={data.topSellingProduct ?? null}
                     />
                 );
             case 'stockValue':
@@ -279,23 +295,85 @@ function OwnerDashboard({ dashboard: data }: Props) {
                     )}
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {data.stats.map((stat, index) => (
-                        <StatCard
-                            key={stat.label}
-                            {...stat}
-                            icon={
-                                stat.key
-                                    ? (statIconByKey[stat.key] ?? WalletCards)
-                                    : (statIcons[index] ?? WalletCards)
-                            }
-                            tone={statTones[index] ?? 'emerald'}
-                        />
-                    ))}
+                    {data.stats.map((stat, index) =>
+                        stat.key === 'top_selling_product' ? (
+                            <TopSellingProductCard
+                                key={stat.label}
+                                label={stat.label}
+                                product={data.topSellingProduct ?? null}
+                                tone={statTones[index] ?? 'emerald'}
+                            />
+                        ) : (
+                            <StatCard
+                                key={stat.label}
+                                {...stat}
+                                icon={
+                                    stat.key
+                                        ? (statIconByKey[stat.key] ?? WalletCards)
+                                        : (statIcons[index] ?? WalletCards)
+                                }
+                                tone={statTones[index] ?? 'emerald'}
+                            />
+                        ),
+                    )}
                 </div>
 
                 {sections}
             </DashboardLayout>
         </>
+    );
+}
+
+function TopSellingProductCard({
+    label,
+    product,
+    tone = 'emerald',
+}: {
+    label: string;
+    product: NonNullable<DashboardData['topSellingProduct']> | null;
+    tone?: StatTone;
+}) {
+    const t = tones[tone];
+
+    return (
+        <article
+            className={cn(
+                'group relative overflow-hidden rounded-xl border bg-gradient-to-br from-card to-card p-5 shadow-sm transition-all duration-300',
+                t.hover,
+                'hover:shadow-md hover:-translate-y-0.5',
+            )}
+        >
+            <div className={cn('absolute inset-0 bg-gradient-to-br opacity-50', t.bg)} />
+            <div className="relative flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+                    {product ? (
+                        <p className="mt-2 truncate text-2xl font-bold tracking-tight" title={product.name}>
+                            {product.name}
+                        </p>
+                    ) : (
+                        <p className="mt-2 text-xl font-semibold tracking-tight text-muted-foreground">
+                            No sales yet
+                        </p>
+                    )}
+                </div>
+                <div className={cn('flex size-11 shrink-0 items-center justify-center rounded-lg', t.icon)}>
+                    <Trophy className="size-5" />
+                </div>
+            </div>
+            <div className={cn('mt-4 h-0.5 w-0 rounded-full transition-all duration-300 group-hover:w-full', t.accent)} />
+            {product && (
+                <p className="relative mt-3 text-xs text-muted-foreground/80">
+                    {product.units_sold} unit{product.units_sold === 1 ? '' : 's'} sold ·{' '}
+                    {formatMoney(product.revenue)} revenue
+                </p>
+            )}
+            {product && (
+                <p className="relative mt-1 truncate text-xs text-muted-foreground/60" title={product.category}>
+                    {product.category}
+                </p>
+            )}
+        </article>
     );
 }
 

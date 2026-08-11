@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, History } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -50,23 +51,12 @@ export default function InventoryHistory({ inventory, transactions }: Props) {
         <>
             <Head title={`${inventory.product.name} History`} />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <History className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">{inventory.product.name}</h1>
-                            <p className="text-sm text-muted-foreground">Inventory movement history for this product.</p>
-                        </div>
-                    </div>
-                    <Button variant="outline" asChild>
-                        <Link href="/inventory">
-                            <ArrowLeft className="size-4" />
-                            Back to inventory
-                        </Link>
-                    </Button>
-                </div>
+                <PageHeader
+                    icon={History}
+                    title={inventory.product.name}
+                    description="Inventory movement history for this product."
+                    actions={<Button variant="outline" asChild><Link href="/inventory"><ArrowLeft className="size-4" />Back to inventory</Link></Button>}
+                />
                 <DataTable columns={columns} data={transactions.data} rowKey={(transaction) => transaction.id} emptyMessage="No inventory movements recorded yet." />
                 <Pagination links={transactions.links} from={transactions.from} to={transactions.to} total={transactions.total} />
             </div>

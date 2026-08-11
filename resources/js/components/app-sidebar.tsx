@@ -20,6 +20,7 @@ import {
     WalletCards,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import { BusinessBranding } from '@/components/business-branding';
 import { NavMain } from '@/components/nav-main';
 import {
     Sidebar,
@@ -54,7 +55,9 @@ const icons = {
 };
 
 export function AppSidebar() {
-    const { navigation = [] } = usePage<SharedData>().props;
+    const { auth, navigation = [] } = usePage<SharedData>().props;
+    const isOwner = auth.user?.role === 'owner';
+    const hasBusinessName = Boolean(auth.user?.display_business_name);
     const mainNavGroups = navigation.map((group) => ({
         ...group,
         items: group.items.map((item) => ({
@@ -74,7 +77,11 @@ export function AppSidebar() {
                             asChild
                         >
                             <Link href={dashboard()} prefetch>
-                                <AppLogo />
+                                {isOwner && hasBusinessName ? (
+                                    <BusinessBranding />
+                                ) : (
+                                    <AppLogo />
+                                )}
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

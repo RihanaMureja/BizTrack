@@ -111,9 +111,10 @@ export function BusinessForm({ business }: { business: BusinessFormBusiness | nu
                 <Input
                     id="logo"
                     type="file"
-                    accept="image/*"
+                    accept=".jpg,.jpeg,.png,.webp"
                     onChange={(event) => form.setData('logo', event.target.files?.[0] ?? null)}
                 />
+                <p className="text-xs text-muted-foreground">JPG, JPEG, PNG, or WEBP — max 2 MB.</p>
                 <InputError message={form.errors.logo} />
             </div>
 

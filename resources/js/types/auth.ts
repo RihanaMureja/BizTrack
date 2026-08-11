@@ -1,6 +1,7 @@
 export type User = {
     id: number;
     business_id?: number | null;
+    owned_business?: { id: number } | null;
     first_name?: string | null;
     last_name?: string | null;
     name: string;

@@ -22,8 +22,8 @@ export function DataTable<T extends Record<string, unknown>>({
     emptyMessage = 'No records found.',
 }: Props<T>) {
     return (
-        <div className="overflow-hidden rounded-md border">
-            <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-md border">
+            <table className="w-full min-w-[40rem] text-sm">
                 <thead className="bg-muted/50 text-left text-xs tracking-wide text-muted-foreground uppercase">
                     <tr>
                         {columns.map((column) => (

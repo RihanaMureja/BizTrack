@@ -14,6 +14,7 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerCreditController;
+use App\Http\Controllers\CreditDiscountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
@@ -120,7 +121,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('customers', CustomerController::class)->except(['create', 'edit']);
             Route::post('customer-credits/{customerCredit}/overdue', [CustomerCreditController::class, 'overdue'])->name('customer-credits.overdue');
             Route::post('customer-credits/{customerCredit}/remind', [CustomerCreditController::class, 'remind'])->name('customer-credits.remind');
-        });
+            });
+
+       Route::middleware('business.permission:manage_credit')->group(function () {
+           Route::get('credit-discounts', [CreditDiscountController::class, 'index'])->name('credit-discounts.index');
+           Route::post('credit-discounts/rules', [CreditDiscountController::class, 'store'])->name('credit-discounts.rules.store');
+           Route::put('credit-discounts/rules/{discountRule}', [CreditDiscountController::class, 'update'])->name('credit-discounts.rules.update');
+           Route::delete('credit-discounts/rules/{discountRule}', [CreditDiscountController::class, 'destroy'])->name('credit-discounts.rules.destroy');
+           Route::put('credit-discounts/customers/{customer}/credit-limit', [CreditDiscountController::class, 'updateCreditLimit'])->name('credit-discounts.customers.credit-limit.update');
+});
+        
 
         Route::get('sales/pos', [SaleController::class, 'create'])->middleware('business.permission:create_sales')->name('sales.pos');
         Route::get('sales/checkout', [SaleController::class, 'checkoutPage'])->middleware('business.permission:create_sales')->name('sales.checkout.page');

@@ -60,6 +60,7 @@ class RBACService
                     'label' => 'Operations',
                     'items' => [
                         ['title' => 'Sales', 'href' => '/sales', 'icon' => 'Receipt'],
+                        ['title' => 'Credit', 'href' => '/credit-discounts', 'icon' => 'CreditCard'],
                         ['title' => 'Customers', 'href' => '/customers', 'icon' => 'Users'],
                         ['title' => 'Payments', 'href' => '/payments', 'icon' => 'CreditCard'],
                         ['title' => 'Expenses', 'href' => '/expenses', 'icon' => 'WalletCards'],
@@ -139,12 +140,22 @@ class RBACService
                     'icon' => 'Receipt',
                 ],
             ],
+             
             BusinessPermissionKey::ManageCustomers->value => [
                 'group' => 'Operations',
                 'item' => [
                     'title' => 'Customers',
                     'href' => '/customers',
                     'icon' => 'Users',
+                ],
+            ],
+
+            BusinessPermissionKey::ManageCredit->value => [
+                'group' => 'Operations',
+                'item' => [
+                    'title' => 'Credit',
+                    'href' => '/credit-discounts',
+                    'icon' => 'CreditCard',
                 ],
             ],
             BusinessPermissionKey::ManagePayments->value => [
@@ -205,3 +216,4 @@ class RBACService
         return $navigation;
     }
 }
+

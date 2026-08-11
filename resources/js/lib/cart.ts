@@ -8,10 +8,15 @@ export type CartProduct = {
 
 export type CartItem = CartProduct & { quantity: number };
 
-export const cartStorageKey = 'biztrack.pos-cart';
+export function cartStorageKey(businessId?: number | null): string {
+    return businessId ? `biztrack.pos-cart.${businessId}` : 'biztrack.pos-cart';
+}
 
 export function cartSubtotal(items: CartItem[]): number {
-    return items.reduce((total, item) => total + Number(item.selling_price) * item.quantity, 0);
+    return items.reduce(
+        (total, item) => total + Number(item.selling_price) * item.quantity,
+        0,
+    );
 }
 
 export function clampQuantity(quantity: number, stock: number): number {

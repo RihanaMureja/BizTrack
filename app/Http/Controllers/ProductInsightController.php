@@ -40,10 +40,12 @@ class ProductInsightController extends Controller
     {
         $this->authorize('view', $product);
 
-        $product->load(['category', 'inventory']);
+        $product->load(['category', 'inventory.batches']);
 
         return Inertia::render('products/product-insights', [
             ...$this->productInsightService->forProduct($product),
+            'batches' => $product->inventory?->batches ?? collect(),
+            'inventoryId' => $product->inventory?->id ?? null,
             'backUrl' => route('products.index'),
         ]);
     }

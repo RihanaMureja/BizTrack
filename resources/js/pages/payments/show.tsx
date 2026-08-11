@@ -1,9 +1,10 @@
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, CheckCircle2, CreditCard } from 'lucide-react';
+import type { FormEvent } from 'react';
+import type { ReactNode } from 'react';
+import { PageHeader } from '@/components/page-header/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, CreditCard } from 'lucide-react';
-import { FormEvent } from 'react';
-import type { ReactNode } from 'react';
 
 type Payment = {
     id: number;
@@ -32,23 +33,12 @@ export default function PaymentShow({ payment, verifyStatuses }: { payment: Paym
         <>
             <Head title={payment.payment_number} />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                            <CreditCard className="size-5" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-semibold">{payment.payment_number}</h1>
-                            <p className="text-sm text-muted-foreground">{payment.sale.invoice_number} | {payment.customer?.full_name ?? 'Walk-in customer'}</p>
-                        </div>
-                    </div>
-                    <Button variant="outline" asChild>
-                        <Link href="/payments">
-                            <ArrowLeft className="size-4" />
-                            Back
-                        </Link>
-                    </Button>
-                </div>
+                <PageHeader
+                    icon={CreditCard}
+                    title={payment.payment_number}
+                    description={`${payment.sale.invoice_number} | ${payment.customer?.full_name ?? 'Walk-in customer'}`}
+                    actions={<Button variant="outline" asChild><Link href="/payments"><ArrowLeft className="size-4" />Back</Link></Button>}
+                />
 
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]">
                     <section className="rounded-md border bg-card p-5 shadow-sm">
