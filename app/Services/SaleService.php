@@ -94,10 +94,11 @@ class SaleService
             $vatRate = $vatEnabled ? 15.0 : 0.0;
             $tax = $vatEnabled ? round($taxableAmount * ($vatRate / 100), 2) : 0.0;
             $grandTotal = $taxableAmount + $tax;
-            $isCreditSale = (bool) ($data['is_credit_sale'] ?? false);
+            $split = $this->paymentSplit($data, $grandTotal);
+            $isCreditSale = $split['credit'] > 0;
 
             if ($isCreditSale) {
-                $this->validateCreditSale($customer, $grandTotal);
+                $this->validateCreditSale($customer, $split['credit']);
             }
 
             $sale = Sale::create([
@@ -165,8 +166,43 @@ class SaleService
 
         if ($grandTotal > $availableCredit) {
             throw ValidationException::withMessages([
-                'is_credit_sale' => 'This sale exceeds the customer available credit.',
+                'credit_amount' => 'Credit amount exceeds the customer available credit.',
             ]);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array{cash: float, credit: float}
+     */
+    private function paymentSplit(array $data, float $grandTotal): array
+    {
+        $hasCashAmount = array_key_exists('cash_amount', $data) && $data['cash_amount'] !== null && $data['cash_amount'] !== '';
+        $hasCreditAmount = array_key_exists('credit_amount', $data) && $data['credit_amount'] !== null && $data['credit_amount'] !== '';
+        $isCreditSale = (bool) ($data['is_credit_sale'] ?? false);
+
+        if (! $hasCashAmount && ! $hasCreditAmount) {
+            return [
+                'cash' => $isCreditSale ? 0.0 : $grandTotal,
+                'credit' => $isCreditSale ? $grandTotal : 0.0,
+            ];
+        }
+
+        $cashAmount = round((float) ($data['cash_amount'] ?? 0), 2);
+        $creditAmount = round((float) ($data['credit_amount'] ?? 0), 2);
+
+        if (! $isCreditSale && $creditAmount > 0) {
+            throw ValidationException::withMessages([
+                'is_credit_sale' => 'Enable credit sale before assigning part of the sale to customer credit.',
+            ]);
+        }
+
+        if (round($cashAmount + $creditAmount, 2) !== round($grandTotal, 2)) {
+            throw ValidationException::withMessages([
+                'cash_amount' => 'Pay now amount plus credit amount must equal the sale total.',
+            ]);
+        }
+
+        return ['cash' => $cashAmount, 'credit' => $creditAmount];
     }
 }

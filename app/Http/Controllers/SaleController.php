@@ -92,9 +92,12 @@ class SaleController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Sale '.$sale->invoice_number.' sent to checkout.']);
 
-        if (! empty($data['checkout_method']) && ! $sale->is_credit_sale) {
+        $checkoutAmount = (float) ($data['cash_amount'] ?? ($sale->is_credit_sale ? 0 : $sale->grand_total));
+
+        if (! empty($data['checkout_method']) && $checkoutAmount > 0) {
             $payment = $this->paymentService->createFromCheckout($sale, $request->user(), [
                 'method' => $data['checkout_method'],
+                'amount' => $checkoutAmount,
                 'phone' => $data['checkout_phone'] ?? null,
                 'notes' => $data['notes'] ?? null,
             ]);

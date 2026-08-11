@@ -18,7 +18,7 @@ export default function Pos({ products, customers, business }: Props) {
     const [query, setQuery] = useState('');
     const [cart, setCart] = useState<CartItem[]>([]);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
-    const form = useForm({ customer_id: '', discount_amount: '0', apply_vat: business?.is_vat_registered ?? false, is_credit_sale: false, checkout_method: 'cash' as 'cash' | 'telebirr', checkout_phone: '', notes: '', items: [] as Array<{ product_id: number; quantity: number }> });
+    const form = useForm({ customer_id: '', discount_amount: '0', apply_vat: business?.is_vat_registered ?? false, is_credit_sale: false, cash_amount: '0', credit_amount: '0', checkout_method: 'cash' as 'cash' | 'telebirr', checkout_phone: '', notes: '', items: [] as Array<{ product_id: number; quantity: number }> });
     const filtered = products.filter((product) => `${product.name} ${product.barcode ?? ''}`.toLowerCase().includes(query.toLowerCase())).slice(0, 12);
     const subtotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.selling_price) * item.quantity, 0), [cart]);
     const selectedCustomer = customers.find((customer) => String(customer.id) === String(form.data.customer_id));
@@ -27,7 +27,11 @@ export default function Pos({ products, customers, business }: Props) {
     const taxableAmount = Math.max(0, subtotal - effectiveDiscount);
     const vatAmount = business?.is_vat_registered && form.data.apply_vat ? Number((taxableAmount * ((business.vat_rate ?? 15) / 100)).toFixed(2)) : 0;
     const grandTotal = taxableAmount + vatAmount;
-    const exceedsCredit = form.data.is_credit_sale && selectedCustomer ? grandTotal > selectedCustomer.credit.available_credit : false;
+    const cashAmount = Number(form.data.cash_amount || 0);
+    const creditAmount = Number(form.data.credit_amount || 0);
+    const splitTotal = Number((cashAmount + creditAmount).toFixed(2));
+    const splitMismatch = checkoutOpen && splitTotal !== Number(grandTotal.toFixed(2));
+    const exceedsCredit = form.data.is_credit_sale && selectedCustomer ? creditAmount > selectedCustomer.credit.available_credit : false;
 
     const addProduct = (product: Product) => setCart((items) => {
         const existing = items.find((item) => item.id === product.id);
@@ -38,8 +42,18 @@ export default function Pos({ products, customers, business }: Props) {
     const removeItem = (id: number) => setCart((items) => items.filter((item) => item.id !== id));
     const clearCart = () => setCart([]);
     const submit = () => {
-        form.transform((data) => ({ ...data, customer_id: data.customer_id || null, is_credit_sale: Boolean(data.is_credit_sale), apply_vat: Boolean(data.apply_vat), items: cart.map((item) => ({ product_id: item.id, quantity: item.quantity })) }));
+        form.transform((data) => ({ ...data, customer_id: data.customer_id || null, is_credit_sale: Boolean(data.is_credit_sale), apply_vat: Boolean(data.apply_vat), cash_amount: data.cash_amount || '0', credit_amount: data.is_credit_sale ? (data.credit_amount || '0') : '0', items: cart.map((item) => ({ product_id: item.id, quantity: item.quantity })) }));
         form.post('/sales');
+    };
+    const openCheckout = () => {
+        if (!form.data.is_credit_sale) {
+            form.setData((data) => ({ ...data, cash_amount: grandTotal.toFixed(2), credit_amount: '0' }));
+        } else if (Number(form.data.cash_amount || 0) === 0 && Number(form.data.credit_amount || 0) === 0) {
+            const credit = Math.min(grandTotal, selectedCustomer?.credit.available_credit ?? 0);
+            form.setData((data) => ({ ...data, credit_amount: credit.toFixed(2), cash_amount: Math.max(0, grandTotal - credit).toFixed(2) }));
+        }
+
+        setCheckoutOpen(true);
     };
 
     return (
@@ -74,7 +88,18 @@ export default function Pos({ products, customers, business }: Props) {
                     {selectedCustomer && (
                         <div className="rounded-md border bg-background/70 p-3 text-sm">
                             <label className="flex items-center gap-2 font-medium">
-                                <input type="checkbox" checked={form.data.is_credit_sale} onChange={(event) => form.setData('is_credit_sale', event.target.checked)} />
+                                <input
+                                    type="checkbox"
+                                    checked={form.data.is_credit_sale}
+                                    onChange={(event) => {
+                                        const checked = event.target.checked;
+                                        form.setData((data) => ({
+                                            ...data,
+                                            is_credit_sale: checked,
+                                            credit_amount: checked ? data.credit_amount : '0',
+                                        }));
+                                    }}
+                                />
                                 Sell on credit
                             </label>
                             <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
@@ -85,6 +110,7 @@ export default function Pos({ products, customers, business }: Props) {
                             </div>
                             {exceedsCredit && <p className="mt-2 text-sm text-destructive">This sale exceeds available credit.</p>}
                             {form.errors.is_credit_sale && <p className="mt-2 text-sm text-destructive">{form.errors.is_credit_sale}</p>}
+                            {form.errors.credit_amount && <p className="mt-2 text-sm text-destructive">{form.errors.credit_amount}</p>}
                         </div>
                     )}
                     <div className="flex-1 space-y-3">
@@ -139,7 +165,7 @@ export default function Pos({ products, customers, business }: Props) {
                     )}
                     {form.errors.items && <p className="text-sm text-destructive">{form.errors.items}</p>}
                     <div className="border-t pt-3 text-sm"><div className="flex justify-between"><span>Subtotal</span><span>{subtotal.toFixed(2)} ETB</span></div><div className="mt-2 flex justify-between"><span>Discount</span><span>{effectiveDiscount.toFixed(2)} ETB</span></div><div className="mt-2 flex justify-between"><span>VAT</span><span>{vatAmount.toFixed(2)} ETB</span></div><div className="mt-2 flex justify-between text-lg font-semibold"><span>Total</span><span>{grandTotal.toFixed(2)} ETB</span></div></div>
-                    <Button onClick={() => setCheckoutOpen(true)} disabled={cart.length === 0 || form.processing || exceedsCredit}>Proceed to Payment</Button>
+                    <Button onClick={openCheckout} disabled={cart.length === 0 || form.processing || exceedsCredit}>Proceed to Payment</Button>
                 </aside>
             </div>
             <ProceedToPaymentModal
@@ -149,9 +175,16 @@ export default function Pos({ products, customers, business }: Props) {
                 phone={form.data.checkout_phone}
                 processing={form.processing}
                 total={grandTotal}
+                cashAmount={form.data.cash_amount}
+                creditAmount={form.data.credit_amount}
+                creditEnabled={form.data.is_credit_sale}
+                availableCredit={selectedCustomer?.credit.available_credit}
                 phoneError={form.errors.checkout_phone}
+                splitError={form.errors.cash_amount ?? form.errors.credit_amount ?? (splitMismatch ? 'Pay now amount plus credit amount must equal the sale total.' : undefined)}
                 onMethodChange={(method) => form.setData('checkout_method', method)}
                 onPhoneChange={(phone) => form.setData('checkout_phone', phone)}
+                onCashAmountChange={(amount) => form.setData('cash_amount', amount)}
+                onCreditAmountChange={(amount) => form.setData('credit_amount', amount)}
                 onConfirm={submit}
             />
         </>

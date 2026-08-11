@@ -23,6 +23,8 @@ class StoreSaleRequest extends FormRequest
             'tax_amount' => ['prohibited'],
             'discount_amount' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
             'is_credit_sale' => ['boolean'],
+            'cash_amount' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'credit_amount' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
             'apply_vat' => ['boolean'],
             'checkout_method' => ['nullable', Rule::in(['cash', 'telebirr'])],
             'checkout_phone' => ['required_if:checkout_method,telebirr', 'nullable', 'string', 'max:30'],

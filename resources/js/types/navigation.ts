@@ -14,10 +14,20 @@ export type NavItem = {
     isActive?: boolean;
 };
 
+export type NavGroup = {
+    label: string;
+    items: NavItem[];
+};
+
 export type ServerNavItem = {
     title: string;
     href: string;
     icon: string;
+};
+
+export type ServerNavGroup = {
+    label: string;
+    items: ServerNavItem[];
 };
 
 export type SharedNotification = {
@@ -32,7 +42,7 @@ export type SharedNotification = {
 export type SharedData = {
     name: string;
     auth: Auth;
-    navigation: ServerNavItem[];
+    navigation: ServerNavGroup[];
     notificationSummary: {
         unreadCount: number;
         recent: SharedNotification[];

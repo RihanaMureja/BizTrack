@@ -9,12 +9,15 @@ use App\Events\BusinessRegistered;
 use App\Models\Business;
 use App\Models\BusinessVerificationDocument;
 use App\Models\User;
+use App\Services\Theme\BusinessThemeService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 class BusinessService
 {
+    public function __construct(private readonly BusinessThemeService $businessThemeService) {}
+
     public function paginateForAdmin(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
         return Business::query()
@@ -46,6 +49,9 @@ class BusinessService
                 'vat_certificate',
                 'rental_agreement',
             ])->all();
+            $categoryChanged = $existingBusiness
+                && isset($payload['business_category'])
+                && $payload['business_category'] !== $existingBusiness->business_category?->value;
 
             if (($data['logo'] ?? null) instanceof UploadedFile) {
                 $payload['logo'] = $data['logo']->store('business-logos', 'public');
@@ -83,6 +89,12 @@ class BusinessService
             $owner->forceFill(['business_id' => $business->id])->save();
 
             $this->syncOptionalDocuments($business, $owner, $documentPaths);
+
+            if (isset($payload['logo']) || ! $business->theme_primary) {
+                $business = $this->businessThemeService->refreshFromLogo($business);
+            } elseif ($categoryChanged && in_array($business->theme_mode, ['category', 'default', null], true)) {
+                $business = $this->businessThemeService->applyMode($business, ['theme_mode' => 'category']);
+            }
 
             if (! $existingBusiness) {
                 BusinessRegistered::dispatch($business->refresh());

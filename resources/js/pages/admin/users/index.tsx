@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Head, router } from '@inertiajs/react';
-import { Ban, CheckCircle2, ShieldCheck, Users } from 'lucide-react';
+import { Ban, CheckCircle2, CirclePause, Clock3, ShieldCheck, Users } from 'lucide-react';
 import { useState } from 'react';
 
 type User = { id: number; first_name: string | null; last_name: string | null; email: string; role: string; role_label: string; status: string; business: { business_name: string } | null };
@@ -21,14 +21,22 @@ const roleVariant = (role: string) => role === 'super_admin' ? 'default' : role 
 
 export default function AdminUsersIndex({ users, roles, statuses, filters, currentUserId }: Props) {
     const [statusTarget, setStatusTarget] = useState<User | null>(null);
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
     const applyFilters = (next: Record<string, string | null>) => router.get('/admin/users', { search: filters.search ?? '', role: filters.role ?? '', status: filters.status ?? '', ...next }, { preserveState: true, preserveScroll: true, replace: true });
     const statusOptions = statuses.filter((status) => status.value !== statusTarget?.status);
-    const updateStatus = (status: string) => {
-        if (!statusTarget) return;
+    const openStatusDialog = (user: User) => {
+        setStatusTarget(user);
+        setSelectedStatus('');
+    };
+    const updateStatus = () => {
+        if (!statusTarget || !selectedStatus) return;
 
-        router.put(`/admin/users/${statusTarget.id}`, { status }, {
+        router.put(`/admin/users/${statusTarget.id}`, { status: selectedStatus }, {
             preserveScroll: true,
-            onSuccess: () => setStatusTarget(null),
+            onSuccess: () => {
+                setStatusTarget(null);
+                setSelectedStatus('');
+            },
         });
     };
     const columns: DataTableColumn<User>[] = [
@@ -41,14 +49,14 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
             header: '',
             className: 'text-right',
             render: (user) => {
-                const locked = user.role === 'super_admin' || user.id === currentUserId;
+                const locked = user.role === 'super_admin' || user.id === currentUserId || user.role === 'cashier';
 
                 return locked ? (
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <ShieldCheck className="size-3.5" /> Protected
+                        <ShieldCheck className="size-3.5" /> {user.role === 'cashier' ? 'Owner managed' : 'Protected'}
                     </span>
                 ) : (
-                    <Button type="button" variant="outline" size="sm" onClick={() => setStatusTarget(user)}>
+                    <Button type="button" variant="outline" size="sm" onClick={() => openStatusDialog(user)}>
                         Manage status
                     </Button>
                 );
@@ -73,7 +81,12 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
                 </section>
             </div>
 
-            <Dialog open={Boolean(statusTarget)} onOpenChange={(open) => !open && setStatusTarget(null)}>
+            <Dialog open={Boolean(statusTarget)} onOpenChange={(open) => {
+                if (!open) {
+                    setStatusTarget(null);
+                    setSelectedStatus('');
+                }
+            }}>
                 <DialogContent className="max-w-xl">
                     <DialogHeader>
                         <DialogTitle>Update account status</DialogTitle>
@@ -81,36 +94,34 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
                             Choose the next status for {statusTarget?.email}. Role changes are intentionally unavailable from this screen.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="flex flex-wrap gap-2 rounded-md border bg-muted/30 p-2">
                         {statusOptions.map((status) => {
-                            const isActive = status.value === 'active';
-                            const isRisky = ['inactive', 'suspended', 'rejected'].includes(status.value);
+                            const style = statusStyle(status.value);
+                            const Icon = style.Icon;
+                            const active = selectedStatus === status.value;
 
                             return (
                                 <button
                                     key={status.value}
                                     type="button"
-                                    onClick={() => updateStatus(status.value)}
+                                    onClick={() => setSelectedStatus(status.value)}
                                     className={[
-                                        'rounded-md border p-4 text-left transition hover:shadow-sm',
-                                        isActive ? 'border-emerald-200 bg-emerald-50 text-emerald-950 hover:bg-emerald-100' : '',
-                                        isRisky ? 'border-destructive/25 bg-destructive/5 text-destructive hover:bg-destructive/10' : '',
-                                        !isActive && !isRisky ? 'border-border bg-background hover:bg-muted/40' : '',
+                                        'inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition',
+                                        active ? style.activeClass : style.idleClass,
                                     ].join(' ')}
                                 >
-                                    <span className="flex items-center gap-2 text-sm font-semibold">
-                                        {isActive ? <CheckCircle2 className="size-4" /> : isRisky ? <Ban className="size-4" /> : <ShieldCheck className="size-4" />}
-                                        {prettyStatus(status.value)}
-                                    </span>
-                                    <span className="mt-1 block text-xs opacity-75">
-                                        {isActive ? 'Restore access for this user.' : isRisky ? 'Restrict this user from normal access.' : 'Move this account into a review workflow state.'}
-                                    </span>
+                                    <Icon className="size-4" />
+                                    {prettyStatus(status.value)}
                                 </button>
                             );
                         })}
                     </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setStatusTarget(null)}>Cancel</Button>
+                    <DialogFooter className="gap-2">
+                        <Button type="button" variant="outline" onClick={() => {
+                            setStatusTarget(null);
+                            setSelectedStatus('');
+                        }}>Cancel</Button>
+                        <Button type="button" onClick={updateStatus} disabled={!selectedStatus}>Confirm status</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -119,3 +130,35 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
 }
 
 AdminUsersIndex.layout = { breadcrumbs: [{ title: 'Super Admin', href: '/admin' }, { title: 'Users', href: '/admin/users' }] };
+
+function statusStyle(status: string): { Icon: typeof CheckCircle2; activeClass: string; idleClass: string } {
+    if (status === 'active') {
+        return {
+            Icon: CheckCircle2,
+            activeClass: 'border-emerald-600 bg-emerald-600 text-white shadow-sm',
+            idleClass: 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100',
+        };
+    }
+
+    if (status === 'inactive') {
+        return {
+            Icon: CirclePause,
+            activeClass: 'border-slate-700 bg-slate-700 text-white shadow-sm',
+            idleClass: 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100',
+        };
+    }
+
+    if (['suspended', 'rejected'].includes(status)) {
+        return {
+            Icon: Ban,
+            activeClass: 'border-red-600 bg-red-600 text-white shadow-sm',
+            idleClass: 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100',
+        };
+    }
+
+    return {
+        Icon: Clock3,
+        activeClass: 'border-amber-600 bg-amber-500 text-white shadow-sm',
+        idleClass: 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100',
+    };
+}

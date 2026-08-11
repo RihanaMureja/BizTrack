@@ -12,16 +12,20 @@ import type React from 'react';
 type Business = {
     business_name?: string;
     business_type?: string | null;
+    business_category?: string | null;
     email?: string | null;
     phone?: string | null;
     address?: string | null;
     national_id_fan_number?: string | null;
 };
 
-export default function OnboardingBusinessProfile({ business }: { business: Business | null }) {
+type BusinessCategory = { value: string; label: string };
+
+export default function OnboardingBusinessProfile({ business, businessCategories }: { business: Business | null; businessCategories: BusinessCategory[] }) {
     const form = useForm({
         business_name: business?.business_name ?? '',
         business_type: business?.business_type ?? '',
+        business_category: business?.business_category ?? 'retail_shop',
         email: business?.email ?? '',
         phone: business?.phone ?? '',
         address: business?.address ?? '',
@@ -50,6 +54,11 @@ export default function OnboardingBusinessProfile({ business }: { business: Busi
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                     <Field label="Business name" error={form.errors.business_name}><Input value={form.data.business_name} onChange={(e) => form.setData('business_name', e.target.value)} required /></Field>
                     <Field label="Business type" error={form.errors.business_type}><Input value={form.data.business_type} onChange={(e) => form.setData('business_type', e.target.value)} placeholder="Retail, pharmacy, cafe..." /></Field>
+                    <Field label="Business category" error={form.errors.business_category}>
+                        <select value={form.data.business_category} onChange={(e) => form.setData('business_category', e.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm">
+                            {businessCategories.map((category) => <option key={category.value} value={category.value}>{category.label}</option>)}
+                        </select>
+                    </Field>
                     <Field label="Business email" error={form.errors.email}><Input type="email" value={form.data.email} onChange={(e) => form.setData('email', e.target.value)} /></Field>
                     <Field label="Phone" error={form.errors.phone}><Input value={form.data.phone} onChange={(e) => form.setData('phone', e.target.value)} placeholder="+251..." /></Field>
                     <Field label="Address" error={form.errors.address}><Input value={form.data.address} onChange={(e) => form.setData('address', e.target.value)} /></Field>

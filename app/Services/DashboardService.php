@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BusinessCategory;
 use App\Enums\Role;
 use App\Enums\BusinessPermissionKey;
 use App\Models\Business;
@@ -54,11 +55,7 @@ class DashboardService
             'lowStock' => $this->lowStock($business),
             'stagnantProducts' => $this->productService->previewForBusiness($business),
             'topProducts' => [],
-            'nextSteps' => [
-                'Complete product categories',
-                'Add products and opening stock',
-                'Create cashier accounts before POS rollout',
-            ],
+            'nextSteps' => $this->nextStepsForCategory($business),
         ];
     }
 
@@ -182,5 +179,36 @@ class DashboardService
     private function money(float $amount): string
     {
         return number_format($amount, 2).' ETB';
+    }
+
+    private function nextStepsForCategory(?Business $business): array
+    {
+        return match ($business?->business_category) {
+            BusinessCategory::Restaurant => [
+                'Set up menu categories',
+                'Track ingredients and fast-moving items',
+                'Review daily order revenue',
+            ],
+            BusinessCategory::OnlineStore => [
+                'Add shippable product catalog',
+                'Monitor pending payments',
+                'Track repeat online customers',
+            ],
+            BusinessCategory::ServiceBusiness => [
+                'Register recurring customers',
+                'Track service payments',
+                'Review monthly expenses and payroll',
+            ],
+            BusinessCategory::Pharmacy => [
+                'Track expiring inventory batches',
+                'Watch low-stock medicines',
+                'Review product profit by batch cost',
+            ],
+            default => [
+                'Complete product categories',
+                'Add products and opening stock',
+                'Create employee accounts before POS rollout',
+            ],
+        };
     }
 }
