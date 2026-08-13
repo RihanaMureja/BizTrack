@@ -119,7 +119,9 @@ export default function OnboardingBusinessProfile({ business, businessCategories
 
     return (
         <OnboardingLayout title="Business setup">
-            <OnboardingProgress current="business" />
+            <div className="mb-4">
+                <OnboardingProgress current="business" />
+            </div>
 
             <section className="rounded-xl border bg-card p-5 shadow-sm md:p-8">
                 <div className="mx-auto max-w-2xl text-center">

@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Enums\BusinessAccessMode;
 use App\Enums\RecordStatus;
 use App\Models\Business;
+use App\Models\Notification as AppNotification;
 use App\Models\Subscription;
 use App\Models\User;
-use App\Notifications\TrialStartedNotification;
 
 class OnboardingService
 {
@@ -44,7 +44,18 @@ class OnboardingService
             'onboarding_completed_at' => now(),
         ])->save();
 
-        $business->owner?->notify(new TrialStartedNotification($business));
+        // Create notification directly using the custom Notification model
+        $owner = $business->owner;
+        if ($owner) {
+            AppNotification::create([
+                'user_id' => $owner->id,
+                'business_id' => $business->id,
+                'type' => 'trial_started',
+                'title' => 'Trial Started',
+                'message' => $business->business_name.' trial started.',
+                'is_read' => false,
+            ]);
+        }
 
         return $business->refresh();
     }

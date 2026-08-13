@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\NotificationType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,11 +12,12 @@ class Notification extends Model
 {
     use HasFactory;
 
+    protected $table = 'notifications';
+
     protected function casts(): array
     {
         return [
             'is_read' => 'boolean',
-            'type' => NotificationType::class,
         ];
     }
 

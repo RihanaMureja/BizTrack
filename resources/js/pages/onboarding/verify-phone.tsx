@@ -24,7 +24,9 @@ export default function VerifyPhone({ phone, devOtp }: { phone: string | null; d
 
     return (
         <OnboardingLayout title="Verify phone">
-            <OnboardingProgress current="phone" />
+            <div className="mb-4">
+                <OnboardingProgress current="phone" />
+            </div>
             <section className="rounded-md border bg-card p-5 shadow-sm">
                 <div className="flex items-center gap-3">
                     <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary"><Smartphone className="size-5" /></div>

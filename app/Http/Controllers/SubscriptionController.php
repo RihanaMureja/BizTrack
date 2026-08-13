@@ -21,6 +21,7 @@ class SubscriptionController extends Controller
     public function index(): Response
     {
         return Inertia::render('business/subscriptions', [
+            'business' => request()->user()->ownedBusiness?->load(['subscription']),
             'subscriptions' => $this->subscriptionService->activePlans(),
         ]);
     }

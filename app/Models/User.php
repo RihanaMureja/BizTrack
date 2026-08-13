@@ -97,6 +97,14 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(PhoneVerification::class);
     }
 
+    public function routeNotificationForDatabase(): array
+    {
+        return [
+            'business_id' => $this->business_id,
+            'user_id' => $this->id,
+        ];
+    }
+
     public function getRoleLabelAttribute(): string
     {
         return $this->businessRole?->name ?? $this->role->label();
