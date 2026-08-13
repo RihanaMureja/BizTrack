@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['business_id', 'customer_id', 'user_id', 'invoice_number', 'is_credit_sale', 'subtotal', 'tax_amount', 'discount_amount', 'vat_enabled', 'vat_rate', 'grand_total', 'paid_amount', 'balance_due', 'status', 'payment_status', 'notes', 'sold_at'])]
+#[Fillable(['business_id', 'customer_id', 'user_id', 'invoice_number', 'is_credit_sale', 'cash_amount', 'credit_amount', 'subtotal', 'tax_amount', 'discount_amount', 'vat_enabled', 'vat_rate', 'grand_total', 'paid_amount', 'balance_due', 'status', 'payment_status', 'notes', 'sold_at'])]
 class Sale extends Model
 {
     use HasFactory;
@@ -23,6 +23,8 @@ class Sale extends Model
             'tax_amount' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'is_credit_sale' => 'boolean',
+            'cash_amount' => 'decimal:2',
+            'credit_amount' => 'decimal:2',
             'vat_enabled' => 'boolean',
             'vat_rate' => 'decimal:2',
             'grand_total' => 'decimal:2',

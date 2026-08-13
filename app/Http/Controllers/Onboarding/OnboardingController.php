@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Onboarding;
 
 use App\Enums\BusinessCategory;
+use App\Enums\RecordStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BusinessProfileRequest;
 use App\Models\Subscription;
@@ -84,6 +85,8 @@ class OnboardingController extends Controller
 
     public function activatePlan(Request $request, Subscription $subscription): RedirectResponse
     {
+        abort_unless($subscription->status === RecordStatus::Active, 404);
+
         $business = $request->user()->ownedBusiness;
         abort_unless($business, 403);
 

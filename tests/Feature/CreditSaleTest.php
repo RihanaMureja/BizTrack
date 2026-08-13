@@ -6,7 +6,9 @@ use App\Models\Category;
 use App\Models\Customer;
 use App\Models\CustomerCredit;
 use App\Models\InventoryBatch;
+use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\User;
 
 function creditSaleBusinessContext(): array
@@ -116,12 +118,14 @@ test('owner can choose any cash and credit split within available credit', funct
         ])
         ->assertRedirect();
 
-    $sale = \App\Models\Sale::query()->firstOrFail();
+    $sale = Sale::query()->firstOrFail();
     $credit = CustomerCredit::query()->firstOrFail();
-    $payment = \App\Models\Payment::query()->firstOrFail();
+    $payment = Payment::query()->firstOrFail();
 
     expect((float) $sale->refresh()->paid_amount)->toBe(80.0)
         ->and((float) $sale->balance_due)->toBe(120.0)
+        ->and((float) $sale->cash_amount)->toBe(80.0)
+        ->and((float) $sale->credit_amount)->toBe(120.0)
         ->and((float) $payment->amount)->toBe(80.0)
         ->and((float) $credit->credit_amount)->toBe(120.0)
         ->and((float) $credit->remaining_balance)->toBe(120.0)
@@ -167,9 +171,46 @@ test('sale can be entered as full credit when it fits available credit', functio
         ])
         ->assertRedirect(route('sales.index'));
 
-    $sale = \App\Models\Sale::query()->firstOrFail();
+    $sale = Sale::query()->firstOrFail();
 
     expect((float) $sale->paid_amount)->toBe(0.0)
         ->and((float) $sale->balance_due)->toBe(200.0)
+        ->and((float) $sale->cash_amount)->toBe(0.0)
+        ->and((float) $sale->credit_amount)->toBe(200.0)
         ->and((float) $customer->refresh()->current_balance)->toBe(200.0);
+});
+
+test('pending mobile money split does not overstate customer credit balance', function () {
+    [$owner, $business] = creditSaleBusinessContext();
+    $customer = Customer::factory()->create([
+        'business_id' => $business->id,
+        'credit_limit' => 500,
+        'current_balance' => 0,
+    ]);
+    $product = creditSaleStockedProduct($business, 10, 100);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'customer_id' => $customer->id,
+            'is_credit_sale' => true,
+            'cash_amount' => 80,
+            'credit_amount' => 120,
+            'checkout_method' => 'telebirr',
+            'checkout_phone' => '0911222333',
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        ])
+        ->assertRedirect();
+
+    $sale = Sale::query()->firstOrFail();
+    $credit = CustomerCredit::query()->firstOrFail();
+    $payment = Payment::query()->firstOrFail();
+
+    expect((float) $payment->amount)->toBe(80.0)
+        ->and($payment->status)->toBe(\App\Enums\PaymentStatus::Pending)
+        ->and((float) $sale->refresh()->paid_amount)->toBe(0.0)
+        ->and((float) $sale->balance_due)->toBe(200.0)
+        ->and((float) $sale->credit_amount)->toBe(120.0)
+        ->and((float) $credit->credit_amount)->toBe(120.0)
+        ->and((float) $credit->remaining_balance)->toBe(120.0)
+        ->and((float) $customer->refresh()->current_balance)->toBe(120.0);
 });

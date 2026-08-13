@@ -33,7 +33,6 @@ class BusinessProfileRequest extends FormRequest
             'business_name' => ['required', 'string', 'max:150'],
             'business_type' => ['nullable', 'string', 'max:100'],
             'business_category' => ['required', Rule::enum(BusinessCategory::class)],
-            'subscription_id' => ['nullable', Rule::exists('subscriptions', 'id')->where('status', 'active')],
             'email' => [
                 'nullable',
                 'email',

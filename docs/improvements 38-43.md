@@ -456,28 +456,57 @@ tests/Feature/SaleCreditSplitTest.php   (new coverage: sale with credit_amount
 
 ---
 
-## Phase 43: Payment Step Between Plan Selection And Dashboard Access
+## Phase 43: Payment Step Between Plan Selection And Dashboard Access — And A Proper Plan-Change Flow From Settings
 
 ### Task
 
+This phase covers **two connected problems** with how a business's subscription
+plan is chosen and changed, tied together by one payment modal that's used in
+both places.
+
+**Problem 1 — no payment step at signup.**
 `OnboardingController::activatePlan()` currently activates a paid plan and
 redirects straight to the dashboard the moment "Get Started" is clicked on
 `plan-card.tsx` — there is no payment collection step at all for a paid plan, only
 for the free trial (which correctly gates on phone OTP). This means a business can
 reach `active` status and full paid-tier access without ever paying anything.
 
-Insert a payment step between plan selection and activation. Since Phase 33's
-real Telebirr gateway work may not be complete yet at this point in the roadmap,
-build this as an explicit **demo/placeholder payment modal** now — a real modal
-(not a silent auto-activate), showing the selected plan, price, and a payment
-method choice, that the owner must explicitly confirm before the business is
-marked `active`. Structure it so Phase 33's real gateway integration is a drop-in
-replacement for the demo confirmation handler, not a rebuild of this screen.
+**Problem 2 — plan changes after signup are a buried form dropdown with no
+payment step either.**
+Once a business is live, the *only* way an owner can change their plan today is a
+`subscription_id` `<Select>` dropdown mixed into the same giant general business
+profile form (`resources/js/components/forms/business-form.tsx`, alongside
+business name, category, email, address, and verification documents), submitted
+via the same generic `PUT /settings/business` request handled by
+`BusinessController::update()` → `BusinessService::upsertForOwner()`. Picking a
+different plan and clicking the profile's "Save" button silently swaps
+`subscription_id` right there — no dedicated screen, no confirmation of what
+changes, no price shown clearly, and critically, **no payment step at all**,
+upgrade or downgrade. This needs to become its own dedicated, professional flow:
+plan cards (not a dropdown) showing the current plan clearly marked, and
+switching plans routes through the same payment confirmation modal used at
+signup — a plan is never changed in the same request as unrelated profile
+fields like business name or address again.
+
+Insert a payment step between plan selection and activation in **both** places.
+Since Phase 33's real Telebirr gateway work may not be complete yet at this point
+in the roadmap, build this as an explicit **demo/placeholder payment modal** now —
+a real modal (not a silent auto-activate, not a silent form-save), showing the
+selected plan, price, and a payment method choice, that the owner must explicitly
+confirm before the business's plan actually changes. Structure it so Phase 33's
+real gateway integration is a drop-in replacement for the demo confirmation
+handler in both entry points, not a rebuild of either screen.
 
 ### Files To Create
 
 ```text
-resources/js/components/onboarding/plan-payment-modal.tsx   (shows selected plan
+resources/js/components/onboarding/plan-payment-modal.tsx   (shared component,
+                                                                despite the
+                                                                onboarding/ folder
+                                                                name — also used
+                                                                from Settings, see
+                                                                below; shows
+                                                                selected plan
                                                                 name/price, a
                                                                 payment method
                                                                 selector — cash /
@@ -487,18 +516,80 @@ resources/js/components/onboarding/plan-payment-modal.tsx   (shows selected plan
                                                                 Phase 33 — and a
                                                                 "Confirm Payment"
                                                                 action that posts
-                                                                to the activation
-                                                                endpoint)
+                                                                to a plan
+                                                                confirmation
+                                                                endpoint; accepts a
+                                                                `context` prop of
+                                                                'onboarding' |
+                                                                'change-plan' so
+                                                                copy/labels and the
+                                                                submit route can
+                                                                differ slightly
+                                                                while the visual
+                                                                shell stays
+                                                                identical)
+
+resources/js/components/settings/plan-selector.tsx   (the professional
+                                                        replacement for the
+                                                        subscription_id dropdown:
+                                                        a grid of plan cards
+                                                        (reusing the same visual
+                                                        language as onboarding's
+                                                        plan-card.tsx, not a
+                                                        rebuild from scratch — 
+                                                        extract shared bits into a
+                                                        common presentational
+                                                        component if that's
+                                                        cleaner than duplicating
+                                                        markup), current plan
+                                                        clearly badged "Current
+                                                        plan", every other plan
+                                                        shows a "Switch to this
+                                                        plan" action that opens
+                                                        PlanPaymentModal with
+                                                        context="change-plan"
+                                                        instead of submitting a
+                                                        form field)
 
 app/Http/Controllers/Onboarding/PlanPaymentController.php   (renders/confirms the
-                                                               demo payment step;
+                                                               demo payment step
+                                                               for the onboarding
+                                                               entry point;
                                                                separates "select a
                                                                plan" from "confirm
                                                                payment for that
                                                                plan" as two
                                                                distinct actions)
 
+app/Http/Controllers/BusinessSubscriptionChangeController.php   (owner-only;
+                                                                    handles the
+                                                                    post-onboarding
+                                                                    plan-change
+                                                                    flow: show the
+                                                                    plan-change
+                                                                    confirmation
+                                                                    for a selected
+                                                                    plan, then
+                                                                    confirm payment
+                                                                    and actually
+                                                                    swap
+                                                                    subscription_id
+                                                                    on success —
+                                                                    this is
+                                                                    intentionally
+                                                                    separate from
+                                                                    BusinessController
+                                                                    so a plan
+                                                                    change is never
+                                                                    bundled into
+                                                                    the same
+                                                                    request as
+                                                                    profile-field
+                                                                    edits again)
+
 tests/Feature/OnboardingPlanPaymentTest.php
+
+tests/Feature/BusinessSubscriptionChangeTest.php
 ```
 
 ### Files To Update
@@ -522,19 +613,69 @@ app/Services/OnboardingService.php   (split activatePaidPlan() into
                                        `active`)
 
 resources/js/components/onboarding/plan-card.tsx   (Get Started button opens
-                                                      PlanPaymentModal instead of
-                                                      posting directly to
+                                                      PlanPaymentModal
+                                                      context="onboarding" instead
+                                                      of posting directly to
                                                       /onboarding/plans/{id})
 
 resources/js/pages/onboarding/choose-plan.tsx   (wire modal open/close state
                                                    around plan selection)
 
-routes/web.php   (add the payment confirmation route alongside the existing
-                   plans.activate route; plans.activate becomes "select", a new
-                   route becomes "confirm payment")
+app/Http/Requests/UpdateBusinessRequest.php (and its parent
+                                               BusinessProfileRequest)   (drop
+                                                                          subscription_id
+                                                                          from the
+                                                                          validated/accepted
+                                                                          fields
+                                                                          entirely —
+                                                                          this
+                                                                          request
+                                                                          no longer
+                                                                          has any
+                                                                          authority
+                                                                          to change
+                                                                          the plan)
+
+app/Services/BusinessService.php   (remove the subscription_id branch from
+                                     upsertForOwner() — plan changes now only
+                                     happen through
+                                     BusinessSubscriptionChangeController /
+                                     confirmPaidPlanPayment(), never through the
+                                     general profile upsert)
+
+app/Http/Controllers/BusinessController.php   (settings() still passes
+                                                subscriptions to the page for
+                                                display, but the update() flow no
+                                                longer touches subscription_id at
+                                                all)
+
+resources/js/components/forms/business-form.tsx   (remove the "Subscription
+                                                      plan" Select field and the
+                                                      subscription_id form key
+                                                      entirely — this form is
+                                                      profile fields only now)
+
+resources/js/pages/settings/business.tsx   (remove the subscriptions prop from
+                                              the profile-form usage; add a new
+                                              section below the profile form —
+                                              or its own settings sub-page,
+                                              whichever matches how other
+                                              multi-section settings screens are
+                                              structured in this codebase —
+                                              rendering <PlanSelector
+                                              subscriptions={subscriptions}
+                                              currentPlanId={business?.subscription_id}
+                                              />)
+
+routes/web.php   (add the onboarding payment confirmation route alongside the
+                   existing plans.activate route; plans.activate becomes
+                   "select", a new route becomes "confirm payment"; add owner-only
+                   routes for BusinessSubscriptionChangeController — show the
+                   change-plan confirmation and confirm its payment — separate
+                   from the /settings/business route)
 ```
 
-### Build This Exact Workflow
+### Build This Exact Workflow (Onboarding Entry Point)
 
 ```text
 Owner clicks "Get Started" on a paid plan card
@@ -551,16 +692,48 @@ Owner redirected to dashboard with full access for the selected plan
 Telebirr/gateway charge behind the same modal and route shape
 ```
 
+### Build This Exact Workflow (Settings Entry Point, After Onboarding)
+
+```text
+Owner opens Settings → Business, scrolls to the new Plan section
+        ↓
+Sees plan cards, not a dropdown — current plan clearly badged
+        ↓
+Clicks "Switch to this plan" on a different plan
+        ↓
+Same PlanPaymentModal opens (context="change-plan"): shows the new plan's name,
+price, payment method choice
+        ↓
+Owner confirms (demo payment — clearly labeled as such, same as onboarding)
+        ↓
+subscription_id only changes after this confirmation — never as a side effect of
+saving unrelated profile fields
+        ↓
+Owner sees their updated plan reflected immediately, general profile form is
+completely unaffected by this action
+```
+
 ### Definition Of Done
 
 ```text
-[ ] Selecting a paid plan no longer activates the business immediately
-[ ] A visible payment modal (not a silent redirect) sits between plan selection
-    and dashboard access
-[ ] Business status becomes `active` only after explicit payment confirmation
-[ ] Modal is clearly labeled as a demo step so it is obviously swappable for a
-    real gateway later
+[ ] Selecting a paid plan at onboarding no longer activates the business
+    immediately — a visible payment modal sits between selection and dashboard
+    access, and the business becomes `active` only after confirmation
 [ ] Free trial flow (phone OTP → trial) is completely unaffected by this phase
+[ ] The general business profile form (Settings → Business) no longer contains a
+    subscription/plan dropdown or field of any kind
+[ ] Settings → Business has a dedicated, professional plan section: plan cards
+    with the current plan clearly badged, not a dropdown-and-save pattern
+[ ] Changing plans from Settings opens the same payment confirmation modal used
+    at onboarding (same component, `context="change-plan"`), not a silent form
+    submit
+[ ] subscription_id only ever changes as a result of explicit payment
+    confirmation, never as a side effect of saving other profile fields in the
+    same request
+[ ] Both entry points (onboarding and Settings) are clearly labeled as a demo
+    payment step so they are obviously swappable for a real gateway later, and
+    both are structured so Phase 33's real gateway is a drop-in replacement for
+    the confirmation handler in each
 ```
 
 ---

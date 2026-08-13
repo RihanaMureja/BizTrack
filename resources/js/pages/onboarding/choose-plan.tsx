@@ -1,9 +1,11 @@
 import { OnboardingProgress } from '@/components/onboarding/onboarding-progress';
-import { PlanCard } from '@/components/onboarding/plan-card';
+import { DemoPlanPaymentModal, type DemoPaymentPlan } from '@/components/subscriptions/demo-plan-payment-modal';
+import { PlanSelectionCard } from '@/components/subscriptions/plan-selection-card';
 import { Button } from '@/components/ui/button';
 import OnboardingLayout from '@/layouts/onboarding-layout';
-import { router } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 type Subscription = {
     id: number;
@@ -20,6 +22,20 @@ type Business = {
 } | null;
 
 export default function ChoosePlan({ business, subscriptions }: { business: Business; subscriptions: Subscription[] }) {
+    const [selectedPlan, setSelectedPlan] = useState<DemoPaymentPlan | null>(null);
+    const form = useForm({});
+
+    const confirmPlan = () => {
+        if (!selectedPlan) {
+            return;
+        }
+
+        form.post(`/onboarding/plans/${selectedPlan.id}`, {
+            preserveScroll: true,
+            onSuccess: () => setSelectedPlan(null),
+        });
+    };
+
     return (
         <OnboardingLayout title="Choose plan">
             <OnboardingProgress current="plan" />
@@ -37,9 +53,26 @@ export default function ChoosePlan({ business, subscriptions }: { business: Busi
                 </div>
 
                 <div className="mx-auto mt-10 grid max-w-5xl gap-5 lg:grid-cols-3">
-                    {subscriptions.map((subscription) => <PlanCard key={subscription.id} plan={subscription} />)}
+                    {subscriptions.map((subscription) => (
+                        <PlanSelectionCard
+                            key={subscription.id}
+                            plan={subscription}
+                            dark
+                            actionLabel="Continue to demo payment"
+                            onSelect={setSelectedPlan}
+                        />
+                    ))}
                 </div>
             </section>
+
+            <DemoPlanPaymentModal
+                open={Boolean(selectedPlan)}
+                plan={selectedPlan}
+                context="onboarding"
+                processing={form.processing}
+                onOpenChange={(open) => !open && setSelectedPlan(null)}
+                onConfirm={confirmPlan}
+            />
         </OnboardingLayout>
     );
 }
