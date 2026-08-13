@@ -206,7 +206,12 @@ class DashboardService
      */
     private function expiringProducts(?Business $business): array
     {
-        if (! $business || ! Schema::hasTable('inventory_batches')) {
+        if (
+            ! $business
+            || ! Schema::hasTable('inventory_batches')
+            || ! Schema::hasColumn('inventory_batches', 'remaining_quantity')
+            || ! Schema::hasColumn('inventory_batches', 'expires_at')
+        ) {
             return [];
         }
 
@@ -235,7 +240,12 @@ class DashboardService
      */
     private function stockValue(?Business $business): array
     {
-        if (! $business || ! Schema::hasTable('inventory_batches')) {
+        if (
+            ! $business
+            || ! Schema::hasTable('inventory_batches')
+            || ! Schema::hasColumn('inventory_batches', 'remaining_quantity')
+            || ! Schema::hasColumn('inventory_batches', 'unit_cost')
+        ) {
             return ['total' => 0.0, 'items' => []];
         }
 

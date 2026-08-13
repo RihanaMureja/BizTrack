@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { Save } from 'lucide-react';
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,9 @@ export type BusinessFormBusiness = {
 };
 
 export function BusinessForm({ business }: { business: BusinessFormBusiness | null }) {
+    const isEditing = Boolean(business?.id);
+    const [isPreparingLogo, setIsPreparingLogo] = useState(false);
+
     const form = useForm({
         business_name: business?.business_name ?? '',
         business_type: business?.business_type ?? '',
@@ -41,12 +44,68 @@ export function BusinessForm({ business }: { business: BusinessFormBusiness | nu
         has_physical_shop: business?.has_physical_shop ?? false,
         rental_agreement: null as File | null,
         logo: null as File | null,
-        _method: business?.id ? 'put' : 'post',
     });
+
+    const optimizeLogo = async (file: File): Promise<File> => {
+        if (file.size <= 1_500_000) {
+            return file;
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+
+        try {
+            const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = objectUrl;
+            });
+
+            const maxDimension = 1600;
+            const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+            const width = Math.max(1, Math.round(image.width * scale));
+            const height = Math.max(1, Math.round(image.height * scale));
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const context = canvas.getContext('2d');
+            if (!context) {
+                return file;
+            }
+
+            context.drawImage(image, 0, 0, width, height);
+
+            const blob = await new Promise<Blob | null>((resolve) => {
+                canvas.toBlob(resolve, 'image/webp', 0.9);
+            });
+
+            if (!blob) {
+                return file;
+            }
+
+            const safeName = file.name.replace(/\.[^.]+$/, '') || 'logo';
+
+            return new File([blob], `${safeName}.webp`, {
+                type: 'image/webp',
+                lastModified: Date.now(),
+            });
+        } finally {
+            URL.revokeObjectURL(objectUrl);
+        }
+    };
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        form.post('/business/profile', { forceFormData: true });
+
+        const options = { forceFormData: true };
+
+        if (isEditing) {
+            form.post('/business/profile?_method=PUT', options);
+        } else {
+            form.post('/business/profile', options);
+        }
     };
 
     return (
@@ -112,9 +171,24 @@ export function BusinessForm({ business }: { business: BusinessFormBusiness | nu
                     id="logo"
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp"
-                    onChange={(event) => form.setData('logo', event.target.files?.[0] ?? null)}
+                    onChange={async (event) => {
+                        const file = event.target.files?.[0] ?? null;
+
+                        if (!file) {
+                            form.setData('logo', null);
+                            return;
+                        }
+
+                        setIsPreparingLogo(true);
+
+                        try {
+                            form.setData('logo', await optimizeLogo(file));
+                        } finally {
+                            setIsPreparingLogo(false);
+                        }
+                    }}
                 />
-                <p className="text-xs text-muted-foreground">JPG, JPEG, PNG, or WEBP — max 2 MB.</p>
+                <p className="text-xs text-muted-foreground">JPG, JPEG, PNG, or WEBP - max 2 MB. Larger images are compressed automatically.</p>
                 <InputError message={form.errors.logo} />
             </div>
 
@@ -163,7 +237,7 @@ export function BusinessForm({ business }: { business: BusinessFormBusiness | nu
                 </div>
             </div>
 
-            <Button type="submit" className="w-fit" disabled={form.processing}>
+            <Button type="submit" className="w-fit" disabled={form.processing || isPreparingLogo}>
                 {form.processing ? <Spinner /> : <Save className="size-4" />}
                 Save business
             </Button>

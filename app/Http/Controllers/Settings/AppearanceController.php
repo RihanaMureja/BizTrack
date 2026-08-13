@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\AppearanceUpdateRequest;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,9 +19,11 @@ class AppearanceController extends Controller
     {
         $user = $request->user();
         $business = $user?->ownedBusiness;
+        $brandColor = $business?->brand_color
+            ?? ($user?->preferences['brand_color'] ?? null);
 
         return Inertia::render('settings/appearance', [
-            'brandColor' => $business?->brand_color ?? null,
+            'brandColor' => $brandColor,
             'canManageBrandColor' => (bool) $user?->isOwner() && $business !== null,
         ]);
     }
@@ -31,12 +34,29 @@ class AppearanceController extends Controller
     public function update(AppearanceUpdateRequest $request): RedirectResponse
     {
         $business = $request->user()->ownedBusiness;
+        $user = $request->user();
 
         abort_unless($business, 403);
 
-        $business->forceFill([
-            'brand_color' => $request->validated('brand_color'),
-        ])->save();
+        $brandColor = $request->validated('brand_color');
+
+        if (Schema::hasColumn($business->getTable(), 'brand_color')) {
+            $business->forceFill([
+                'brand_color' => $brandColor,
+            ])->save();
+        } else {
+            $preferences = $user->preferences ?? [];
+
+            if ($brandColor === null || $brandColor === '') {
+                unset($preferences['brand_color']);
+            } else {
+                $preferences['brand_color'] = $brandColor;
+            }
+
+            $user->forceFill([
+                'preferences' => $preferences,
+            ])->save();
+        }
 
         Inertia::flash('toast', [
             'type' => 'success',

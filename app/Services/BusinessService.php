@@ -13,6 +13,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class BusinessService
 {
@@ -48,11 +49,16 @@ class BusinessService
      */
     public function profileData(User $user): array
     {
-        $business = $user->ownedBusiness?->load([
+        $relations = [
             'subscription',
             'verificationDocuments',
-            'verificationReviews.reviewer:id,first_name,last_name,email,role,status',
-        ]);
+        ];
+
+        if (Schema::hasTable('business_verification_reviews')) {
+            $relations[] = 'verificationReviews.reviewer:id,first_name,last_name,email,role,status';
+        }
+
+        $business = $user->ownedBusiness?->load($relations);
 
         return [
             'business' => $business,
@@ -203,24 +209,46 @@ class BusinessService
 
     public function activateSubscription(Business $business, Subscription $plan): Business
     {
-        $business->forceFill([
+        $payload = [
             'subscription_id' => $plan->id,
-            'subscription_status' => BusinessSubscriptionStatus::Active,
-            'subscription_started_at' => now(),
-            'subscription_ends_at' => $this->subscriptionEndsAt($plan),
-        ])->save();
+        ];
+
+        if (Schema::hasColumn('businesses', 'subscription_status')) {
+            $payload['subscription_status'] = BusinessSubscriptionStatus::Active;
+        }
+
+        if (Schema::hasColumn('businesses', 'subscription_started_at')) {
+            $payload['subscription_started_at'] = now();
+        }
+
+        if (Schema::hasColumn('businesses', 'subscription_ends_at')) {
+            $payload['subscription_ends_at'] = $this->subscriptionEndsAt($plan);
+        }
+
+        $business->forceFill($payload)->save();
 
         return $business->refresh();
     }
 
     public function pendingSubscription(Business $business, Subscription $plan): Business
     {
-        $business->forceFill([
+        $payload = [
             'subscription_id' => $plan->id,
-            'subscription_status' => BusinessSubscriptionStatus::Pending,
-            'subscription_started_at' => null,
-            'subscription_ends_at' => null,
-        ])->save();
+        ];
+
+        if (Schema::hasColumn('businesses', 'subscription_status')) {
+            $payload['subscription_status'] = BusinessSubscriptionStatus::Pending;
+        }
+
+        if (Schema::hasColumn('businesses', 'subscription_started_at')) {
+            $payload['subscription_started_at'] = null;
+        }
+
+        if (Schema::hasColumn('businesses', 'subscription_ends_at')) {
+            $payload['subscription_ends_at'] = null;
+        }
+
+        $business->forceFill($payload)->save();
 
         return $business->refresh();
     }

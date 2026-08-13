@@ -42,8 +42,10 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user()?->loadMissing('business', 'ownedBusiness');
         $business = $user?->ownedBusiness ?? $user?->business;
         $businessLogo = $business ? app(BusinessService::class)->logoUrl($business) : null;
+        $brandColor = $business?->brand_color
+            ?? ($user?->preferences['brand_color'] ?? null);
 
-        View::share('brand_color', $business?->brand_color ?? null);
+        View::share('brand_color', $brandColor);
 
         return [
             ...parent::share($request),
@@ -56,7 +58,7 @@ class HandleInertiaRequests extends Middleware
                     'display_business_name' => $business?->business_name,
                 ] : null,
             ],
-            'brandColor' => $business?->brand_color ?? null,
+            'brandColor' => $brandColor,
             'navigation' => $user
                 ? app(RBACService::class)->navigationFor($user)
                 : [],

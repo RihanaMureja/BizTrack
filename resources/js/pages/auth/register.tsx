@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { LockKeyhole, Mail, Phone, UserRound } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -29,16 +30,20 @@ export default function Register({ passwordRules }: Props) {
                             <div className="grid gap-2 md:grid-cols-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="first_name">First name</Label>
-                                    <Input
-                                        id="first_name"
-                                        type="text"
-                                        required
-                                        autoFocus
-                                        tabIndex={1}
-                                        autoComplete="given-name"
-                                        name="first_name"
-                                        placeholder="First name"
-                                    />
+                                    <div className="relative">
+                                        <UserRound className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            id="first_name"
+                                            type="text"
+                                            required
+                                            autoFocus
+                                            tabIndex={1}
+                                            autoComplete="given-name"
+                                            name="first_name"
+                                            placeholder="First name"
+                                            className="pl-10"
+                                        />
+                                    </div>
                                     <InputError
                                         message={errors.first_name}
                                         className="mt-2"
@@ -47,15 +52,19 @@ export default function Register({ passwordRules }: Props) {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="last_name">Last name</Label>
-                                    <Input
-                                        id="last_name"
-                                        type="text"
-                                        required
-                                        tabIndex={2}
-                                        autoComplete="family-name"
-                                        name="last_name"
-                                        placeholder="Last name"
-                                    />
+                                    <div className="relative">
+                                        <UserRound className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            id="last_name"
+                                            type="text"
+                                            required
+                                            tabIndex={2}
+                                            autoComplete="family-name"
+                                            name="last_name"
+                                            placeholder="Last name"
+                                            className="pl-10"
+                                        />
+                                    </div>
                                     <InputError
                                         message={errors.last_name}
                                         className="mt-2"
@@ -65,42 +74,54 @@ export default function Register({ passwordRules }: Props) {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="phone">Phone</Label>
-                                <Input
-                                    id="phone"
-                                    type="text"
-                                    tabIndex={3}
-                                    autoComplete="tel"
-                                    name="phone"
-                                    placeholder="+251..."
-                                />
+                                <div className="relative">
+                                    <Phone className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        id="phone"
+                                        type="text"
+                                        tabIndex={3}
+                                        autoComplete="tel"
+                                        name="phone"
+                                        placeholder="+251..."
+                                        className="pl-10"
+                                    />
+                                </div>
                                 <InputError message={errors.phone} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
+                                <div className="relative">
+                                    <Mail className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        tabIndex={4}
+                                        autoComplete="email"
+                                        name="email"
+                                        placeholder="email@example.com"
+                                        className="pl-10"
+                                    />
+                                </div>
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
-                                <PasswordInput
-                                    id="password"
-                                    required
-                                    tabIndex={5}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                    passwordrules={passwordRules}
-                                />
+                                <div className="relative">
+                                    <LockKeyhole className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <PasswordInput
+                                        id="password"
+                                        required
+                                        tabIndex={5}
+                                        autoComplete="new-password"
+                                        name="password"
+                                        placeholder="Password"
+                                        passwordrules={passwordRules}
+                                        className="pl-10"
+                                    />
+                                </div>
                                 <InputError message={errors.password} />
                             </div>
 
@@ -108,15 +129,19 @@ export default function Register({ passwordRules }: Props) {
                                 <Label htmlFor="password_confirmation">
                                     Confirm password
                                 </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    required
-                                    tabIndex={6}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                    passwordrules={passwordRules}
-                                />
+                                <div className="relative">
+                                    <LockKeyhole className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <PasswordInput
+                                        id="password_confirmation"
+                                        required
+                                        tabIndex={6}
+                                        autoComplete="new-password"
+                                        name="password_confirmation"
+                                        placeholder="Confirm password"
+                                        passwordrules={passwordRules}
+                                        className="pl-10"
+                                    />
+                                </div>
                                 <InputError
                                     message={errors.password_confirmation}
                                 />
