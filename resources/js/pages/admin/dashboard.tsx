@@ -1,9 +1,9 @@
+import { Head } from '@inertiajs/react';
+import { Activity, Building2, CreditCard, Users, WalletCards } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { StatCard } from '@/components/stat-card/stat-card';
 import { Badge } from '@/components/ui/badge';
-import { Head } from '@inertiajs/react';
-import { Activity, Building2, CreditCard, Users, WalletCards } from 'lucide-react';
 
 type Stat = { label: string; value: string; trend: string };
 type Business = { id: number; business_name: string; business_type: string | null; status: string; owner: { email: string } | null; subscription: { name: string } | null };

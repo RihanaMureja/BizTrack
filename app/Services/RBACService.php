@@ -14,20 +14,7 @@ class RBACService
     public function navigationFor(User $user): array
     {
         return match ($user->role) {
-            Role::SuperAdmin => [
-                $this->group('Workspace', [
-                    ['title' => 'Dashboard', 'href' => '/admin', 'icon' => 'LayoutGrid'],
-                ]),
-                $this->group('Platform', [
-                    ['title' => 'Businesses', 'href' => '/admin/businesses', 'icon' => 'Building2'],
-                    ['title' => 'Users', 'href' => '/admin/users', 'icon' => 'Users'],
-                    ['title' => 'Subscriptions', 'href' => '/admin/subscriptions', 'icon' => 'CreditCard'],
-                ]),
-                $this->group('Governance', [
-                    ['title' => 'Roles & Permissions', 'href' => '/admin/roles', 'icon' => 'ShieldCheck'],
-                    ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
-                ]),
-            ],
+            Role::SuperAdmin => $this->superAdminNavigation(),
             Role::Owner => [
                 $this->group('Workspace', [
                     ['title' => 'Dashboard', 'href' => '/dashboard', 'icon' => 'LayoutGrid'],
@@ -55,6 +42,39 @@ class RBACService
             ],
             Role::Cashier => $this->employeeNavigation($user),
         };
+    }
+
+    /**
+     * @return list<array{label: string, items: list<array{title: string, href: string, icon: string}>}>
+     */
+    private function superAdminNavigation(): array
+    {
+        return [
+            $this->group('Dashboard', [
+                ['title' => 'Dashboard', 'href' => '/admin', 'icon' => 'LayoutGrid'],
+            ]),
+            $this->group('Platform', [
+                ['title' => 'Businesses', 'href' => '/admin/businesses', 'icon' => 'Building2'],
+                ['title' => 'Users', 'href' => '/admin/users', 'icon' => 'Users'],
+            ]),
+            $this->group('Subscriptions', [
+                ['title' => 'Plans', 'href' => '/admin/subscriptions', 'icon' => 'CreditCard'],
+                ['title' => 'Subscriptions', 'href' => '/admin/subscriptions/assignments', 'icon' => 'FileText'],
+            ]),
+            $this->group('Monitoring', [
+                ['title' => 'System Health', 'href' => '/admin/system-health', 'icon' => 'Activity'],
+                ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
+            ]),
+            $this->group('Reports', [
+                ['title' => 'Revenue', 'href' => '/admin/reports/revenue', 'icon' => 'ChartBar'],
+                ['title' => 'Business Growth', 'href' => '/admin/reports/business-growth', 'icon' => 'TrendingUp'],
+                ['title' => 'Subscription Analytics', 'href' => '/admin/reports/subscription-analytics', 'icon' => 'ChartColumnIncreasing'],
+            ]),
+            $this->group('Access Control', [
+                ['title' => 'Roles & Permissions', 'href' => '/admin/roles', 'icon' => 'ShieldCheck'],
+                ['title' => 'Permissions', 'href' => '/admin/permissions', 'icon' => 'KeyRound'],
+            ]),
+        ];
     }
 
     /**

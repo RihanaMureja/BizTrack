@@ -120,7 +120,7 @@ export function ExpenseForm({ expense, categories, statuses, onSuccess }: Props)
 
             <Button type="submit" className="w-fit" disabled={form.processing}>
                 {form.processing ? <Spinner /> : <Save className="size-4" />}
-                {isEditing ? 'Save changes' : 'Record expense'}
+                {isEditing ? 'Save changes' : 'Record transaction'}
             </Button>
         </form>
     );

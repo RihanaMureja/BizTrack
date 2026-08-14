@@ -120,27 +120,27 @@ export default function ExpensesIndex({ expenses, categories, statuses, sources,
 
     return (
         <>
-            <Head title="Expenses" />
+            <Head title="Transactions" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-                            <WalletCards className="size-5" />
+                            <FileText className="size-5" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-semibold">Expenses</h1>
-                            <p className="text-sm text-muted-foreground">Record business costs, organize categories, and track receipts.</p>
+                            <h1 className="text-xl font-semibold">Transactions</h1>
+                            <p className="text-sm text-muted-foreground">Track all business expenses and revenue in one place.</p>
                         </div>
                     </div>
                     {expenses && (
                         <div className="flex flex-wrap gap-2">
                             <Button type="button" variant="outline" onClick={() => setCategoryOpen(true)}>
                                 <Tags className="size-4" />
-                                Category
+                                Categories
                             </Button>
                             <Button type="button" onClick={() => setCreateOpen(true)}>
                                 <Plus className="size-4" />
-                                New expense
+                                New Transaction
                             </Button>
                         </div>
                     )}
@@ -150,7 +150,7 @@ export default function ExpensesIndex({ expenses, categories, statuses, sources,
                     <Alert variant="destructive">
                         <AlertTriangle />
                         <AlertTitle>Business profile required</AlertTitle>
-                        <AlertDescription>Create your business profile before recording expenses.</AlertDescription>
+                        <AlertDescription>Create your business profile before recording transactions.</AlertDescription>
                     </Alert>
                 ) : (
                     <>
@@ -176,7 +176,7 @@ export default function ExpensesIndex({ expenses, categories, statuses, sources,
                             <FileText className="size-8 text-primary" />
                         </div>
 
-                        <DataTable columns={columns} data={expenses.data} rowKey={(expense) => expense.id} emptyMessage="No expenses match the current filters." />
+                        <DataTable columns={columns} data={expenses.data} rowKey={(expense) => expense.id} emptyMessage="No transactions match the current filters." />
                         <Pagination links={expenses.links} from={expenses.from} to={expenses.to} total={expenses.total} />
                     </>
                 )}
@@ -184,28 +184,28 @@ export default function ExpensesIndex({ expenses, categories, statuses, sources,
 
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogContent className="max-w-2xl">
-                    <DialogHeader><DialogTitle>New expense</DialogTitle></DialogHeader>
-                    <ExpenseForm expense={null} categories={categories} statuses={statuses} onSuccess={() => setCreateOpen(false)} />
+                    <DialogHeader><DialogTitle>New transaction</DialogTitle></DialogHeader>
+                    <ExpenseForm transaction={null} categories={categories} statuses={statuses} sources={sources} onSuccess={() => setCreateOpen(false)} />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={Boolean(editingExpense)} onOpenChange={(open) => !open && setEditingExpense(null)}>
                 <DialogContent className="max-w-2xl">
-                    <DialogHeader><DialogTitle>Edit expense</DialogTitle></DialogHeader>
-                    <ExpenseForm expense={editingExpense} categories={categories} statuses={statuses} onSuccess={() => setEditingExpense(null)} />
+                    <DialogHeader><DialogTitle>Edit transaction</DialogTitle></DialogHeader>
+                    <ExpenseForm transaction={editingExpense} categories={categories} statuses={statuses} sources={sources} onSuccess={() => setEditingExpense(null)} />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={categoryOpen} onOpenChange={setCategoryOpen}>
                 <DialogContent>
-                    <DialogHeader><DialogTitle>New expense category</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>New category</DialogTitle></DialogHeader>
                     <ExpenseCategoryForm category={null} onSuccess={() => setCategoryOpen(false)} />
                 </DialogContent>
             </Dialog>
 
-            <DeleteDialog open={Boolean(deletingExpense)} onOpenChange={(open) => !open && setDeletingExpense(null)} itemLabel={deletingExpense?.title ?? 'this expense'} onConfirm={confirmDelete} processing={deleting} />
+            <DeleteDialog open={Boolean(deletingExpense)} onOpenChange={(open) => !open && setDeletingExpense(null)} itemLabel={deletingExpense?.title ?? 'this transaction'} onConfirm={confirmDelete} processing={deleting} />
         </>
     );
 }
 
-ExpensesIndex.layout = { breadcrumbs: [{ title: 'Dashboard', href: '/dashboard' }, { title: 'Expenses', href: '/expenses' }] };
+ExpensesIndex.layout = { breadcrumbs: [{ title: 'Dashboard', href: '/dashboard' }, { title: 'Transactions', href: '/expenses' }] };

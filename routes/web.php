@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\AdminSubscriptionAssignmentsController;
 use App\Http\Controllers\AdminSubscriptionController;
 use App\Http\Controllers\BusinessManagementController;
 use App\Http\Controllers\BusinessLogoController;
@@ -22,6 +24,7 @@ use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Onboarding\OnboardingController;
 use App\Http\Controllers\Onboarding\TrialActivationController;
+use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentReceiptController;
 use App\Http\Controllers\ProductController;
@@ -31,6 +34,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\AdminSystemHealthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserManagementController;
@@ -67,9 +71,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('businesses', [BusinessManagementController::class, 'index'])->name('businesses.index');
         Route::get('users', [UserManagementController::class, 'index'])->name('users.index');
         Route::put('users/{user}', [UserManagementController::class, 'update'])->name('users.update');
+        Route::get('subscriptions/assignments', [AdminSubscriptionAssignmentsController::class, 'index'])->name('subscriptions.assignments.index');
         Route::post('subscriptions/{subscription}/activate', [AdminSubscriptionController::class, 'activate'])->name('subscriptions.activate');
         Route::post('subscriptions/{subscription}/deactivate', [AdminSubscriptionController::class, 'deactivate'])->name('subscriptions.deactivate');
         Route::resource('subscriptions', AdminSubscriptionController::class)->only(['index', 'store', 'update']);
+        Route::get('system-health', [AdminSystemHealthController::class, 'index'])->name('system-health.index');
+        Route::prefix('reports')->name('reports.')->group(function (): void {
+            Route::get('revenue', [AdminReportController::class, 'revenue'])->name('revenue');
+            Route::get('business-growth', [AdminReportController::class, 'businessGrowth'])->name('business-growth');
+            Route::get('subscription-analytics', [AdminReportController::class, 'subscriptionAnalytics'])->name('subscription-analytics');
+        });
         Route::resource('roles', RoleController::class)->only(['index']);
         Route::resource('permissions', PermissionController::class)->only(['index']);
     });
@@ -143,7 +154,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('sales', SaleController::class)->only(['index', 'show']);
         });
 
-        Route::middleware('business.permission:manage_payments')->group(function () {
+        Route::middleware('business.permission:manage_payments|manage_expenses')->group(function () {
+            Route::get('transactions', [TransactionsController::class, 'index'])->name('transactions.index');
             Route::post('payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
             Route::get('payments/{payment}/receipt', [PaymentReceiptController::class, 'show'])->name('payments.receipt.show');
             Route::resource('payments', PaymentController::class)->only(['index', 'show']);

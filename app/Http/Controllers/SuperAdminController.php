@@ -6,7 +6,6 @@ use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\AuditLog;
 use App\Models\Business;
-use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,10 +20,13 @@ class SuperAdminController extends Controller
 
         return Inertia::render('admin/dashboard', [
             'stats' => [
-                ['label' => 'Businesses', 'value' => (string) Business::count(), 'trend' => Business::where('status', RecordStatus::Active)->count().' active'],
-                ['label' => 'Users', 'value' => (string) User::count(), 'trend' => User::where('role', Role::Owner)->count().' owners'],
-                ['label' => 'Subscriptions', 'value' => (string) Subscription::count(), 'trend' => Subscription::where('status', RecordStatus::Active)->count().' active plans'],
-                ['label' => 'Payment Volume', 'value' => number_format((float) Payment::sum('amount'), 2).' ETB', 'trend' => 'Recorded platform payments'],
+                ['label' => 'Businesses', 'value' => (string) Business::count(), 'trend' => Business::where('status', RecordStatus::Active->value)->count().' active'],
+                ['label' => 'Users', 'value' => (string) User::count(), 'trend' => User::where('role', Role::Owner->value)->count().' owners'],
+                ['label' => 'Subscriptions', 'value' => (string) Subscription::count(), 'trend' => Subscription::where('status', RecordStatus::Active->value)->count().' active plans'],
+                ['label' => 'Platform MRR', 'value' => number_format((float) Business::query()
+                    ->join('subscriptions', 'businesses.subscription_id', '=', 'subscriptions.id')
+                    ->where('subscriptions.status', RecordStatus::Active->value)
+                    ->sum('subscriptions.price'), 2).' ETB', 'trend' => 'Active assigned plans'],
             ],
             'recentBusinesses' => Business::query()
                 ->with(['owner:id,first_name,last_name,email,role,status', 'subscription:id,name'])

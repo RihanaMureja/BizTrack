@@ -21,14 +21,14 @@ class BusinessService
     public function paginateForAdmin(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
         return Business::query()
-            ->with(['owner:id,first_name,last_name,email,role,status', 'subscription:id,name'])
+            ->with(['owner:id,first_name,last_name,email,role,status,created_at', 'subscription:id,name,price,duration_months,max_cashiers,status'])
             ->withCount(['users', 'products', 'sales'])
             ->when($filters['search'] ?? null, fn ($query, $search) => $query->where(fn ($searchQuery) => $searchQuery
                 ->where('business_name', 'like', '%'.$search.'%')
                 ->orWhere('business_type', 'like', '%'.$search.'%')
                 ->orWhere('email', 'like', '%'.$search.'%')
                 ->orWhereHas('owner', fn ($ownerQuery) => $ownerQuery->where('email', 'like', '%'.$search.'%'))))
-            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('access_mode', $status))
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();

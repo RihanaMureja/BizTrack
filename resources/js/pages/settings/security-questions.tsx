@@ -1,12 +1,12 @@
-import InputError from '@/components/input-error';
+import { Head, useForm } from '@inertiajs/react';
+import { ShieldQuestion } from 'lucide-react';
+import type { FormEvent } from 'react';
 import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Head, useForm } from '@inertiajs/react';
-import { ShieldQuestion } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 type Question = {
     id: number;
@@ -40,11 +40,11 @@ export default function SecurityQuestions({ questions, configuredQuestions }: Pr
 
     return (
         <>
-            <Head title="Security questions" />
+            <Head title="Backup" />
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Security questions"
+                    title="Backup"
                     description="Add an account recovery question that only you can answer."
                 />
 
@@ -112,6 +112,6 @@ export default function SecurityQuestions({ questions, configuredQuestions }: Pr
 
 SecurityQuestions.layout = {
     breadcrumbs: [
-        { title: 'Security questions', href: '/settings/security-questions' },
+        { title: 'Backup', href: '/settings/security-questions' },
     ],
 };

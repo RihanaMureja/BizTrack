@@ -20,6 +20,7 @@ export function RestockBatchForm({ item, onSuccess }: { item: InventoryItem; onS
     const form = useForm({
         quantity: '1',
         unit_cost: '',
+        selling_price: '',
         received_at: new Date().toISOString().slice(0, 10),
         expiry_date: '',
         notes: '',
@@ -52,6 +53,11 @@ export function RestockBatchForm({ item, onSuccess }: { item: InventoryItem; onS
                     <Label htmlFor="restock_unit_cost">Unit cost</Label>
                     <Input id="restock_unit_cost" type="number" min="0" step="0.01" value={form.data.unit_cost} onChange={(event) => form.setData('unit_cost', event.target.value)} required />
                     <InputError message={form.errors.unit_cost} />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="restock_selling_price">Selling price</Label>
+                    <Input id="restock_selling_price" type="number" min="0" step="0.01" value={form.data.selling_price} onChange={(event) => form.setData('selling_price', event.target.value)} required />
+                    <InputError message={form.errors.selling_price} />
                 </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">

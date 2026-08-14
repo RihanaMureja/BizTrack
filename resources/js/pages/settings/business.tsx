@@ -1,11 +1,12 @@
-import { BusinessForm } from '@/components/forms/business-form';
-import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
-import Heading from '@/components/heading';
-import { DemoPlanPaymentModal, type DemoPaymentPlan } from '@/components/subscriptions/demo-plan-payment-modal';
-import { PlanSelectionCard } from '@/components/subscriptions/plan-selection-card';
 import { Head, useForm } from '@inertiajs/react';
 import { Building2, CreditCard, Eye } from 'lucide-react';
 import { useState } from 'react';
+import { BusinessForm } from '@/components/forms/business-form';
+import type { BusinessFormBusiness, BusinessFormSubscription } from '@/components/forms/business-form';
+import Heading from '@/components/heading';
+import type { DemoPaymentPlan } from '@/components/subscriptions/demo-plan-payment-modal';
+import { DemoPlanPaymentModal } from '@/components/subscriptions/demo-plan-payment-modal';
+import { PlanSelectionCard } from '@/components/subscriptions/plan-selection-card';
 
 type Props = {
     business: (BusinessFormBusiness & {
@@ -33,13 +34,13 @@ export default function BusinessSettings({ business, subscriptions, businessCate
 
     return (
         <>
-            <Head title="Business settings" />
+            <Head title="Payment settings" />
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Business"
-                    description="Manage business details used on receipts, reports, inventory, and sales."
+                    title="Payment Settings"
+                    description="Manage business details, billing, and plan changes."
                 />
 
                 <section className="rounded-md border bg-card p-5 shadow-sm">
@@ -122,6 +123,6 @@ export default function BusinessSettings({ business, subscriptions, businessCate
 BusinessSettings.layout = {
     breadcrumbs: [
         { title: 'Settings', href: '/settings/profile' },
-        { title: 'Business', href: '/settings/business' },
+        { title: 'Payment Settings', href: '/settings/business' },
     ],
 };

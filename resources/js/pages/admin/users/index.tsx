@@ -1,3 +1,6 @@
+import { Head, router } from '@inertiajs/react';
+import { CheckCircle2, CirclePause, ShieldCheck, Users } from 'lucide-react';
+import { useState } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { Pagination } from '@/components/pagination/pagination';
@@ -6,17 +9,14 @@ import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, router } from '@inertiajs/react';
-import { Ban, CheckCircle2, CirclePause, Clock3, ShieldCheck, Users } from 'lucide-react';
-import { useState } from 'react';
 
-type User = { id: number; first_name: string | null; last_name: string | null; email: string; role: string; role_label: string; status: string; business: { business_name: string } | null };
+type User = { id: number; first_name: string | null; last_name: string | null; email: string; role: string; role_label: string; status: string; created_at: string; business: { business_name: string } | null };
 type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; to: number | null; total: number };
 type Option = { value: string; label: string };
 type Props = { users: Paginated<User>; roles: Option[]; statuses: Option[]; filters: { search: string | null; role: string | null; status: string | null }; currentUserId: number };
 
-const prettyStatus = (status: string) => status.split('_').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
-const statusVariant = (status: string) => status === 'active' ? 'default' : status === 'suspended' || status === 'rejected' ? 'destructive' : 'secondary';
+const prettyStatus = (status: string) => (status === 'active' ? 'Active' : 'Inactive');
+const statusVariant = (status: string) => status === 'active' ? 'default' : 'secondary';
 const roleVariant = (role: string) => role === 'super_admin' ? 'default' : role === 'owner' ? 'secondary' : 'outline';
 
 export default function AdminUsersIndex({ users, roles, statuses, filters, currentUserId }: Props) {
@@ -29,7 +29,9 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
         setSelectedStatus('');
     };
     const updateStatus = () => {
-        if (!statusTarget || !selectedStatus) return;
+        if (!statusTarget || !selectedStatus) {
+            return;
+        }
 
         router.put(`/admin/users/${statusTarget.id}`, { status: selectedStatus }, {
             preserveScroll: true,
@@ -44,6 +46,7 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
         { key: 'business', header: 'Business', render: (user) => user.business?.business_name ?? 'Platform' },
         { key: 'role', header: 'Role', render: (user) => <Badge variant={roleVariant(user.role)}>{user.role_label}</Badge> },
         { key: 'status', header: 'Status', render: (user) => <Badge variant={statusVariant(user.status)}>{prettyStatus(user.status)}</Badge> },
+        { key: 'created_at', header: 'Registration Date', render: (user) => new Date(user.created_at).toLocaleDateString() },
         {
             key: 'actions',
             header: '',
@@ -140,25 +143,9 @@ function statusStyle(status: string): { Icon: typeof CheckCircle2; activeClass: 
         };
     }
 
-    if (status === 'inactive') {
-        return {
-            Icon: CirclePause,
-            activeClass: 'border-slate-700 bg-slate-700 text-white shadow-sm',
-            idleClass: 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100',
-        };
-    }
-
-    if (['suspended', 'rejected'].includes(status)) {
-        return {
-            Icon: Ban,
-            activeClass: 'border-red-600 bg-red-600 text-white shadow-sm',
-            idleClass: 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100',
-        };
-    }
-
     return {
-        Icon: Clock3,
-        activeClass: 'border-amber-600 bg-amber-500 text-white shadow-sm',
-        idleClass: 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100',
+        Icon: CirclePause,
+        activeClass: 'border-slate-700 bg-slate-700 text-white shadow-sm',
+        idleClass: 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100',
     };
 }

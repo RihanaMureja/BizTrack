@@ -20,7 +20,6 @@ export type ProductFormProduct = {
     qr_payload?: string | null;
     description?: string | null;
     buy_price?: string | number;
-    selling_price?: string | number;
     unit?: string | null;
     reorder_level?: number;
     status?: string;
@@ -40,7 +39,6 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
         name: product?.name ?? '',
         description: product?.description ?? '',
         buy_price: String(product?.buy_price ?? ''),
-        selling_price: String(product?.selling_price ?? ''),
         unit: product?.unit ?? '',
         reorder_level: String(product?.reorder_level ?? 0),
         status: product?.status ?? 'active',
@@ -118,20 +116,6 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
                         required
                     />
                     <InputError message={form.errors.buy_price} />
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="selling_price">Selling price</Label>
-                    <Input
-                        id="selling_price"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={form.data.selling_price}
-                        onChange={(event) => form.setData('selling_price', event.target.value)}
-                        required
-                    />
-                    <InputError message={form.errors.selling_price} />
                 </div>
 
                 <div className="grid gap-2">

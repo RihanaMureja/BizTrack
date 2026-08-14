@@ -1,11 +1,11 @@
+import { Head, useForm } from '@inertiajs/react';
+import { Save, SlidersHorizontal } from 'lucide-react';
+import type { FormEvent } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, useForm } from '@inertiajs/react';
-import { Save, SlidersHorizontal } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 type Option = { value: string; label: string };
 type Preferences = {
@@ -54,13 +54,13 @@ export default function Preferences({ preferences, options }: Props) {
 
     return (
         <>
-            <Head title="Preferences" />
-            <h1 className="sr-only">Preferences</h1>
+            <Head title="Notification preferences" />
+            <h1 className="sr-only">Notification preferences</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Preferences"
+                    title="Notification Preferences"
                     description="Set account defaults for navigation, display, records, and notifications"
                 />
 
@@ -205,7 +205,7 @@ function PreferenceToggle({ label, checked, onChange }: { label: string; checked
 Preferences.layout = {
     breadcrumbs: [
         {
-            title: 'Preferences',
+            title: 'Notification Preferences',
             href: '/settings/preferences',
         },
     ],

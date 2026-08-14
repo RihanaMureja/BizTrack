@@ -60,11 +60,13 @@ export function CategoryForm({ category, onSuccess }: Props) {
 
             <div className="grid gap-2">
                 <Label htmlFor="description">Description</Label>
-                <Input
+                <textarea
                     id="description"
-                    value={form.data.description}
+                    value={form.data.description ?? ''}
                     onChange={(event) => form.setData('description', event.target.value)}
                     placeholder="Optional"
+                    rows={3}
+                    className="border-input bg-background min-h-24 rounded-md border px-3 py-2 text-sm"
                 />
                 <InputError message={form.errors.description} />
             </div>

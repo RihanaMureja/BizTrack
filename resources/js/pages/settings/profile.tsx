@@ -26,14 +26,14 @@ export default function Profile({
 
     return (
         <>
-            <Head title="Profile settings" />
+            <Head title="General settings" />
 
-            <h1 className="sr-only">Profile settings</h1>
+            <h1 className="sr-only">General settings</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Profile"
+                    title="General"
                     description="Update your name and email address"
                 />
 
@@ -185,7 +185,7 @@ export default function Profile({
 Profile.layout = {
     breadcrumbs: [
         {
-            title: 'Profile settings',
+            title: 'General',
             href: edit(),
         },
     ],

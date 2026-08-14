@@ -13,13 +13,13 @@ import type { NavItem, SharedData } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'General',
         href: edit(),
         icon: null,
     },
     {
-        title: 'Business',
-        href: '/settings/business',
+        title: 'Notification Preferences',
+        href: editPreferences(),
         icon: null,
     },
     {
@@ -28,13 +28,13 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Security Questions',
-        href: '/settings/security-questions',
+        title: 'Payment Settings',
+        href: '/settings/business',
         icon: null,
     },
     {
-        title: 'Preferences',
-        href: editPreferences(),
+        title: 'Backup',
+        href: '/settings/security-questions',
         icon: null,
     },
     {
@@ -47,13 +47,13 @@ const sidebarNavItems: NavItem[] = [
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const { auth } = usePage<SharedData>().props;
-    const visibleNavItems = sidebarNavItems.filter((item) => item.title !== 'Business' || auth.user.role === 'owner');
+    const visibleNavItems = sidebarNavItems.filter((item) => item.title !== 'Payment Settings' || auth.user.role === 'owner');
 
     return (
         <div className="px-4 py-6">
             <Heading
                 title="Settings"
-                description="Manage your profile and account settings"
+                description="Manage general, notification, security, payment, backup, and appearance settings"
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

@@ -1,10 +1,10 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
+import type { FormEvent } from 'react';
 import AppearanceTabs from '@/components/appearance-tabs';
 import Heading from '@/components/heading';
 import { ThemePalettePreview } from '@/components/settings/theme-palette-preview';
-import { edit as editAppearance } from '@/routes/appearance';
 import { Button } from '@/components/ui/button';
-import type { FormEvent } from 'react';
+import { edit as editAppearance } from '@/routes/appearance';
 
 type TenantTheme = {
     primary: string;
@@ -63,14 +63,14 @@ export default function Appearance() {
 
     return (
         <>
-            <Head title="Appearance settings" />
+            <Head title="Appearance" />
 
-            <h1 className="sr-only">Appearance settings</h1>
+            <h1 className="sr-only">Appearance</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Appearance settings"
+                    title="Appearance"
                     description="Update the appearance settings for your account"
                 />
                 <AppearanceTabs />
@@ -146,7 +146,7 @@ export default function Appearance() {
 Appearance.layout = {
     breadcrumbs: [
         {
-            title: 'Appearance settings',
+            title: 'Appearance',
             href: editAppearance(),
         },
     ],

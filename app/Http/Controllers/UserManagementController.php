@@ -42,7 +42,10 @@ class UserManagementController extends Controller
                 ->paginate(12)
                 ->withQueryString(),
             'roles' => collect(Role::cases())->map(fn (Role $role): array => ['value' => $role->value, 'label' => $role->label()]),
-            'statuses' => collect(RecordStatus::cases())->map(fn (RecordStatus $status): array => ['value' => $status->value, 'label' => ucfirst($status->value)]),
+            'statuses' => [
+                ['value' => RecordStatus::Active->value, 'label' => 'Active'],
+                ['value' => RecordStatus::Inactive->value, 'label' => 'Inactive'],
+            ],
             'filters' => $filters,
             'currentUserId' => $request->user()->id,
         ]);

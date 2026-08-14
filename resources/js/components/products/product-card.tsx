@@ -19,7 +19,7 @@ export type CatalogProduct = {
     reorder_level: number;
     status: string;
     category: { id: number; name: string } | null;
-    inventory: { quantity: number; available_stock: number } | null;
+    inventory: { quantity: number; available_stock: number; selling_price?: string | null } | null;
     sales_trend?: Array<{ date: string; units: number }>;
     open_insight?: {
         id: number;
@@ -41,6 +41,10 @@ export function ProductCard({ product, onEdit, onDeactivate }: Props) {
     const { auth } = usePage<{ auth: { user?: { business_category?: string | null } | null } }>().props;
     const visual = visualForBusinessCategory(auth.user?.business_category);
     const Icon = visual.Icon;
+
+    const sellingPrice = product.inventory?.selling_price !== null && product.inventory?.selling_price !== undefined
+        ? Number(product.inventory.selling_price)
+        : Number(product.selling_price);
 
     const stop = (event: MouseEvent) => {
         event.stopPropagation();
@@ -75,7 +79,7 @@ export function ProductCard({ product, onEdit, onDeactivate }: Props) {
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-md bg-muted/50 p-3">
                     <p className="text-xs text-muted-foreground">Selling price</p>
-                    <p className="mt-1 font-semibold">{Number(product.selling_price).toLocaleString()} ETB</p>
+                    <p className="mt-1 font-semibold">{sellingPrice.toLocaleString()} ETB</p>
                 </div>
                 <div className="rounded-md bg-muted/50 p-3">
                     <p className="text-xs text-muted-foreground">Available stock</p>
