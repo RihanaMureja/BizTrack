@@ -28,12 +28,12 @@ class InventoryService
                     ->when($search, function ($query) use ($search): void {
                         $query->where(function ($query) use ($search): void {
                             $query
-                                ->where('name', 'like', '%'.$search.'%')
-                                ->orWhere('barcode', 'like', '%'.$search.'%');
+                                ->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('barcode', 'like', '%' . $search . '%');
                         });
                     })
-                    ->when($status === 'low', fn ($query) => $query->whereColumn('products.reorder_level', '>=', 'inventory.available_stock'))
-                    ->when($status === 'out', fn ($query) => $query->where('inventory.available_stock', '<=', 0));
+                    ->when($status === 'low', fn($query) => $query->whereColumn('products.reorder_level', '>=', 'inventory.available_stock'))
+                    ->when($status === 'out', fn($query) => $query->where('inventory.available_stock', '<=', 0));
             })
             ->orderBy('available_stock')
             ->paginate($perPage)
@@ -58,9 +58,9 @@ class InventoryService
         ?string $expiryDate,
         ?string $notes,
         User $user,
-    ): InventoryBatch
-    {
-        return $this->inventoryBatchService->restock($inventory, $quantity, $unitCost, $receivedAt, $expiryDate, $notes, $user);
+        ?float $sellingPrice = null,
+    ): InventoryBatch {
+        return $this->inventoryBatchService->restock($inventory, $quantity, $unitCost, $receivedAt, $expiryDate, $notes, $user, InventoryTransactionType::Restock, $sellingPrice);
     }
 
     public function adjust(Inventory $inventory, InventoryTransactionType $type, int $quantity, ?string $notes, User $user): void

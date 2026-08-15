@@ -29,7 +29,7 @@ class RBACService
                     ['title' => 'Payments', 'href' => '/payments', 'icon' => 'CreditCard'],
                     ['title' => 'Customers', 'href' => '/customers', 'icon' => 'Users'],
                     ['title' => 'Credit & Discounts', 'href' => '/credit-discounts', 'icon' => 'BadgePercent'],
-                    ['title' => 'Expenses', 'href' => '/expenses', 'icon' => 'WalletCards'],
+                    ['title' => 'Transactions', 'href' => '/transactions', 'icon' => 'WalletCards'],
                     ['title' => 'Reports', 'href' => '/reports', 'icon' => 'ChartNoAxesCombined'],
                 ]),
                 $this->group('Team', [
@@ -101,16 +101,16 @@ class RBACService
             BusinessPermissionKey::ViewSales->value => ['title' => 'Sales', 'href' => '/sales', 'icon' => 'Receipt'],
             BusinessPermissionKey::ManagePayments->value => ['title' => 'Payments', 'href' => '/payments', 'icon' => 'CreditCard'],
             BusinessPermissionKey::ManageCustomers->value => ['title' => 'Customers', 'href' => '/customers', 'icon' => 'Users'],
-            BusinessPermissionKey::ManageExpenses->value => ['title' => 'Expenses', 'href' => '/expenses', 'icon' => 'WalletCards'],
+            BusinessPermissionKey::ManageExpenses->value => ['title' => 'Transactions', 'href' => '/transactions', 'icon' => 'WalletCards'],
             BusinessPermissionKey::ViewReports->value => ['title' => 'Reports', 'href' => '/reports', 'icon' => 'ChartNoAxesCombined'],
         ]));
 
         $groups[] = $this->group('Team', $this->permittedItems($user, [
             BusinessPermissionKey::ManageEmployees->value => ['title' => 'Employees', 'href' => '/cashiers', 'icon' => 'UserRound'],
-            BusinessPermissionKey::ManageEmployees->value.'.roles' => ['title' => 'Employee Roles', 'href' => '/business-roles', 'icon' => 'ShieldCheck'],
+            BusinessPermissionKey::ManageEmployees->value . '.roles' => ['title' => 'Employee Roles', 'href' => '/business-roles', 'icon' => 'ShieldCheck'],
         ]));
 
-        return array_values(array_filter($groups, fn (array $group): bool => count($group['items']) > 0));
+        return array_values(array_filter($groups, fn(array $group): bool => count($group['items']) > 0));
     }
 
     /**

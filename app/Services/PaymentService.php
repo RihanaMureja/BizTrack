@@ -27,13 +27,43 @@ class PaymentService
         return Payment::query()
             ->with(['sale', 'customer', 'user'])
             ->where('business_id', $business->id)
-            ->when($search, fn ($query) => $query->where(fn ($searchQuery) => $searchQuery
-                ->where('payment_number', 'like', '%'.$search.'%')
-                ->orWhere('reference', 'like', '%'.$search.'%')
-                ->orWhereHas('sale', fn ($saleQuery) => $saleQuery->where('invoice_number', 'like', '%'.$search.'%'))))
+            ->when($search, fn($query) => $query->where(fn($searchQuery) => $searchQuery
+                ->where('payment_number', 'like', '%' . $search . '%')
+                ->orWhere('reference', 'like', '%' . $search . '%')
+                ->orWhereHas('sale', fn($saleQuery) => $saleQuery->where('invoice_number', 'like', '%' . $search . '%'))))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function paginateCompletedForBusiness(Business $business, ?string $search = null, ?string $dateFrom = null, ?string $dateTo = null, int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->basePaymentQuery($business, $search, $dateFrom, $dateTo)
+            ->latest('paid_at')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    public function revenueTotalForBusiness(Business $business, ?string $search = null, ?string $dateFrom = null, ?string $dateTo = null): string
+    {
+        $total = (float) $this->basePaymentQuery($business, $search, $dateFrom, $dateTo)
+            ->sum('amount');
+
+        return number_format($total, 2);
+    }
+
+    private function basePaymentQuery(Business $business, ?string $search = null, ?string $dateFrom = null, ?string $dateTo = null)
+    {
+        return Payment::query()
+            ->with(['sale', 'customer', 'user'])
+            ->where('business_id', $business->id)
+            ->where('status', PaymentStatus::Completed->value)
+            ->when($search, fn($query) => $query->where(fn($searchQuery) => $searchQuery
+                ->where('payment_number', 'like', '%' . $search . '%')
+                ->orWhere('reference', 'like', '%' . $search . '%')
+                ->orWhereHas('sale', fn($saleQuery) => $saleQuery->where('invoice_number', 'like', '%' . $search . '%'))))
+            ->when($dateFrom, fn($query, $date) => $query->whereDate('paid_at', '>=', $date))
+            ->when($dateTo, fn($query, $date) => $query->whereDate('paid_at', '<=', $date));
     }
 
     public function create(Business $business, User $user, array $data): Payment
@@ -200,9 +230,9 @@ class PaymentService
 
     protected function nextPaymentNumber(Business $business): string
     {
-        $prefix = 'PAY-'.$business->id.'-'.now()->format('Ymd').'-';
-        $next = Payment::query()->where('business_id', $business->id)->where('payment_number', 'like', $prefix.'%')->count() + 1;
+        $prefix = 'PAY-' . $business->id . '-' . now()->format('Ymd') . '-';
+        $next = Payment::query()->where('business_id', $business->id)->where('payment_number', 'like', $prefix . '%')->count() + 1;
 
-        return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 }

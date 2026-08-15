@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['product_id', 'business_id', 'batch_number', 'quantity_received', 'quantity_remaining', 'unit_cost', 'received_at', 'expiry_date'])]
+#[Fillable(['product_id', 'business_id', 'batch_number', 'quantity_received', 'quantity_remaining', 'unit_cost', 'selling_price', 'received_at', 'expiry_date'])]
 class InventoryBatch extends Model
 {
     use HasFactory;
@@ -19,6 +19,7 @@ class InventoryBatch extends Model
             'quantity_received' => 'integer',
             'quantity_remaining' => 'integer',
             'unit_cost' => 'decimal:2',
+            'selling_price' => 'decimal:2',
             'received_at' => 'datetime',
             'expiry_date' => 'date',
         ];

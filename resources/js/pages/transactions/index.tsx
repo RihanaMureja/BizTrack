@@ -9,12 +9,29 @@ import { SearchBox } from '@/components/search-box/search-box';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, CreditCard, FileText, MoreVertical, Trash2, WalletCards } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+    AlertTriangle,
+    CreditCard,
+    FileText,
+    MoreVertical,
+    Trash2,
+    WalletCards,
+} from 'lucide-react';
+import { useState } from 'react';
 
-type ExpenseCategory = { id: number; name: string; description: string | null; expenses_count: number };
+type ExpenseCategory = {
+    id: number;
+    name: string;
+    description: string | null;
+    expenses_count: number;
+};
 type Expense = {
     id: number;
     expense_category_id: number;
@@ -44,7 +61,13 @@ type Payment = {
 };
 type Status = { value: string; label: string };
 type Source = { value: string; label: string };
-type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; to: number | null; total: number };
+type Paginated<T> = {
+    data: T[];
+    links: PaginationLink[];
+    from: number | null;
+    to: number | null;
+    total: number;
+};
 type Props = {
     activeTab: 'revenue' | 'expenses';
     expenses: Paginated<Expense> | null;
@@ -53,35 +76,57 @@ type Props = {
     expenseStatuses: Status[];
     expenseSources: Source[];
     total: string;
-    filters: { search: string | null; category_id: number | null; source: string | null; date_from: string | null; date_to: string | null };
+    revenueTotal: string;
+    filters: {
+        search: string | null;
+        category_id: number | null;
+        source: string | null;
+        date_from: string | null;
+        date_to: string | null;
+    };
 };
 
 const statusVariant = (status: string) => {
-    if (status === 'paid' || status === 'approved' || status === 'completed') return 'default';
+    if (status === 'paid' || status === 'approved' || status === 'completed')
+        return 'default';
     if (status === 'rejected' || status === 'failed') return 'destructive';
     return 'secondary';
 };
 
-export default function TransactionsIndex({ activeTab: initialActiveTab, expenses, payments, expenseCategories, expenseStatuses, expenseSources, total, filters }: Props) {
-    const [activeTab, setActiveTab] = useState<Props['activeTab']>(initialActiveTab);
-    const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
+export default function TransactionsIndex({
+    activeTab,
+    expenses,
+    payments,
+    expenseCategories,
+    expenseStatuses,
+    expenseSources,
+    total,
+    revenueTotal,
+    filters,
+}: Props) {
+    const [deletingExpense, setDeletingExpense] = useState<Expense | null>(
+        null,
+    );
     const [deleting, setDeleting] = useState(false);
-    const [receiptPaymentId, setReceiptPaymentId] = useState<number | null>(null);
+    const [receiptPaymentId, setReceiptPaymentId] = useState<number | null>(
+        null,
+    );
+    const [currentTab, setCurrentTab] = useState<Props['activeTab']>(activeTab);
 
-    useEffect(() => {
-        setActiveTab(initialActiveTab);
-    }, [initialActiveTab]);
-
-    const visitTransactions = (nextTab: Props['activeTab'], nextFilters: Partial<Props['filters']> = {}) => {
-        router.get('/transactions', {
-            tab: nextTab,
-            search: filters.search ?? '',
-            category_id: filters.category_id ?? '',
-            source: filters.source ?? '',
-            date_from: filters.date_from ?? '',
-            date_to: filters.date_to ?? '',
-            ...nextFilters,
-        }, { preserveScroll: true, preserveState: true, replace: true });
+    const visitTransactions = (nextFilters: Partial<Props['filters']> = {}) => {
+        router.get(
+            '/transactions',
+            {
+                tab: currentTab,
+                search: filters.search ?? '',
+                category_id: filters.category_id ?? '',
+                source: filters.source ?? '',
+                date_from: filters.date_from ?? '',
+                date_to: filters.date_to ?? '',
+                ...nextFilters,
+            },
+            { preserveScroll: true, preserveState: true, replace: true },
+        );
     };
 
     const confirmDelete = () => {
@@ -103,19 +148,53 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
             render: (expense) => (
                 <div>
                     <p className="font-medium">{expense.title}</p>
-                    <p className="text-xs text-muted-foreground">{expense.vendor || 'No vendor'} | {expense.user?.name ?? 'System'}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {expense.vendor || 'No vendor'} |{' '}
+                        {expense.user?.name ?? 'System'}
+                    </p>
                 </div>
             ),
         },
-        { key: 'category', header: 'Category', render: (expense) => expense.category?.name ?? 'Uncategorized' },
-        { key: 'source', header: 'Source', render: (expense) => <AutoGeneratedBadge source={expense.source} /> },
+        {
+            key: 'category',
+            header: 'Category',
+            render: (expense) => expense.category?.name ?? 'Uncategorized',
+        },
+        {
+            key: 'source',
+            header: 'Source',
+            render: (expense) => <AutoGeneratedBadge source={expense.source} />,
+        },
         { key: 'expense_date', header: 'Date' },
-        { key: 'amount', header: 'Amount', render: (expense) => `${expense.amount} ETB` },
-        { key: 'status', header: 'Status', render: (expense) => <Badge variant={statusVariant(expense.status)}>{expense.status}</Badge> },
+        {
+            key: 'amount',
+            header: 'Amount',
+            render: (expense) => `${expense.amount} ETB`,
+        },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (expense) => (
+                <Badge variant={statusVariant(expense.status)}>
+                    {expense.status}
+                </Badge>
+            ),
+        },
         {
             key: 'receipt_path',
             header: 'Receipt',
-            render: (expense) => expense.receipt_path ? <a className="text-primary underline" href={`/storage/${expense.receipt_path}`} target="_blank">View</a> : <span className="text-muted-foreground">None</span>,
+            render: (expense) =>
+                expense.receipt_path ? (
+                    <a
+                        className="text-primary underline"
+                        href={`/storage/${expense.receipt_path}`}
+                        target="_blank"
+                    >
+                        View
+                    </a>
+                ) : (
+                    <span className="text-muted-foreground">None</span>
+                ),
         },
         {
             key: 'actions',
@@ -123,7 +202,13 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
             className: 'text-right',
             render: (expense) => (
                 <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" size="icon" onClick={() => setDeletingExpense(expense)} aria-label={`Delete ${expense.title}`}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setDeletingExpense(expense)}
+                        aria-label={`Delete ${expense.title}`}
+                    >
                         <Trash2 className="size-4" />
                     </Button>
                 </div>
@@ -137,29 +222,76 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
             header: 'Payment',
             render: (payment) => (
                 <div>
-                    <button type="button" className="font-medium text-primary underline-offset-4 hover:underline" onClick={() => setReceiptPaymentId(payment.id)}>
+                    <button
+                        type="button"
+                        className="font-medium text-primary underline-offset-4 hover:underline"
+                        onClick={() => setReceiptPaymentId(payment.id)}
+                    >
                         {payment.payment_number}
                     </button>
-                    <button type="button" className="block text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline" onClick={() => setReceiptPaymentId(payment.id)}>
+                    <button
+                        type="button"
+                        className="block text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+                        onClick={() => setReceiptPaymentId(payment.id)}
+                    >
                         {payment.sale?.invoice_number ?? 'No sale'}
                     </button>
                 </div>
             ),
         },
-        { key: 'customer', header: 'Customer', render: (payment) => payment.customer?.display_name ?? 'Walk-in customer' },
-        { key: 'amount', header: 'Amount', render: (payment) => `${payment.amount} ETB` },
-        { key: 'method', header: 'Method', render: (payment) => payment.method },
-        { key: 'status', header: 'Status', render: (payment) => <Badge variant={statusVariant(payment.status)}>{payment.status}</Badge> },
+        {
+            key: 'customer',
+            header: 'Customer',
+            render: (payment) =>
+                payment.customer?.display_name ?? 'Walk-in customer',
+        },
+        {
+            key: 'amount',
+            header: 'Amount',
+            render: (payment) => `${payment.amount} ETB`,
+        },
+        {
+            key: 'method',
+            header: 'Method',
+            render: (payment) => payment.method,
+        },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (payment) => (
+                <Badge variant={statusVariant(payment.status)}>
+                    {payment.status}
+                </Badge>
+            ),
+        },
         {
             key: 'actions',
             header: '',
             className: 'text-right',
             render: (payment) => (
                 <Button variant="outline" size="icon" asChild>
-                    <a href={`/payments/${payment.id}`} aria-label={`View ${payment.payment_number}`}>
-                        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <a
+                        href={`/payments/${payment.id}`}
+                        aria-label={`View ${payment.payment_number}`}
+                    >
+                        <svg
+                            className="size-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
                         </svg>
                     </a>
                 </Button>
@@ -168,28 +300,26 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
     ];
 
     const handleSearch = (search: string) => {
-        visitTransactions(activeTab, { search });
+        visitTransactions({ search });
     };
 
-    const handleDateChange = (dateField: 'date_from' | 'date_to', value: string) => {
-        visitTransactions(activeTab, { [dateField]: value } as Partial<Props['filters']>);
+    const handleDateChange = (
+        dateField: 'date_from' | 'date_to',
+        value: string,
+    ) => {
+        visitTransactions({ [dateField]: value } as Partial<Props['filters']>);
     };
 
     const handleCategoryChange = (value: string) => {
-        visitTransactions(activeTab, { category_id: value ? Number(value) : null });
+        visitTransactions({ category_id: value ? Number(value) : null });
     };
 
     const handleSourceChange = (value: string) => {
-        visitTransactions(activeTab, { source: value });
+        visitTransactions({ source: value });
     };
 
     const handleTabChange = (nextTab: Props['activeTab']) => {
-        if (nextTab === activeTab) {
-            return;
-        }
-
-        setActiveTab(nextTab);
-        visitTransactions(nextTab);
+        setCurrentTab(nextTab);
     };
 
     return (
@@ -202,8 +332,13 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
                             <FileText className="size-5" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-semibold">Transactions</h1>
-                            <p className="text-sm text-muted-foreground">Track all business expenses and revenue in one place.</p>
+                            <h1 className="text-xl font-semibold">
+                                Transactions
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Track all business expenses and revenue in one
+                                place.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -212,37 +347,54 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
                     <Alert variant="destructive">
                         <AlertTriangle />
                         <AlertTitle>Business profile required</AlertTitle>
-                        <AlertDescription>Create your business profile before viewing transactions.</AlertDescription>
+                        <AlertDescription>
+                            Create your business profile before viewing
+                            transactions.
+                        </AlertDescription>
                     </Alert>
                 ) : (
                     <div className="mb-4 flex items-center gap-3">
                         <Button
                             type="button"
-                            variant={activeTab === 'revenue' ? 'default' : 'outline'}
+                            variant={
+                                currentTab === 'revenue' ? 'default' : 'outline'
+                            }
                             onClick={() => handleTabChange('revenue')}
                         >
-                            <CreditCard className="size-4 mr-2" />
+                            <CreditCard className="mr-2 size-4" />
                             Revenue
                         </Button>
                         <Button
                             type="button"
-                            variant={activeTab === 'expenses' ? 'default' : 'outline'}
+                            variant={
+                                currentTab === 'expenses'
+                                    ? 'default'
+                                    : 'outline'
+                            }
                             onClick={() => handleTabChange('expenses')}
                         >
-                            <WalletCards className="size-4 mr-2" />
+                            <WalletCards className="mr-2 size-4" />
                             Expense
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button type="button" variant="outline" size="icon">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                >
                                     <MoreVertical className="size-4" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onSelect={() => handleTabChange('revenue')}>
+                                <DropdownMenuItem
+                                    onSelect={() => handleTabChange('revenue')}
+                                >
                                     View Revenue
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => handleTabChange('expenses')}>
+                                <DropdownMenuItem
+                                    onSelect={() => handleTabChange('expenses')}
+                                >
                                     View Expense
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -250,64 +402,179 @@ export default function TransactionsIndex({ activeTab: initialActiveTab, expense
                     </div>
                 )}
 
-                {activeTab === 'revenue' && payments && (
+                {currentTab === 'revenue' && payments && (
                     <div>
                         <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem_11rem_10rem_10rem]">
-                            <SearchBox defaultValue={filters.search ?? ''} placeholder="Search payment, reference, or invoice..." onSearch={handleSearch} />
-                            <input type="date" value={filters.date_from ?? ''} onChange={(event) => handleDateChange('date_from', event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
-                            <input type="date" value={filters.date_to ?? ''} onChange={(event) => handleDateChange('date_to', event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
+                            <SearchBox
+                                defaultValue={filters.search ?? ''}
+                                placeholder="Search payment, reference, or invoice..."
+                                onSearch={handleSearch}
+                            />
+                            <input
+                                type="date"
+                                value={filters.date_from ?? ''}
+                                onChange={(event) =>
+                                    handleDateChange(
+                                        'date_from',
+                                        event.target.value,
+                                    )
+                                }
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            />
+                            <input
+                                type="date"
+                                value={filters.date_to ?? ''}
+                                onChange={(event) =>
+                                    handleDateChange(
+                                        'date_to',
+                                        event.target.value,
+                                    )
+                                }
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            />
                         </div>
 
                         <div className="flex items-center justify-between rounded-md border bg-card p-4 shadow-sm">
                             <div>
-                                <p className="text-sm text-muted-foreground">Total revenue</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Total revenue
+                                </p>
                                 <p className="text-2xl font-semibold">
-                                    {payments.data.reduce((sum, p) => sum + parseFloat(p.amount), 0).toLocaleString()} ETB
+                                    {revenueTotal} ETB
                                 </p>
                             </div>
                             <CreditCard className="size-8 text-primary" />
                         </div>
 
-                        <DataTable columns={paymentColumns} data={payments.data} rowKey={(payment) => payment.id} emptyMessage="No payments yet. Payments will appear after POS checkout." />
-                        <Pagination links={payments.links} from={payments.from} to={payments.to} total={payments.total} />
+                        <DataTable
+                            columns={paymentColumns}
+                            data={payments.data}
+                            rowKey={(payment) => payment.id}
+                            emptyMessage="No payments yet. Payments will appear after POS checkout."
+                        />
+                        <Pagination
+                            links={payments.links}
+                            from={payments.from}
+                            to={payments.to}
+                            total={payments.total}
+                        />
                     </div>
                 )}
 
-                {activeTab === 'expenses' && expenses && (
+                {currentTab === 'expenses' && expenses && (
                     <div>
                         <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem_11rem_10rem_10rem]">
-                            <SearchBox defaultValue={filters.search ?? ''} placeholder="Search title, vendor, category..." onSearch={handleSearch} />
-                            <select value={filters.category_id ?? ''} onChange={(event) => handleCategoryChange(event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm">
+                            <SearchBox
+                                defaultValue={filters.search ?? ''}
+                                placeholder="Search title, vendor, category..."
+                                onSearch={handleSearch}
+                            />
+                            <select
+                                value={filters.category_id ?? ''}
+                                onChange={(event) =>
+                                    handleCategoryChange(event.target.value)
+                                }
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            >
                                 <option value="">All categories</option>
-                                {expenseCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                                {expenseCategories.map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))}
                             </select>
-                            <select value={filters.source ?? ''} onChange={(event) => handleSourceChange(event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm">
+                            <select
+                                value={filters.source ?? ''}
+                                onChange={(event) =>
+                                    handleSourceChange(event.target.value)
+                                }
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            >
                                 <option value="">All sources</option>
-                                {expenseSources.map((source) => <option key={source.value} value={source.value}>{source.label}</option>)}
+                                {expenseSources.map((source) => (
+                                    <option
+                                        key={source.value}
+                                        value={source.value}
+                                    >
+                                        {source.label}
+                                    </option>
+                                ))}
                             </select>
-                            <input type="date" value={filters.date_from ?? ''} onChange={(event) => handleDateChange('date_from', event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
-                            <input type="date" value={filters.date_to ?? ''} onChange={(event) => handleDateChange('date_to', event.target.value)} className="border-input bg-background h-10 rounded-md border px-3 text-sm" />
+                            <input
+                                type="date"
+                                value={filters.date_from ?? ''}
+                                onChange={(event) =>
+                                    handleDateChange(
+                                        'date_from',
+                                        event.target.value,
+                                    )
+                                }
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            />
+                            <input
+                                type="date"
+                                value={filters.date_to ?? ''}
+                                onChange={(event) =>
+                                    handleDateChange(
+                                        'date_to',
+                                        event.target.value,
+                                    )
+                                }
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            />
                         </div>
 
                         <div className="flex items-center justify-between rounded-md border bg-card p-4 shadow-sm">
                             <div>
-                                <p className="text-sm text-muted-foreground">Filtered total</p>
-                                <p className="text-2xl font-semibold">{total} ETB</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Filtered total
+                                </p>
+                                <p className="text-2xl font-semibold">
+                                    {total} ETB
+                                </p>
                             </div>
                             <WalletCards className="size-8 text-primary" />
                         </div>
 
-                        <DataTable columns={expenseColumns} data={expenses.data} rowKey={(expense) => expense.id} emptyMessage="No expenses match the current filters." />
-                        <Pagination links={expenses.links} from={expenses.from} to={expenses.to} total={expenses.total} />
+                        <DataTable
+                            columns={expenseColumns}
+                            data={expenses.data}
+                            rowKey={(expense) => expense.id}
+                            emptyMessage="No expenses match the current filters."
+                        />
+                        <Pagination
+                            links={expenses.links}
+                            from={expenses.from}
+                            to={expenses.to}
+                            total={expenses.total}
+                        />
                     </div>
                 )}
             </div>
 
-            <DeleteDialog open={Boolean(deletingExpense)} onOpenChange={(open) => !open && setDeletingExpense(null)} itemLabel={deletingExpense?.title ?? 'this expense'} onConfirm={confirmDelete} processing={deleting} />
+            <DeleteDialog
+                open={Boolean(deletingExpense)}
+                onOpenChange={(open) => !open && setDeletingExpense(null)}
+                itemLabel={deletingExpense?.title ?? 'this expense'}
+                onConfirm={confirmDelete}
+                processing={deleting}
+            />
 
-            <PaymentReceiptModal paymentId={receiptPaymentId} open={receiptPaymentId !== null} onOpenChange={(open) => !open && setReceiptPaymentId(null)} />
+            <PaymentReceiptModal
+                paymentId={receiptPaymentId}
+                open={receiptPaymentId !== null}
+                onOpenChange={(open) => !open && setReceiptPaymentId(null)}
+            />
         </>
     );
 }
 
-TransactionsIndex.layout = { breadcrumbs: [{ title: 'Dashboard', href: '/dashboard' }, { title: 'Transactions', href: '/transactions' }] };
+TransactionsIndex.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'Transactions', href: '/transactions' },
+    ],
+};

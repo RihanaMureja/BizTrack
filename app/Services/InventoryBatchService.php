@@ -36,8 +36,9 @@ class InventoryBatchService
         ?string $notes,
         User $user,
         InventoryTransactionType $type = InventoryTransactionType::Restock,
+        ?float $sellingPrice = null,
     ): InventoryBatch {
-        $batch = DB::transaction(function () use ($inventory, $quantity, $unitCost, $receivedAt, $expiryDate, $notes, $user, $type): InventoryBatch {
+        $batch = DB::transaction(function () use ($inventory, $quantity, $unitCost, $receivedAt, $expiryDate, $notes, $user, $type, $sellingPrice): InventoryBatch {
             $locked = Inventory::query()->with('product')->whereKey($inventory->id)->lockForUpdate()->firstOrFail();
             $product = $locked->product;
             $before = (int) $locked->available_stock;
@@ -50,9 +51,14 @@ class InventoryBatchService
                 'quantity_received' => $quantity,
                 'quantity_remaining' => $quantity,
                 'unit_cost' => $unitCost,
+                'selling_price' => $sellingPrice ?? $product->selling_price,
                 'received_at' => $receivedAt ? Carbon::parse($receivedAt) : now(),
                 'expiry_date' => $expiryDate,
             ]);
+
+            if ($sellingPrice !== null) {
+                $product->forceFill(['selling_price' => $sellingPrice])->save();
+            }
 
             $this->saveInventorySummary($locked, $after);
 
@@ -103,12 +109,12 @@ class InventoryBatchService
 
     private function nextBatchNumber(Product $product): string
     {
-        $prefix = 'B'.$product->business_id.'-P'.$product->id.'-'.now()->format('Ymd').'-';
+        $prefix = 'B' . $product->business_id . '-P' . $product->id . '-' . now()->format('Ymd') . '-';
         $next = InventoryBatch::query()
             ->where('business_id', $product->business_id)
-            ->where('batch_number', 'like', $prefix.'%')
+            ->where('batch_number', 'like', $prefix . '%')
             ->count() + 1;
 
-        return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 }

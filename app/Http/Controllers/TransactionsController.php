@@ -27,29 +27,32 @@ class TransactionsController extends Controller
 
         $search = $request->string('search')->toString();
         $activeTab = $request->string('tab')->toString() === 'expenses' ? 'expenses' : 'revenue';
+        $dateFrom = $request->string('date_from')->toString() ?: null;
+        $dateTo = $request->string('date_to')->toString() ?: null;
 
         $filters = [
             'search' => $search ?: null,
             'category_id' => $request->integer('category_id') ?: null,
             'source' => $request->string('source')->toString() ?: null,
-            'date_from' => $request->string('date_from')->toString() ?: null,
-            'date_to' => $request->string('date_to')->toString() ?: null,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
         ];
 
         return Inertia::render('transactions/index', [
             'activeTab' => $activeTab,
             'expenses' => $business ? $this->expenseService->paginateForBusiness($business, $filters) : null,
-            'payments' => $business ? $this->paymentService->paginateForBusiness($business, $search) : null,
+            'payments' => $business ? $this->paymentService->paginateCompletedForBusiness($business, $search ?: null, $dateFrom, $dateTo) : null,
             'expenseCategories' => $business ? $this->expenseService->categoriesForBusiness($business) : [],
-            'expenseStatuses' => collect(ExpenseStatus::cases())->map(fn (ExpenseStatus $status): array => [
+            'expenseStatuses' => collect(ExpenseStatus::cases())->map(fn(ExpenseStatus $status): array => [
                 'value' => $status->value,
                 'label' => $status->label(),
             ])->values(),
-            'expenseSources' => collect(ExpenseSource::cases())->map(fn (ExpenseSource $source): array => [
+            'expenseSources' => collect(ExpenseSource::cases())->map(fn(ExpenseSource $source): array => [
                 'value' => $source->value,
                 'label' => $source->label(),
             ])->values(),
             'total' => $business ? number_format($this->expenseService->totalForBusiness($business, $filters), 2) : '0.00',
+            'revenueTotal' => $business ? $this->paymentService->revenueTotalForBusiness($business, $search ?: null, $dateFrom, $dateTo) : '0.00',
             'filters' => $filters,
         ]);
     }

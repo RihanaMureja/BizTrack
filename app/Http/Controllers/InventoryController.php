@@ -39,7 +39,7 @@ class InventoryController extends Controller
                 InventoryTransactionType::Adjustment,
                 InventoryTransactionType::Damaged,
                 InventoryTransactionType::Return,
-            ])->map(fn (InventoryTransactionType $type) => [
+            ])->map(fn(InventoryTransactionType $type) => [
                 'value' => $type->value,
                 'label' => $type->label(),
             ])->values(),
@@ -58,6 +58,7 @@ class InventoryController extends Controller
             $request->validated('expiry_date'),
             $request->validated('notes'),
             $request->user(),
+            (float) $request->validated('selling_price'),
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Stock restocked.']);
