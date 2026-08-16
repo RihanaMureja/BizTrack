@@ -1,3 +1,6 @@
+import { Head, router } from '@inertiajs/react';
+import { Ban, CheckCircle2, ShieldCheck, Users } from 'lucide-react';
+import { useState } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { Pagination } from '@/components/pagination/pagination';
@@ -6,9 +9,6 @@ import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Head, router } from '@inertiajs/react';
-import { Ban, CheckCircle2, ShieldCheck, Users } from 'lucide-react';
-import { useState } from 'react';
 
 type User = { id: number; first_name: string | null; last_name: string | null; email: string; role: string; role_label: string; status: string; business: { business_name: string } | null };
 type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; to: number | null; total: number };
@@ -24,7 +24,9 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
     const applyFilters = (next: Record<string, string | null>) => router.get('/admin/users', { search: filters.search ?? '', role: filters.role ?? '', status: filters.status ?? '', ...next }, { preserveState: true, preserveScroll: true, replace: true });
     const statusOptions = statuses.filter((status) => status.value !== statusTarget?.status);
     const updateStatus = (status: string) => {
-        if (!statusTarget) return;
+        if (!statusTarget) {
+return;
+}
 
         router.put(`/admin/users/${statusTarget.id}`, { status }, {
             preserveScroll: true,

@@ -122,7 +122,7 @@ export default function BusinessSetup() {
                     <div>
                         <Label>What type of business do you run?</Label>
                         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                            {businessTypes.map(({ value, label, description, icon: Icon }) => {
+                            {businessTypes.map(({ value, label, description, icon: Icon, backgroundImage }) => {
                                 const isOther = value === 'other';
                                 const selected =
                                     (isOther ? form.data.business_type === 'other' || isCustomType : form.data.business_type === value);
@@ -143,15 +143,27 @@ export default function BusinessSetup() {
                                             form.clearErrors('business_type');
                                         }}
                                         className={cn(
-                                            'group flex flex-col items-start gap-3 rounded-lg border p-4 text-left transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
+                                            'group relative flex flex-col items-start gap-3 overflow-hidden rounded-lg border p-4 text-left transition-all duration-300 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
                                             selected
-                                                ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                                                : 'border-border bg-background hover:border-primary/40 hover:bg-accent',
+                                                ? 'border-primary ring-1 ring-primary'
+                                                : 'border-border hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md',
                                         )}
                                     >
+                                        <span
+                                            aria-hidden="true"
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
+                                            style={{ backgroundImage: `url("${backgroundImage}")` }}
+                                        />
+                                        <span
+                                            aria-hidden="true"
+                                            className={cn(
+                                                'absolute inset-0 bg-gradient-to-b from-white/20 via-white/55 to-white/95 transition-colors duration-300 group-hover:from-white/30 group-hover:via-white/60',
+                                                selected && 'from-primary/20 via-white/55 to-white/95',
+                                            )}
+                                        />
                                         <div
                                             className={cn(
-                                                'flex size-10 items-center justify-center rounded-md transition-colors',
+                                                'relative z-10 flex size-10 items-center justify-center rounded-md border border-white/70 bg-white/80 shadow-sm backdrop-blur-sm transition-colors',
                                                 selected
                                                     ? 'bg-primary text-primary-foreground'
                                                     : 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary',
@@ -159,7 +171,7 @@ export default function BusinessSetup() {
                                         >
                                             <Icon className="size-5" />
                                         </div>
-                                        <div>
+                                        <div className="relative z-10">
                                             <div className="text-sm font-semibold">{label}</div>
                                             <p className="mt-1 text-xs text-muted-foreground">
                                                 {description}

@@ -1,7 +1,7 @@
+import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/cart';
 import { cartSubtotal } from '@/lib/cart';
-import { Button } from '@/components/ui/button';
-import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 
 export function PosCart({ items, onQuantity, onRemove, onClear, onCheckout }: {
     items: CartItem[];
@@ -11,6 +11,7 @@ export function PosCart({ items, onQuantity, onRemove, onClear, onCheckout }: {
     onCheckout: () => void;
 }) {
     const subtotal = cartSubtotal(items);
+
     return <aside className="flex min-h-[32rem] flex-col gap-4 rounded-md border bg-card p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><ShoppingCart className="size-5 text-primary" /><h2 className="font-semibold">Cart</h2></div>
             {items.length > 0 && <Button type="button" variant="ghost" size="sm" onClick={onClear} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" />Clear</Button>}

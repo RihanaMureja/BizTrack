@@ -20,7 +20,8 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { RevenueOverview } from '@/components/charts/revenue-overview';
-import { StatCard, tones, type StatTone } from '@/components/stat-card/stat-card';
+import { StatCard, tones  } from '@/components/stat-card/stat-card';
+import type {StatTone} from '@/components/stat-card/stat-card';
 import { Button } from '@/components/ui/button';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { businessTypeLabel } from '@/lib/business-types';

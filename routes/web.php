@@ -36,6 +36,8 @@ use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+Route::inertia('/privacy-policy', 'privacy-policy')->name('privacy-policy');
+Route::inertia('/terms-of-service', 'terms-of-service')->name('terms-of-service');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('businesses/{business}/logo', [BusinessLogoController::class, 'show'])

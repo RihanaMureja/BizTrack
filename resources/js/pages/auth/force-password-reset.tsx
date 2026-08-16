@@ -1,11 +1,11 @@
+import { Head, useForm } from '@inertiajs/react';
+import { ShieldCheck } from 'lucide-react';
+import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Head, useForm } from '@inertiajs/react';
-import { ShieldCheck } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 type Props = {
     passwordRules: string;

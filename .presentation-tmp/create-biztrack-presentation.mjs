@@ -34,6 +34,7 @@ async function writeBlob(filePath, blob) {
 
 async function readImage(filePath) {
   const bytes = await fs.readFile(filePath);
+
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
 }
 
@@ -52,6 +53,7 @@ function addText(slide, text, position, style = {}) {
     bold: style.bold ?? false,
     alignment: style.alignment ?? "left",
   };
+
   return shape;
 }
 
@@ -404,6 +406,7 @@ async function main() {
     await writeBlob(path.join(TMP, `${stem}.png`), await presentation.export({ slide, format: "png", scale: 1 }));
     await fs.writeFile(path.join(TMP, `${stem}.layout.json`), await (await slide.export({ format: "layout" })).text());
   }
+
   await writeBlob(path.join(TMP, "deck-montage.webp"), await presentation.export({ format: "webp", montage: true, scale: 1 }));
   const pptx = await PresentationFile.exportPptx(presentation);
   await pptx.save(OUT);

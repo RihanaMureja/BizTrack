@@ -4,7 +4,6 @@ export type LandingHeroSlide = {
     eyebrow: string;
     heading: string;
     description: string;
-    cta: string;
     textPosition: 'left' | 'right';
     features?: string[];
     badge?: string;
@@ -12,53 +11,48 @@ export type LandingHeroSlide = {
 
 export const landingHeroSlides: LandingHeroSlide[] = [
     {
-        image: '/brand/track%20business.jpg',
+        image: '/brand/track business.png',
         eyebrow: 'All-in-One Business Platform',
-        heading: 'Run your entire business from one connected workspace',
-        description: 'Stop juggling scattered notebooks, Excel sheets, and loose papers. Manage every aspect—from sales to inventory to cash flow—in one integrated platform designed for small businesses.',
-        cta: 'Start Free Today',
+        heading: 'Keep your business under control.',
+        description: 'Sales, stock, and payments—connected.',
         textPosition: 'right',
         badge: 'All-in-One',
-        features: ['Daily Operations', 'Multi-Location', 'Team Collaboration', 'Real-Time Sync']
+        features: ['Daily Operations', 'Inventory Tracking', 'Payments', 'Reports']
     },
     {
-        image: '/brand/inventory.jpg',
+        image: '/brand/inventory.png',
         eyebrow: 'Smart Inventory Management',
-        heading: 'Know exactly what you have, where you have it',
-        description: 'Track stock by batch and expiry date, get alerts before you run out, and eliminate dead stock. See your full inventory picture across all locations with zero guesswork.',
-        cta: 'Organize Your Stock',
+        heading: 'Know what is in stock.',
+        description: 'Track batches and expiry with clarity.',
         textPosition: 'left',
         badge: 'Smart Tracking',
-        features: ['Batch Tracking', 'Expiry Alerts', 'Stock Movements', 'Location Sync']
+        features: ['Batch Tracking', 'Expiry Alerts', 'Stock Movements', 'Product Control']
     },
     {
-        image: '/brand/casher.jpg',
+        image: '/brand/casher.png',
         eyebrow: 'Fast & Reliable Checkout',
-        heading: 'Sell faster and never lose a transaction',
-        description: 'Process sales in seconds with our intuitive POS. Print receipts, issue digital invoices, process discounts, and build customer credit records—all without a single paper receipt.',
-        cta: 'Speed Up Sales',
+        heading: 'Track every sale with confidence.',
+        description: 'Fast checkout with clear records.',
         textPosition: 'right',
         badge: 'Fast Checkout',
-        features: ['1-Click Checkout', 'Digital Receipts', 'Instant Reports', 'No Paper Needed']
+        features: ['POS Checkout', 'Receipts', 'Discounts', 'Customer Credit']
     },
     {
-        image: '/brand/cosmetics.jpg',
+        image: '/brand/cosmotics.jpg',
         eyebrow: 'Beauty & Cosmetics Retail',
-        heading: 'Grow your cosmetics or beauty business with precision',
-        description: 'Manage beauty products by shade, formula, and expiry. Track popular items, optimize pricing, and build a loyal customer base with smart transaction records and customer insights.',
-        cta: 'Grow Your Beauty Brand',
+        heading: 'Keep operations in control.',
+        description: 'Built for product-based businesses.',
         textPosition: 'left',
         badge: 'Beauty-Ready',
-        features: ['Product Variants', 'Customer Loyalty', 'Trend Analysis', 'Growth Reports']
+        features: ['Inventory Control', 'Sales Records', 'Customer Data', 'Reports']
     },
     {
-        image: '/brand/clothes%20%20store.jpg',
+        image: '/brand/clothes store.jpg',
         eyebrow: 'Fashion & Apparel Stores',
-        heading: 'Manage fashion retail with style and control',
-        description: 'Track clothing by size, color, and style. Monitor seasonal trends, manage multiple locations, and empower your sales team with the data they need to sell smarter.',
-        cta: 'Launch Your Store',
+        heading: 'Turn activity into better decisions.',
+        description: 'See the business clearly, every day.',
         textPosition: 'right',
         badge: 'Retail-Ready',
-        features: ['Size & Color Tracking', 'Seasonal Reports', 'Team Control', 'Growth Insights']
+        features: ['Catalog Management', 'Team Access', 'Sales Tracking', 'Reports']
     },
 ];

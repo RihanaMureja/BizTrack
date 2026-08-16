@@ -1,11 +1,11 @@
+import { Head, router } from '@inertiajs/react';
+import { ScrollText } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
 import { SearchBox } from '@/components/search-box/search-box';
 import { Badge } from '@/components/ui/badge';
-import { Head, router } from '@inertiajs/react';
-import { ScrollText } from 'lucide-react';
 
 type AuditLog = {
     id: number;

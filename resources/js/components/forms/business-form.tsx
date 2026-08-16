@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Save } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useState  } from 'react';
+import type {FormEvent} from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,6 +72,7 @@ export function BusinessForm({ business }: { business: BusinessFormBusiness | nu
             canvas.height = height;
 
             const context = canvas.getContext('2d');
+
             if (!context) {
                 return file;
             }
@@ -176,6 +178,7 @@ export function BusinessForm({ business }: { business: BusinessFormBusiness | nu
 
                         if (!file) {
                             form.setData('logo', null);
+
                             return;
                         }
 

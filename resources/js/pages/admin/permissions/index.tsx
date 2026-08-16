@@ -1,8 +1,8 @@
+import { Head } from '@inertiajs/react';
+import { KeyRound } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { Badge } from '@/components/ui/badge';
-import { Head } from '@inertiajs/react';
-import { KeyRound } from 'lucide-react';
 
 type PermissionRow = { module: string; permission: string; roles: string[] };
 type Props = { permissions: PermissionRow[] };

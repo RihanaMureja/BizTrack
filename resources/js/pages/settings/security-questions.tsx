@@ -1,12 +1,12 @@
-import InputError from '@/components/input-error';
+import { Head, useForm } from '@inertiajs/react';
+import { ShieldQuestion } from 'lucide-react';
+import type { FormEvent } from 'react';
 import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Head, useForm } from '@inertiajs/react';
-import { ShieldQuestion } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 type Question = {
     id: number;

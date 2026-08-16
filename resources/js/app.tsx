@@ -5,6 +5,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import { useBrandColor } from '@/hooks/use-brand-color';
 import AppLayout from '@/layouts/app-layout';
 import AuthOnboardingLayout from '@/layouts/auth/auth-onboarding-layout';
+import AuthSplitLayout from '@/layouts/auth/auth-split-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { DEFAULT_BRAND_COLOR, initializeBrandColor } from '@/lib/brand-color';
@@ -23,6 +24,8 @@ createInertiaApp({
         switch (true) {
             case name === 'welcome':
                 return null;
+            case name === 'auth/login' || name === 'auth/register' || name === 'auth/forgot-password':
+                return AuthSplitLayout;
             case name === 'auth/business-setup' ||
                 name === 'auth/subscription-select' ||
                 name === 'auth/subscription-payment':

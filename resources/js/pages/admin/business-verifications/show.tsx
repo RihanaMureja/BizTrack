@@ -1,3 +1,7 @@
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, Check, ExternalLink, Eye, FileText, RotateCcw, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,10 +19,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Check, ExternalLink, Eye, FileText, RotateCcw, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import type { FormEvent } from 'react';
 
 type User = { first_name: string | null; last_name: string | null; email: string };
 type VerificationDocument = {

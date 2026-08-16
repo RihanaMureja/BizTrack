@@ -1,9 +1,8 @@
 // resources/js/components/landing/immersive-hero-slider.tsx
-import { useEffect, useState, useRef, type CSSProperties } from 'react';
-import type { LandingHeroSlide } from '../../data/landing-hero-slides';
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useState, useRef  } from 'react';
+import type {CSSProperties} from 'react';
 import { cn } from '@/lib/utils';
-import { register } from '@/routes';
+import type { LandingHeroSlide } from '../../data/landing-hero-slides';
 
 interface ImmersiveHeroSliderProps {
     slides: LandingHeroSlide[];
@@ -27,7 +26,9 @@ export function ImmersiveHeroSlider({
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const handleSlideChange = (nextIndex: number, manual = false) => {
-        if (nextIndex === activeIndex) return;
+        if (nextIndex === activeIndex) {
+return;
+}
 
         if (controlledIndex === undefined) {
             setInternalIndex(nextIndex);
@@ -45,7 +46,10 @@ export function ImmersiveHeroSlider({
         if (autoplayTimerRef.current) {
             clearInterval(autoplayTimerRef.current);
         }
-        if (slides.length <= 1 || prefersReducedMotion) return;
+
+        if (slides.length <= 1 || prefersReducedMotion) {
+return;
+}
 
         autoplayTimerRef.current = window.setInterval(() => {
             const nextIndex = (activeIndex + 1) % slides.length;
@@ -62,11 +66,16 @@ export function ImmersiveHeroSlider({
     }, []);
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') {
+return;
+}
+
         if (prefersReducedMotion) {
             return;
         }
+
         startAutoplay();
+
         return () => {
             if (autoplayTimerRef.current) {
                 clearInterval(autoplayTimerRef.current);
@@ -76,6 +85,7 @@ export function ImmersiveHeroSlider({
 
     const getGradientOverlays = (slide: LandingHeroSlide) => {
         const isLeft = slide.textPosition === 'left';
+
         return isLeft 
             ? 'bg-gradient-to-r from-black/70 via-black/40 to-black/10'
             : 'bg-gradient-to-l from-black/70 via-black/40 to-black/10';
@@ -100,6 +110,13 @@ export function ImmersiveHeroSlider({
                     animation: heroTextExit 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                 }
 
+                .hero-text-enter .hero-copy-item {
+                    animation: heroCopyEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+                }
+
+                .hero-text-enter .hero-copy-item:nth-child(2) { animation-delay: 90ms; }
+                .hero-text-enter .hero-copy-item:nth-child(3) { animation-delay: 170ms; }
+
                 @keyframes heroTextEnter {
                     from {
                         opacity: 0;
@@ -120,6 +137,11 @@ export function ImmersiveHeroSlider({
                         opacity: 0;
                         transform: translateX(var(--tx-exit, 0));
                     }
+                }
+
+                @keyframes heroCopyEnter {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>
 
@@ -178,42 +200,31 @@ export function ImmersiveHeroSlider({
                                         : 'ml-auto max-w-[26rem] sm:max-w-[30rem] lg:max-w-[34rem]'
                                 )}
                             >
-                                <div className="rounded-3xl border border-white/10 bg-slate-950/20 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:p-7">
-                                    <div className="space-y-3 sm:space-y-4">
-                                        <div className="inline-block">
+                                <div className="space-y-3 text-shadow-sm sm:space-y-4">
+                                        <div className="hero-copy-item inline-block">
                                             <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal-300 sm:text-xs">
                                                 {slide.eyebrow}
                                             </span>
                                         </div>
 
-                                        <h1
+                                        <h2
                                             className={cn(
-                                                'text-2xl font-semibold leading-tight tracking-tight text-white',
-                                                'sm:text-3xl md:text-[2.5rem] xl:text-[2.85rem]'
+                                                'hero-copy-item text-xl font-semibold leading-tight tracking-tight text-white',
+                                                'sm:text-2xl md:text-3xl xl:text-[2rem]'
                                             )}
                                         >
                                             {slide.heading}
-                                        </h1>
+                                        </h2>
 
                                         <p
                                             className={cn(
-                                                'max-w-prose text-sm leading-6 text-white/80',
-                                                'sm:text-[15px] sm:leading-6 md:text-base'
+                                                'hero-copy-item max-w-prose text-xs leading-5 text-white/80',
+                                                'sm:text-sm sm:leading-6'
                                             )}
                                         >
                                             {slide.description}
                                         </p>
 
-                                        <div className="pt-1 sm:pt-2">
-                                            <a
-                                                href={register().url}
-                                                className="group inline-flex items-center gap-2 rounded-full bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/25 transition-all duration-200 hover:bg-teal-400 hover:shadow-teal-400/30 hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-transparent"
-                                            >
-                                                {slide.cta}
-                                                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-                                            </a>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

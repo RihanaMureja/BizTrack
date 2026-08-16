@@ -1,3 +1,6 @@
+import { Head, router, useForm } from '@inertiajs/react';
+import { Check, CreditCard, Power, Save } from 'lucide-react';
+import type { FormEvent } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { Pagination } from '@/components/pagination/pagination';
@@ -7,9 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, router, useForm } from '@inertiajs/react';
-import { Check, CreditCard, Power, Save } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 type Subscription = { id: number; name: string; price: string; duration_months: number; max_cashiers: number; description: string | null; status: string; businesses_count: number };
 type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; to: number | null; total: number };

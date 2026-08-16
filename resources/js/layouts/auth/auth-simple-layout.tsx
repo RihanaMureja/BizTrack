@@ -22,21 +22,21 @@ export default function AuthSimpleLayout({
         <div className="relative min-h-svh overflow-hidden bg-[linear-gradient(160deg,oklch(0.18_0.06_153)_0%,oklch(0.14_0.05_153)_45%,oklch(0.08_0.03_153)_100%)] text-white">
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.24),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.08),transparent_30%)]"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.07),transparent_30%)]"
             />
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.10)_1px,transparent_1px)] [background-size:72px_72px]"
+                className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.10)_1px,transparent_1px)] [background-size:72px_72px]"
             />
 
             <Link
                 href={home()}
-                className="absolute top-5 left-5 z-20 flex items-center rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-md transition-transform hover:scale-[1.02] md:top-8 md:left-8"
+                className="absolute top-5 left-5 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-2 backdrop-blur-md transition-transform hover:scale-[1.02] md:top-8 md:left-8"
             >
                 <img
                     src="/brand/biztrack-logo.jpg"
                     alt="BizTrack"
-                    className="h-10 w-auto max-w-44 rounded-sm object-contain object-left sm:h-12"
+                    className="h-9 w-auto max-w-40 rounded-sm object-contain object-left sm:h-10"
                 />
             </Link>
 

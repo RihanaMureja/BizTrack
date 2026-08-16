@@ -1,11 +1,11 @@
+import { Head, useForm } from '@inertiajs/react';
+import { Save, SlidersHorizontal } from 'lucide-react';
+import type { FormEvent } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, useForm } from '@inertiajs/react';
-import { Save, SlidersHorizontal } from 'lucide-react';
-import type { FormEvent } from 'react';
 
 type Option = { value: string; label: string };
 type Preferences = {

@@ -44,10 +44,16 @@ export function PageBackgroundSlider({
     }, [slides.length]);
 
     useEffect(() => {
-        if (slides.length <= 1 || typeof window === 'undefined') return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (slides.length <= 1 || typeof window === 'undefined') {
+return;
+}
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+return;
+}
 
         const timer = window.setInterval(advance, intervalMs);
+
         return () => window.clearInterval(timer);
     }, [advance, intervalMs, slides.length]);
 
@@ -61,6 +67,7 @@ export function PageBackgroundSlider({
             {/* Slide images — stacked, only the active one is visible */}
             {slides.map((slide, index) => {
                 const isActive = index === activeIndex;
+
                 return (
                     <img
                         key={slide.image}

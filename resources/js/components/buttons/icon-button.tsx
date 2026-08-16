@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { LucideIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Props = Omit<ComponentProps<typeof Button>, 'children'> & {
     icon: LucideIcon;

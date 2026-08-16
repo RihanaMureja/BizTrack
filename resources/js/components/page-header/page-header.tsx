@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
 
 type Props = {
     title: string;
