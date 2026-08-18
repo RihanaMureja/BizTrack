@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { BreadcrumbItem } from '@/types/navigation';
+import type { RouteDefinition } from '@/wayfinder';
 
 export type AppLayoutProps = {
     children: ReactNode;
@@ -18,4 +19,5 @@ export type AuthLayoutProps = {
     name?: string;
     title?: string;
     description?: string;
+    backHref?: RouteDefinition<'get'> | string;
 };
