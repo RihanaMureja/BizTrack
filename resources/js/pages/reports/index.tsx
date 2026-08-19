@@ -1,12 +1,12 @@
-import { RevenueOverview } from '@/components/charts/revenue-overview';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { ProfitByProductChart, type ProductProfitPoint } from '@/components/reports/profit-by-product-chart';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { BarChart3, Download, FileText, Save } from 'lucide-react';
+import { BarChart3, Download, FileText, Save, TrendingUp } from 'lucide-react';
 import type { FormEvent } from 'react';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 type SummaryPoint = { label: string; value: string };
 type ChartPoint = { label: string; value: number };
@@ -101,14 +101,58 @@ export default function ReportsIndex({ report, recentReports, types, sources, ca
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     {report.summary.map((item) => (
-                        <section key={item.label} className="rounded-md border bg-card p-4 shadow-sm">
-                            <p className="text-sm text-muted-foreground">{item.label}</p>
-                            <p className="mt-2 text-2xl font-semibold">{item.value}</p>
+                        <section key={item.label} className="overflow-hidden rounded-xl border bg-card p-4 shadow-sm">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">{item.label}</p>
+                                    <p className="mt-2 text-2xl font-semibold">{item.value}</p>
+                                </div>
+                                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                    <TrendingUp className="size-5" />
+                                </div>
+                            </div>
                         </section>
                     ))}
                 </div>
 
-                <RevenueOverview title={report.title} description={`${report.date_from} to ${report.date_to}`} data={report.chart} />
+                <section className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
+                    <div className="rounded-xl border bg-card p-5 shadow-sm">
+                        <h2 className="font-semibold">{report.title}</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">{report.date_from} to {report.date_to}</p>
+                        <div className="mt-5 h-72">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={report.chart}>
+                                    <defs>
+                                        <linearGradient id="reportArea" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.34} />
+                                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.03} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} />
+                                    <YAxis tickLine={false} axisLine={false} fontSize={11} width={44} />
+                                    <Tooltip contentStyle={{ borderRadius: 10, borderColor: 'var(--border)' }} />
+                                    <Area type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={3} fill="url(#reportArea)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                    <div className="rounded-xl border bg-card p-5 shadow-sm">
+                        <h2 className="font-semibold">Distribution</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Compact comparison of the same report points.</p>
+                        <div className="mt-5 h-72">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={report.chart} layout="vertical">
+                                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" horizontal={false} />
+                                    <XAxis type="number" hide />
+                                    <YAxis type="category" dataKey="label" tickLine={false} axisLine={false} fontSize={11} width={72} />
+                                    <Tooltip contentStyle={{ borderRadius: 10, borderColor: 'var(--border)' }} />
+                                    <Bar dataKey="value" fill="var(--primary)" radius={[0, 8, 8, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </section>
 
                 {report.productProfit && report.productProfit.length > 0 && (
                     <ProfitByProductChart data={report.productProfit} />

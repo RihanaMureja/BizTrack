@@ -10,6 +10,8 @@ enum NotificationType: string
     case DailySales = 'daily_sales';
     case BusinessApproved = 'business_approved';
     case StagnantProduct = 'stagnant_product';
+    case TrialStarted = 'trial_started';
+    case TrialExpiring = 'trial_expiring';
 
     public function label(): string
     {
@@ -20,6 +22,8 @@ enum NotificationType: string
             self::DailySales => 'Daily sales',
             self::BusinessApproved => 'Business approved',
             self::StagnantProduct => 'Stagnant product',
+            self::TrialStarted => 'Trial started',
+            self::TrialExpiring => 'Trial expiring',
         };
     }
 }

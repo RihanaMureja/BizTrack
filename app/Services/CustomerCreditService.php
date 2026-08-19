@@ -30,8 +30,17 @@ class CustomerCreditService
         }
 
         $creditAmount = (float) $sale->credit_amount;
-        $paidAmount = $existing ? min((float) $existing->paid_amount, $creditAmount) : 0.0;
-        $remainingBalance = max(0, $creditAmount - $paidAmount);
+
+        if ($creditAmount <= 0 && $existing) {
+            $creditAmount = (float) $existing->credit_amount;
+        }
+
+        if ($creditAmount <= 0 && $sale->is_credit_sale) {
+            $creditAmount = (float) $sale->balance_due;
+        }
+
+        $remainingBalance = min((float) $sale->balance_due, $creditAmount);
+        $paidAmount = max(0, $creditAmount - $remainingBalance);
 
         if (! $existing && $remainingBalance <= 0) {
             $this->syncCustomerBalance($sale->customer);

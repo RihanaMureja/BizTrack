@@ -49,16 +49,17 @@ class InventoryController extends Controller
     public function restock(RestockRequest $request, Inventory $inventory): RedirectResponse
     {
         $this->authorize('update', $inventory);
+        $data = $request->validated();
 
         $this->inventoryService->restock(
             $inventory,
-            (int) $request->validated('quantity'),
-            (float) $request->validated('unit_cost'),
-            $request->validated('received_at'),
-            $request->validated('expiry_date'),
-            $request->validated('notes'),
+            (int) $data['quantity'],
+            (float) $data['unit_cost'],
+            $data['received_at'] ?? null,
+            $data['expiry_date'] ?? null,
+            $data['notes'] ?? null,
             $request->user(),
-            (float) $request->validated('selling_price'),
+            array_key_exists('selling_price', $data) && $data['selling_price'] !== null ? (float) $data['selling_price'] : null,
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Stock restocked.']);

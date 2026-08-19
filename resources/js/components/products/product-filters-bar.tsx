@@ -19,7 +19,12 @@ type Props = {
     onChange: (filters: Partial<Filters>) => void;
 };
 
-export function ProductFiltersBar({ categories, filters, statuses, onChange }: Props) {
+export function ProductFiltersBar({
+    categories,
+    filters,
+    statuses,
+    onChange,
+}: Props) {
     return (
         <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm lg:grid-cols-[minmax(0,1fr)_12rem_12rem_12rem]">
             <SearchBox
@@ -29,28 +34,42 @@ export function ProductFiltersBar({ categories, filters, statuses, onChange }: P
             />
             <select
                 value={filters.category_id ?? ''}
-                onChange={(event) => onChange({ category_id: event.target.value ? Number(event.target.value) : null })}
-                className="border-input bg-background flex h-10 rounded-md border px-3 text-sm shadow-xs"
+                onChange={(event) =>
+                    onChange({
+                        category_id: event.target.value
+                            ? Number(event.target.value)
+                            : null,
+                    })
+                }
+                className="flex h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs"
             >
                 <option value="">All categories</option>
                 {categories.map((category) => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
+                    <option key={category.id} value={category.id}>
+                        {category.name}
+                    </option>
                 ))}
             </select>
             <select
                 value={filters.status ?? ''}
-                onChange={(event) => onChange({ status: event.target.value || null })}
-                className="border-input bg-background flex h-10 rounded-md border px-3 text-sm shadow-xs"
+                onChange={(event) =>
+                    onChange({ status: event.target.value || null })
+                }
+                className="flex h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs"
             >
-                <option value="">All statuses</option>
+                <option value="">All product states</option>
                 {statuses.map((status) => (
-                    <option key={status.value} value={status.value}>{status.label}</option>
+                    <option key={status.value} value={status.value}>
+                        {status.label}
+                    </option>
                 ))}
             </select>
             <select
                 value={filters.sort ?? ''}
-                onChange={(event) => onChange({ sort: event.target.value || null })}
-                className="border-input bg-background flex h-10 rounded-md border px-3 text-sm shadow-xs"
+                onChange={(event) =>
+                    onChange({ sort: event.target.value || null })
+                }
+                className="flex h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs"
             >
                 <option value="">Newest first</option>
                 <option value="name">Name A-Z</option>

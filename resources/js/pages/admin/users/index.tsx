@@ -10,19 +10,37 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-type User = { id: number; first_name: string | null; last_name: string | null; email: string; role: string; role_label: string; status: string; created_at: string; business: { business_name: string } | null };
+type User = { id: number; first_name: string | null; last_name: string | null; email: string; role: string; role_label: string; status: string; created_at: string; business: { business_name: string; business_category: string | null; business_type: string | null } | null };
 type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; to: number | null; total: number };
 type Option = { value: string; label: string };
-type Props = { users: Paginated<User>; roles: Option[]; statuses: Option[]; filters: { search: string | null; role: string | null; status: string | null }; currentUserId: number };
+type Props = {
+    users: Paginated<User>;
+    accountTypes: Option[];
+    statuses: Option[];
+    businessCategories: Option[];
+    filters: {
+        search: string | null;
+        account_type: string | null;
+        status: string | null;
+        business_category: string | null;
+    };
+    currentUserId: number;
+};
 
 const prettyStatus = (status: string) => (status === 'active' ? 'Active' : 'Inactive');
 const statusVariant = (status: string) => status === 'active' ? 'default' : 'secondary';
 const roleVariant = (role: string) => role === 'super_admin' ? 'default' : role === 'owner' ? 'secondary' : 'outline';
 
-export default function AdminUsersIndex({ users, roles, statuses, filters, currentUserId }: Props) {
+export default function AdminUsersIndex({ users, accountTypes, statuses, businessCategories, filters, currentUserId }: Props) {
     const [statusTarget, setStatusTarget] = useState<User | null>(null);
     const [selectedStatus, setSelectedStatus] = useState<string>('');
-    const applyFilters = (next: Record<string, string | null>) => router.get('/admin/users', { search: filters.search ?? '', role: filters.role ?? '', status: filters.status ?? '', ...next }, { preserveState: true, preserveScroll: true, replace: true });
+    const applyFilters = (next: Record<string, string | null>) => router.get('/admin/users', {
+        search: filters.search ?? '',
+        account_type: filters.account_type ?? '',
+        status: filters.status ?? '',
+        business_category: filters.business_category ?? '',
+        ...next,
+    }, { preserveState: true, preserveScroll: true, replace: true });
     const statusOptions = statuses.filter((status) => status.value !== statusTarget?.status);
     const openStatusDialog = (user: User) => {
         setStatusTarget(user);
@@ -43,7 +61,16 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
     };
     const columns: DataTableColumn<User>[] = [
         { key: 'email', header: 'User', render: (user) => <div><p className="font-medium">{[user.first_name, user.last_name].filter(Boolean).join(' ') || user.email}</p><p className="text-xs text-muted-foreground">{user.email}</p></div> },
-        { key: 'business', header: 'Business', render: (user) => user.business?.business_name ?? 'Platform' },
+        {
+            key: 'business',
+            header: 'Business',
+            render: (user) => (
+                <div>
+                    <p className="font-medium">{user.business?.business_name ?? 'Platform'}</p>
+                    {user.business && <p className="text-xs text-muted-foreground">{businessCategoryLabel(user.business.business_category, user.business.business_type)}</p>}
+                </div>
+            ),
+        },
         { key: 'role', header: 'Role', render: (user) => <Badge variant={roleVariant(user.role)}>{user.role_label}</Badge> },
         { key: 'status', header: 'Status', render: (user) => <Badge variant={statusVariant(user.status)}>{prettyStatus(user.status)}</Badge> },
         { key: 'created_at', header: 'Registration Date', render: (user) => new Date(user.created_at).toLocaleDateString() },
@@ -71,11 +98,12 @@ export default function AdminUsersIndex({ users, roles, statuses, filters, curre
         <>
             <Head title="Manage Users" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
-                <div className="flex items-center gap-3"><div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm"><Users className="size-5" /></div><div><h1 className="text-xl font-semibold">Users</h1><p className="text-sm text-muted-foreground">Manage business owners, cashiers, super admins, role assignment, and account status.</p></div></div>
-                <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem_12rem]">
+                <div className="flex items-center gap-3"><div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm"><Users className="size-5" /></div><div><h1 className="text-xl font-semibold">Users</h1><p className="text-sm text-muted-foreground">Filter platform users by account type, role, status, and business category.</p></div></div>
+                <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem_12rem_13rem]">
                     <SearchBox defaultValue={filters.search ?? ''} placeholder="Search users..." onSearch={(search) => applyFilters({ search })} className="relative w-full" />
-                    <select value={filters.role ?? ''} onChange={(event) => applyFilters({ role: event.target.value })} className="border-input bg-background h-10 rounded-md border px-3 text-sm"><option value="">All roles</option>{roles.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}</select>
+                    <select value={filters.account_type ?? ''} onChange={(event) => applyFilters({ account_type: event.target.value })} className="border-input bg-background h-10 rounded-md border px-3 text-sm"><option value="">All account types</option>{accountTypes.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}</select>
                     <select value={filters.status ?? ''} onChange={(event) => applyFilters({ status: event.target.value })} className="border-input bg-background h-10 rounded-md border px-3 text-sm"><option value="">All statuses</option>{statuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}</select>
+                    <select value={filters.business_category ?? ''} onChange={(event) => applyFilters({ business_category: event.target.value })} className="border-input bg-background h-10 rounded-md border px-3 text-sm"><option value="">All business types</option>{businessCategories.map((category) => <option key={category.value} value={category.value}>{category.label}</option>)}</select>
                 </div>
                 <section className="rounded-md border bg-card p-4 shadow-sm">
                     <div className="mb-4 flex items-center justify-between"><p className="text-sm text-muted-foreground">Platform accounts</p><Badge variant="secondary">{users.total} users</Badge></div>
@@ -148,4 +176,12 @@ function statusStyle(status: string): { Icon: typeof CheckCircle2; activeClass: 
         activeClass: 'border-slate-700 bg-slate-700 text-white shadow-sm',
         idleClass: 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100',
     };
+}
+
+function businessCategoryLabel(category: string | null, customType: string | null): string {
+    if (category === 'other') {
+        return customType || 'Other';
+    }
+
+    return category ? category.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'No business type';
 }

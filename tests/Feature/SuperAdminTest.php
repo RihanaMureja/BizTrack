@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\BusinessAccessMode;
+use App\Enums\BusinessCategory;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\AuditLog;
@@ -43,16 +44,33 @@ test('only super admins can access the admin dashboard', function () {
 
 test('super admin can view and filter businesses', function () {
     $admin = superAdminUser();
-    Business::factory()->create(['business_name' => 'Alpha Market', 'access_mode' => BusinessAccessMode::Active]);
-    Business::factory()->create(['business_name' => 'Beta Shop', 'access_mode' => BusinessAccessMode::Suspended]);
+    Business::factory()->create([
+        'business_name' => 'Alpha Market',
+        'business_category' => BusinessCategory::Pharmacy,
+        'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Active,
+    ]);
+    Business::factory()->create([
+        'business_name' => 'Beta Shop',
+        'business_category' => BusinessCategory::Boutique,
+        'status' => RecordStatus::Active,
+        'access_mode' => BusinessAccessMode::Suspended,
+    ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.businesses.index', ['search' => 'Alpha', 'status' => BusinessAccessMode::Active->value]))
+        ->get(route('admin.businesses.index', [
+            'search' => 'Alpha',
+            'status' => RecordStatus::Active->value,
+            'business_category' => BusinessCategory::Pharmacy->value,
+        ]))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('admin/businesses/index')
             ->where('businesses.total', 1)
-            ->where('businesses.data.0.business_name', 'Alpha Market'));
+            ->where('businesses.data.0.business_name', 'Alpha Market')
+            ->where('businesses.data.0.business_category', BusinessCategory::Pharmacy->value)
+            ->where('filters.business_category', BusinessCategory::Pharmacy->value)
+            ->has('businessCategories'));
 });
 
 test('super admin cannot change business subscription from businesses directory', function () {
@@ -73,11 +91,12 @@ test('super admin can view users and update non super admin status only', functi
     $user = User::factory()->create(['role' => Role::Owner, 'status' => RecordStatus::Active]);
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index', ['role' => Role::Owner->value]))
+        ->get(route('admin.users.index', ['account_type' => 'owners']))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('admin/users/index')
             ->where('users.total', 1)
+            ->where('filters.account_type', 'owners')
             ->where('currentUserId', $admin->id));
 
     $this->actingAs($admin)
@@ -89,6 +108,37 @@ test('super admin can view users and update non super admin status only', functi
     expect($user->refresh()->role)->toBe(Role::Owner)
         ->and($user->status)->toBe(RecordStatus::Inactive)
         ->and(AuditLog::where('action', 'user.status_updated')->exists())->toBeTrue();
+});
+
+test('super admin can filter users by employees and business category', function () {
+    $admin = superAdminUser();
+    $pharmacyOwner = User::factory()->create(['role' => Role::Owner]);
+    $boutiqueOwner = User::factory()->create(['role' => Role::Owner]);
+    $pharmacy = Business::factory()->create([
+        'owner_id' => $pharmacyOwner->id,
+        'business_category' => BusinessCategory::Pharmacy,
+    ]);
+    $boutique = Business::factory()->create([
+        'owner_id' => $boutiqueOwner->id,
+        'business_category' => BusinessCategory::Boutique,
+    ]);
+    User::factory()->create(['role' => Role::Cashier, 'business_id' => $pharmacy->id, 'email' => 'pharmacy.employee@example.com']);
+    User::factory()->create(['role' => Role::Cashier, 'business_id' => $boutique->id, 'email' => 'boutique.employee@example.com']);
+
+    $this->actingAs($admin)
+        ->get(route('admin.users.index', [
+            'account_type' => 'employees',
+            'business_category' => BusinessCategory::Pharmacy->value,
+        ]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/users/index')
+            ->where('users.total', 1)
+            ->where('users.data.0.email', 'pharmacy.employee@example.com')
+            ->where('filters.account_type', 'employees')
+            ->where('filters.business_category', BusinessCategory::Pharmacy->value)
+            ->has('accountTypes')
+            ->has('businessCategories'));
 });
 
 test('super admin cannot change user roles from admin users page', function () {

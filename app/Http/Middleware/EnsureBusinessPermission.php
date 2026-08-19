@@ -14,6 +14,12 @@ class EnsureBusinessPermission
 
         abort_unless($user, 403);
 
+        $permissions = collect($permissions)
+            ->flatMap(fn (string $permission): array => explode('|', $permission))
+            ->map(fn (string $permission): string => trim($permission))
+            ->filter()
+            ->all();
+
         foreach ($permissions as $permission) {
             if ($user->hasBusinessPermission($permission)) {
                 return $next($request);

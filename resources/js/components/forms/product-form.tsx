@@ -156,12 +156,13 @@ export function ProductForm({ categories, product, onSuccess }: Props) {
 
                 <div className="grid gap-2 md:col-span-2">
                     <Label htmlFor="description">Description</Label>
-                    <Input
+                    <textarea
                         id="description"
                         value={form.data.description}
                         onChange={(event) =>
                             form.setData('description', event.target.value)
                         }
+                        className="min-h-28 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background transition outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="Optional"
                     />
                     <InputError message={form.errors.description} />

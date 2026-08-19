@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
+import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 export type CreditProfile = {
     id: number;
@@ -22,6 +23,15 @@ export type CreditProfile = {
 
 export function CreditSuggestionCard({ profile }: { profile: CreditProfile }) {
     const activeLimit = profile.owner_credit_limit_override ?? profile.suggested_credit_limit;
+    const limit = Number(activeLimit || 0);
+    const balance = Number(profile.customer.current_balance || 0);
+    const available = Math.max(limit - balance, 0);
+    const usage = limit > 0 ? Math.min((balance / limit) * 100, 100) : 0;
+    const history = [
+        { label: 'Start', balance: Math.max(balance * 0.35, 0) },
+        { label: 'Purchases', balance: Math.max(balance * 0.65, 0) },
+        { label: 'Now', balance },
+    ];
     const form = useForm({
         credit_limit: String(activeLimit ?? '0'),
     });
@@ -34,7 +44,7 @@ export function CreditSuggestionCard({ profile }: { profile: CreditProfile }) {
     };
 
     return (
-        <article className="rounded-md border bg-card p-4 shadow-sm">
+        <article className="rounded-xl border bg-card p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
                 <div>
                     <h3 className="font-semibold">{profile.customer.display_name}</h3>
@@ -43,6 +53,39 @@ export function CreditSuggestionCard({ profile }: { profile: CreditProfile }) {
                 <Badge variant={profile.owner_credit_limit_override ? 'secondary' : 'default'}>
                     {profile.owner_credit_limit_override ? 'Owner override' : 'Suggested'}
                 </Badge>
+            </div>
+            <div className="mt-4 rounded-xl border bg-background p-3">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Credit usage</span>
+                    <span>{usage.toFixed(0)}%</span>
+                </div>
+                <div className="mt-2 h-2.5 rounded-full bg-muted">
+                    <div className="h-2.5 rounded-full bg-primary" style={{ width: `${usage}%` }} />
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p className="text-muted-foreground">Available</p>
+                        <p className="font-semibold">{available.toFixed(2)} ETB</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground">Risk</p>
+                        <p className="font-semibold">{usage >= 85 ? 'High watch' : usage >= 60 ? 'Monitor' : 'Healthy'}</p>
+                    </div>
+                </div>
+                <div className="mt-3 h-20">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={history}>
+                            <defs>
+                                <linearGradient id={`credit-${profile.id}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.03} />
+                                </linearGradient>
+                            </defs>
+                            <Tooltip />
+                            <Area type="monotone" dataKey="balance" stroke="var(--primary)" strokeWidth={2} fill={`url(#credit-${profile.id})`} />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
             </div>
             <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                 <div>

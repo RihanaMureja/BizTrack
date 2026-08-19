@@ -29,6 +29,7 @@ class BusinessService
                 ->orWhere('email', 'like', '%'.$search.'%')
                 ->orWhereHas('owner', fn ($ownerQuery) => $ownerQuery->where('email', 'like', '%'.$search.'%'))))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['business_category'] ?? null, fn ($query, $category) => $query->where('business_category', $category))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();

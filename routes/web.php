@@ -38,6 +38,7 @@ use App\Http\Controllers\AdminSystemHealthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserManagementController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -127,7 +128,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('expense-categories', ExpenseCategoryController::class)
                 ->only(['store', 'update', 'destroy'])
                 ->parameters(['expense-categories' => 'expenseCategory']);
-            Route::resource('expenses', ExpenseController::class)->except(['create', 'edit', 'show']);
+            Route::get('expenses', fn (Request $request) => to_route('transactions.index', [
+                ...$request->query(),
+                'tab' => 'expenses',
+            ]))->name('expenses.index');
+            Route::resource('expenses', ExpenseController::class)->except(['index', 'create', 'edit', 'show']);
         });
 
         Route::middleware('business.permission:view_reports')->group(function () {

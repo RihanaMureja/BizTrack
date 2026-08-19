@@ -47,13 +47,21 @@ const sidebarNavItems: NavItem[] = [
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const { auth } = usePage<SharedData>().props;
-    const visibleNavItems = sidebarNavItems.filter((item) => item.title !== 'Payment Settings' || auth.user.role === 'owner');
+    const visibleNavItems = sidebarNavItems.filter((item) => {
+        if (auth.user.role === 'super_admin' && item.title === 'Notification Preferences') {
+            return false;
+        }
+
+        return item.title !== 'Payment Settings' || auth.user.role === 'owner';
+    });
 
     return (
         <div className="px-4 py-6">
             <Heading
                 title="Settings"
-                description="Manage general, notification, security, payment, backup, and appearance settings"
+                description={auth.user.role === 'super_admin'
+                    ? 'Manage profile, security, backup, and display mode settings'
+                    : 'Manage general, notification, security, payment, backup, and appearance settings'}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

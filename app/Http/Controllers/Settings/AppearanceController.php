@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAppearanceThemeRequest;
 use App\Services\Theme\BusinessThemeService;
@@ -29,6 +30,8 @@ class AppearanceController extends Controller
 
     public function update(UpdateAppearanceThemeRequest $request): RedirectResponse
     {
+        abort_if($request->user()->role === Role::SuperAdmin, 403);
+
         $business = $request->user()->ownedBusiness ?? $request->user()->business;
         abort_unless($business, 403);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BusinessCategory;
 use App\Enums\RecordStatus;
 use App\Helpers\DateHelper;
 use App\Models\Business;
@@ -23,6 +24,7 @@ class BusinessManagementController extends Controller
         $filters = [
             'search' => $request->string('search')->toString() ?: null,
             'status' => $request->string('status')->toString() ?: null,
+            'business_category' => $request->string('business_category')->toString() ?: null,
         ];
 
         $businesses = $this->businessService->paginateForAdmin($filters);
@@ -31,6 +33,8 @@ class BusinessManagementController extends Controller
                 'id' => $business->id,
                 'business_name' => $business->business_name,
                 'business_type' => $business->business_type,
+                'business_category' => $business->business_category?->value,
+                'business_category_label' => $business->business_category?->label() ?? 'Not set',
                 'email' => $business->email,
                 'phone' => $business->phone,
                 'address' => $business->address,
@@ -65,6 +69,10 @@ class BusinessManagementController extends Controller
                 ['value' => RecordStatus::Active->value, 'label' => 'Active'],
                 ['value' => RecordStatus::Inactive->value, 'label' => 'Inactive'],
             ],
+            'businessCategories' => collect(BusinessCategory::cases())->map(fn (BusinessCategory $category): array => [
+                'value' => $category->value,
+                'label' => $category->label(),
+            ]),
             'filters' => $filters,
         ]);
     }

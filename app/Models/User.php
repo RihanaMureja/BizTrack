@@ -87,6 +87,11 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(AuditLog::class);
     }
 
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     public function securityQuestions(): HasMany
     {
         return $this->hasMany(UserSecurityQuestion::class);

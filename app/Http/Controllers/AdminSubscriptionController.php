@@ -25,12 +25,15 @@ class AdminSubscriptionController extends Controller
 
         $filters = [
             'search' => $request->string('search')->toString() ?: null,
-            'status' => $request->string('status')->toString() ?: null,
+            'status' => $this->normalizeStatusFilter($request->string('status')->toString() ?: null),
         ];
 
         return Inertia::render('admin/subscriptions/index', [
             'subscriptions' => $this->subscriptionService->paginateForAdmin($filters),
-            'statuses' => collect(RecordStatus::cases())->map(fn (RecordStatus $status): array => ['value' => $status->value, 'label' => ucfirst($status->value)]),
+            'statuses' => [
+                ['value' => RecordStatus::Active->value, 'label' => 'Active'],
+                ['value' => RecordStatus::Inactive->value, 'label' => 'Inactive'],
+            ],
             'filters' => $filters,
         ]);
     }
@@ -83,7 +86,12 @@ class AdminSubscriptionController extends Controller
             'duration_months' => ['required', 'integer', 'min:1'],
             'max_cashiers' => ['required', 'integer', 'min:1'],
             'description' => ['nullable', 'string', 'max:500'],
-            'status' => ['required', Rule::enum(RecordStatus::class)],
+            'status' => ['required', Rule::in([RecordStatus::Active->value, RecordStatus::Inactive->value])],
         ]);
+    }
+
+    private function normalizeStatusFilter(?string $status): ?string
+    {
+        return in_array($status, [RecordStatus::Active->value, RecordStatus::Inactive->value], true) ? $status : null;
     }
 }

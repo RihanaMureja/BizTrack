@@ -29,35 +29,32 @@ export default function AuthSplitLayout({ children }: AuthLayoutProps) {
     };
 
     return (
-        <main className="auth-neon relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
-            <div aria-hidden="true" className="auth-ribbon auth-ribbon-one" />
-            <div aria-hidden="true" className="auth-ribbon auth-ribbon-two" />
-            <div aria-hidden="true" className="auth-ribbon auth-ribbon-three" />
-            <div aria-hidden="true" className="auth-ambient-glow" />
+        <main className="auth-soft relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
+            <div aria-hidden="true" className="auth-soft-glow auth-soft-glow-one" />
+            <div aria-hidden="true" className="auth-soft-glow auth-soft-glow-two" />
 
-            <section className={`auth-glass-card relative z-10 w-full ${isRegistration ? 'max-w-[600px]' : 'max-w-[560px]'}`}>
-                <div className="auth-glass-highlight" aria-hidden="true" />
-                <div className={`relative px-6 py-7 sm:px-8 sm:py-8 ${isRegistration ? 'max-h-[calc(100dvh-3rem)] overflow-y-auto' : ''}`}>
-                    <button type="button" onClick={goBack} className="auth-back-button" aria-label="Go back" title="Go back">
-                        <ArrowLeft className="size-5" />
+            <section className={`auth-soft-card relative z-10 w-full ${isRegistration ? 'max-w-[540px]' : 'max-w-[420px]'}`}>
+                <div className={`relative px-5 py-6 sm:px-7 sm:py-7 ${isRegistration ? 'max-h-[calc(100dvh-3rem)] overflow-y-auto' : ''}`}>
+                    <button type="button" onClick={goBack} className="auth-soft-back-button" aria-label="Go back" title="Go back">
+                        <ArrowLeft className="size-4" />
                     </button>
 
                     <Link href={home()} className="mx-auto flex w-fit items-center justify-center transition-transform hover:scale-[1.02]">
                         <img
                             src="/brand/logo.png"
                             alt={`${name ?? 'BizTrack'} logo`}
-                            className="h-auto w-24 rounded-lg sm:w-28"
+                            className="h-auto w-20 rounded-md sm:w-24"
                             onError={(event) => {
                                 event.currentTarget.src = '/brand/biztrack-logo.jpg';
                             }}
                         />
                     </Link>
 
-                    <header className="mb-6 mt-4 text-center">
-                        <h1 className="text-[28px] font-semibold tracking-tight text-white sm:text-[32px]">
+                    <header className="mb-5 mt-3 text-center">
+                        <h1 className="text-2xl font-semibold tracking-normal text-[#10231a] sm:text-[26px]">
                             {title}
                         </h1>
-                        <p className="mt-3 text-sm text-emerald-100/70 sm:text-base">
+                        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#607568]">
                             {description}
                         </p>
                     </header>

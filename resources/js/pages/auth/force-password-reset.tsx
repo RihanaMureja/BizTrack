@@ -3,6 +3,7 @@ import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { authButtonClass, authInputClass, authLabelClass } from '@/lib/auth-styles';
 import { Head, useForm } from '@inertiajs/react';
 import { ShieldCheck } from 'lucide-react';
 import type { FormEvent } from 'react';
@@ -27,17 +28,17 @@ export default function ForcePasswordReset({ passwordRules, temporaryPasswordExp
         <>
             <Head title="Reset temporary password" />
             <form onSubmit={submit} className="flex flex-col gap-6">
-                <div className="flex items-start gap-3 rounded-md border bg-card p-4">
-                    <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                <div className="flex items-start gap-3 rounded-xl border border-[#d9e8df] bg-[#f7fbf8] p-4">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-[#006b3f] text-white">
                         <ShieldCheck className="size-5" />
                     </div>
                     <div>
-                        <h1 className="font-semibold">Create your permanent password</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <h1 className="text-sm font-semibold text-[#10231a]">Create your permanent password</h1>
+                        <p className="mt-1 text-sm text-[#607568]">
                             Your temporary password must be replaced before you can continue using BizTrack.
                         </p>
                         {temporaryPasswordExpiresAt && (
-                            <p className="mt-2 text-xs text-muted-foreground">
+                            <p className="mt-2 text-xs text-[#607568]">
                                 Temporary access expires {new Date(temporaryPasswordExpiresAt).toLocaleString()}.
                             </p>
                         )}
@@ -45,7 +46,7 @@ export default function ForcePasswordReset({ passwordRules, temporaryPasswordExp
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="password">New password</Label>
+                    <Label htmlFor="password" className={authLabelClass}>New password</Label>
                     <PasswordInput
                         id="password"
                         value={form.data.password}
@@ -53,12 +54,13 @@ export default function ForcePasswordReset({ passwordRules, temporaryPasswordExp
                         required
                         autoComplete="new-password"
                         passwordrules={passwordRules}
+                        className={authInputClass}
                     />
                     <InputError message={form.errors.password} />
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="password_confirmation">Confirm password</Label>
+                    <Label htmlFor="password_confirmation" className={authLabelClass}>Confirm password</Label>
                     <PasswordInput
                         id="password_confirmation"
                         value={form.data.password_confirmation}
@@ -66,11 +68,12 @@ export default function ForcePasswordReset({ passwordRules, temporaryPasswordExp
                         required
                         autoComplete="new-password"
                         passwordrules={passwordRules}
+                        className={authInputClass}
                     />
                     <InputError message={form.errors.password_confirmation} />
                 </div>
 
-                <Button type="submit" disabled={form.processing} className="w-full">
+                <Button type="submit" disabled={form.processing} className={`w-full ${authButtonClass}`}>
                     {form.processing && <Spinner />}
                     Reset password
                 </Button>
@@ -80,6 +83,6 @@ export default function ForcePasswordReset({ passwordRules, temporaryPasswordExp
 }
 
 ForcePasswordReset.layout = {
-    title: 'Temporary password',
-    description: 'Set a strong permanent password for your account',
+    title: 'Temporary Password',
+    description: 'Set a strong permanent password for your account.',
 };

@@ -19,29 +19,31 @@ function expenseBusinessContext(): array
     return [$owner, $business];
 }
 
-test('guests are redirected from expenses', function () {
-    $this->get(route('expenses.index'))->assertRedirect(route('login'));
+test('guests are redirected from transactions', function () {
+    $this->get(route('transactions.index', ['tab' => 'expenses']))->assertRedirect(route('login'));
 });
 
-test('cashier cannot access expense management', function () {
+test('cashier without transaction permission cannot access transaction management', function () {
     [$owner, $business] = expenseBusinessContext();
-    $cashier = User::factory()->create(['role' => Role::Cashier, 'business_id' => $business->id]);
+    $role = \App\Models\BusinessRole::factory()->create(['business_id' => $business->id]);
+    $cashier = User::factory()->create(['role' => Role::Cashier, 'business_id' => $business->id, 'business_role_id' => $role->id]);
 
-    $this->actingAs($cashier)->get(route('expenses.index'))->assertForbidden();
+    $this->actingAs($cashier)->get(route('transactions.index', ['tab' => 'expenses']))->assertForbidden();
 });
 
-test('owner can open expenses page', function () {
+test('owner can open transactions expense tab', function () {
     [$owner, $business] = expenseBusinessContext();
     $category = ExpenseCategory::factory()->create(['business_id' => $business->id]);
     Expense::factory()->create(['business_id' => $business->id, 'expense_category_id' => $category->id, 'user_id' => $owner->id, 'amount' => 250]);
 
     $this->actingAs($owner)
-        ->get(route('expenses.index'))
+        ->get(route('transactions.index', ['tab' => 'expenses']))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('expenses/index')
+            ->component('transactions/index')
+            ->where('activeTab', 'expenses')
             ->where('expenses.total', 1)
-            ->has('categories', 1)
+            ->has('expenseCategories', 1)
             ->where('total', '250.00'));
 });
 
@@ -139,9 +141,13 @@ test('expense filters by category and date', function () {
     Expense::factory()->create(['business_id' => $business->id, 'expense_category_id' => $fuel->id, 'user_id' => $owner->id, 'amount' => 70, 'expense_date' => today()->subDays(3)]);
 
     $this->actingAs($owner)
-        ->get(route('expenses.index', ['category_id' => $rent->id, 'date_from' => today()->toDateString()]))
+        ->get(route('transactions.index', ['tab' => 'expenses', 'category_id' => $rent->id, 'date_from' => today()->toDateString()]))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('expenses.total', 1)->where('total', '100.00'));
+        ->assertInertia(fn ($page) => $page
+            ->component('transactions/index')
+            ->where('activeTab', 'expenses')
+            ->where('expenses.total', 1)
+            ->where('total', '100.00'));
 });
 
 test('recording expense writes audit log', function () {

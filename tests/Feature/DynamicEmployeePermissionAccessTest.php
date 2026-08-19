@@ -115,14 +115,16 @@ test('employee with payment permission can open payments', function () {
         ->assertInertia(fn ($page) => $page->component('payments/index'));
 });
 
-test('employee with expense permission can open expenses', function () {
+test('employee with transaction permission can open transactions', function () {
     [$employee, $business] = employeeWithBusinessPermission(BusinessPermissionKey::ManageExpenses);
     ExpenseCategory::factory()->create(['business_id' => $business->id]);
 
     $this->actingAs($employee)
-        ->get(route('expenses.index'))
+        ->get(route('transactions.index', ['tab' => 'expenses']))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('expenses/index'));
+        ->assertInertia(fn ($page) => $page
+            ->component('transactions/index')
+            ->where('activeTab', 'expenses'));
 });
 
 test('employee with report permission can open reports', function () {

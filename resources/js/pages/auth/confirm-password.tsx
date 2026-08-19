@@ -9,6 +9,7 @@ import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { authButtonClass, authInputClass, authLabelClass } from '@/lib/auth-styles';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
@@ -30,13 +31,14 @@ export default function ConfirmPassword() {
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password" className={authLabelClass}>Password</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
                                 placeholder="Password"
                                 autoComplete="current-password"
                                 autoFocus
+                                className={authInputClass}
                             />
 
                             <InputError message={errors.password} />
@@ -44,7 +46,7 @@ export default function ConfirmPassword() {
 
                         <div className="flex items-center">
                             <Button
-                                className="w-full"
+                                className={`w-full ${authButtonClass}`}
                                 disabled={processing}
                                 data-test="confirm-password-button"
                             >
@@ -60,7 +62,7 @@ export default function ConfirmPassword() {
 }
 
 ConfirmPassword.layout = {
-    title: 'Confirm password',
+    title: 'Confirm Password',
     description:
         'This is a secure area of the application. Please confirm your password before continuing.',
 };

@@ -20,6 +20,7 @@ type TenantTheme = {
 type AppearanceProps = {
     auth?: {
         user?: {
+            role?: string;
             business_category?: string | null;
         } | null;
     };
@@ -47,6 +48,7 @@ type CategoryPalette = NonNullable<AppearanceProps['appearance']>['categoryPalet
 
 export default function Appearance() {
     const { auth, tenantTheme, appearance } = usePage<{ tenantTheme?: TenantTheme } & AppearanceProps>().props;
+    const isSuperAdmin = auth?.user?.role === 'super_admin';
     const theme = appearance?.theme ?? tenantTheme;
     const form = useForm({
         theme_mode: appearance?.business?.theme_mode ?? theme?.mode ?? 'default',
@@ -71,73 +73,83 @@ export default function Appearance() {
                 <Heading
                     variant="small"
                     title="Appearance"
-                    description="Update the appearance settings for your account"
+                    description={isSuperAdmin
+                        ? 'Choose whether the admin workspace uses light or dark mode.'
+                        : 'Update the appearance settings for your account'}
                 />
                 <AppearanceTabs />
-                <form onSubmit={submit} className="grid gap-5 rounded-md border bg-card p-5 shadow-sm">
-                    <div>
-                        <h2 className="font-semibold">Theme source</h2>
-                        <p className="mt-1 text-sm text-muted-foreground">Choose how BizTrack should style this business workspace.</p>
+                {isSuperAdmin ? (
+                    <div className="rounded-md border bg-card p-5 text-sm text-muted-foreground shadow-sm">
+                        Super admin accounts use the platform appearance only. Business logo, category, and manual palettes are managed by business owners inside their own workspaces.
                     </div>
+                ) : (
+                    <>
+                        <form onSubmit={submit} className="grid gap-5 rounded-md border bg-card p-5 shadow-sm">
+                            <div>
+                                <h2 className="font-semibold">Theme source</h2>
+                                <p className="mt-1 text-sm text-muted-foreground">Choose how BizTrack should style this business workspace.</p>
+                            </div>
 
-                    <div className="grid gap-3 md:grid-cols-4">
-                        {[
-                            ['logo', 'Logo palette'],
-                            ['category', 'Category palette'],
-                            ['manual', 'Manual colors'],
-                            ['default', 'BizTrack default'],
-                        ].map(([value, label]) => (
-                            <label key={value} className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm">
-                                <input type="radio" checked={form.data.theme_mode === value} onChange={() => form.setData('theme_mode', value)} className="accent-primary" />
-                                {label}
-                            </label>
-                        ))}
-                    </div>
-                    {form.errors.theme_mode && <p className="text-sm text-destructive">{form.errors.theme_mode}</p>}
-
-                    {form.data.theme_mode === 'manual' && (
-                        <div className="grid gap-5">
-                            <div className="grid gap-3 md:grid-cols-3">
-                                {manualPalettes.map((palette) => (
-                                    <button
-                                        key={palette.name}
-                                        type="button"
-                                        onClick={() => {
-                                            form.setData('theme_primary', palette.primary);
-                                            form.setData('theme_secondary', palette.secondary);
-                                            form.setData('theme_accent', palette.accent);
-                                        }}
-                                        className="rounded-md border bg-background p-3 text-left transition hover:border-primary"
-                                    >
-                                        <span className="text-sm font-medium">{palette.name}</span>
-                                        <span className="mt-3 flex gap-2">
-                                            {[palette.primary, palette.secondary, palette.accent].map((color) => (
-                                                <span key={color} className="size-8 rounded-md border" style={{ backgroundColor: color }} />
-                                            ))}
-                                        </span>
-                                    </button>
+                            <div className="grid gap-3 md:grid-cols-4">
+                                {[
+                                    ['logo', 'Logo palette'],
+                                    ['category', 'Category palette'],
+                                    ['manual', 'Manual colors'],
+                                    ['default', 'BizTrack default'],
+                                ].map(([value, label]) => (
+                                    <label key={value} className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm">
+                                        <input type="radio" checked={form.data.theme_mode === value} onChange={() => form.setData('theme_mode', value)} className="accent-primary" />
+                                        {label}
+                                    </label>
                                 ))}
                             </div>
-                            <div className="grid gap-4 md:grid-cols-3">
-                                <ColorField label="Primary" value={form.data.theme_primary} onChange={(value) => form.setData('theme_primary', value)} error={form.errors.theme_primary} />
-                                <ColorField label="Secondary" value={form.data.theme_secondary} onChange={(value) => form.setData('theme_secondary', value)} error={form.errors.theme_secondary} />
-                                <ColorField label="Accent" value={form.data.theme_accent} onChange={(value) => form.setData('theme_accent', value)} error={form.errors.theme_accent} />
-                            </div>
-                        </div>
-                    )}
+                            {form.errors.theme_mode && <p className="text-sm text-destructive">{form.errors.theme_mode}</p>}
 
-                    {form.data.theme_mode === 'logo' && !appearance?.business?.logo && (
-                        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                            No logo is uploaded yet. BizTrack will use the category palette until a logo exists.
-                        </p>
-                    )}
+                            {form.data.theme_mode === 'manual' && (
+                                <div className="grid gap-5">
+                                    <div className="grid gap-3 md:grid-cols-3">
+                                        {manualPalettes.map((palette) => (
+                                            <button
+                                                key={palette.name}
+                                                type="button"
+                                                onClick={() => {
+                                                    form.setData('theme_primary', palette.primary);
+                                                    form.setData('theme_secondary', palette.secondary);
+                                                    form.setData('theme_accent', palette.accent);
+                                                }}
+                                                className="rounded-md border bg-background p-3 text-left transition hover:border-primary"
+                                            >
+                                                <span className="text-sm font-medium">{palette.name}</span>
+                                                <span className="mt-3 flex gap-2">
+                                                    {[palette.primary, palette.secondary, palette.accent].map((color) => (
+                                                        <span key={color} className="size-8 rounded-md border" style={{ backgroundColor: color }} />
+                                                    ))}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="grid gap-4 md:grid-cols-3">
+                                        <ColorField label="Primary" value={form.data.theme_primary} onChange={(value) => form.setData('theme_primary', value)} error={form.errors.theme_primary} />
+                                        <ColorField label="Secondary" value={form.data.theme_secondary} onChange={(value) => form.setData('theme_secondary', value)} error={form.errors.theme_secondary} />
+                                        <ColorField label="Accent" value={form.data.theme_accent} onChange={(value) => form.setData('theme_accent', value)} error={form.errors.theme_accent} />
+                                    </div>
+                                </div>
+                            )}
 
-                    <Button type="submit" className="w-fit" disabled={form.processing}>
-                        {form.processing ? 'Saving...' : 'Save appearance'}
-                    </Button>
-                </form>
+                            {form.data.theme_mode === 'logo' && !appearance?.business?.logo && (
+                                <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                                    No logo is uploaded yet. BizTrack will use the category palette until a logo exists.
+                                </p>
+                            )}
 
-                <ThemePalettePreview theme={previewTheme} businessCategory={auth?.user?.business_category} />
+                            <Button type="submit" className="w-fit" disabled={form.processing}>
+                                {form.processing ? 'Saving...' : 'Save appearance'}
+                            </Button>
+                        </form>
+
+                        <ThemePalettePreview theme={previewTheme} businessCategory={auth?.user?.business_category} />
+                    </>
+                )}
             </div>
         </>
     );

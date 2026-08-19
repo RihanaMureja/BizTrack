@@ -19,6 +19,10 @@ enum BusinessPermissionKey: string
 
     public function label(): string
     {
+        if ($this === self::ManageExpenses) {
+            return 'Manage Transactions';
+        }
+
         return str($this->value)->replace('_', ' ')->title()->toString();
     }
 
@@ -31,7 +35,7 @@ enum BusinessPermissionKey: string
             self::ManageCustomers => 'Customers',
             self::CreateSales, self::ViewSales => 'Sales',
             self::ManagePayments => 'Payments',
-            self::ManageExpenses => 'Expenses',
+            self::ManageExpenses => 'Transactions',
             self::ViewReports => 'Reports',
             self::ManageEmployees => 'Team',
             self::ViewNotifications => 'Notifications',

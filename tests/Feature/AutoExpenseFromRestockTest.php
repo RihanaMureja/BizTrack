@@ -52,10 +52,11 @@ test('expense ledger can filter by restock source', function () {
     Expense::factory()->create(['business_id' => $business->id, 'expense_category_id' => $restockCategory->id, 'source' => ExpenseSource::Restock, 'amount' => 90]);
 
     $this->actingAs($owner)
-        ->get(route('expenses.index', ['source' => ExpenseSource::Restock->value]))
+        ->get(route('transactions.index', ['tab' => 'expenses', 'source' => ExpenseSource::Restock->value]))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('expenses/index')
+            ->component('transactions/index')
+            ->where('activeTab', 'expenses')
             ->where('expenses.total', 1)
             ->where('total', '90.00')
         );

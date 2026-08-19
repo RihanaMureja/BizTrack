@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\RecordStatus;
 use App\Enums\ProductInsightStatus;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
@@ -29,7 +28,7 @@ class ProductController extends Controller
         $business = $request->user()->ownedBusiness ?? $request->user()->business;
         $search = $request->string('search')->toString() ?: null;
         $categoryId = $request->integer('category_id') ?: null;
-        $status = $request->string('status')->toString() ?: null;
+        $status = $this->normalizeStatusFilter($request->string('status')->toString() ?: null);
         $sort = $request->string('sort')->toString() ?: null;
 
         return Inertia::render('products/index', [
@@ -48,12 +47,12 @@ class ProductController extends Controller
                 'status' => $status,
                 'sort' => $sort,
             ],
-            'statuses' => collect(RecordStatus::cases())
-                ->map(fn (RecordStatus $status) => [
-                    'value' => $status->value,
-                    'label' => ucfirst($status->value),
-                ])
-                ->values(),
+            'statuses' => [
+                ['value' => 'active', 'label' => 'Active'],
+                ['value' => 'low_stock', 'label' => 'Low stock'],
+                ['value' => 'out_of_stock', 'label' => 'Out of stock'],
+                ['value' => 'deactivated', 'label' => 'Deactivated'],
+            ],
         ]);
     }
 
@@ -137,5 +136,14 @@ class ProductController extends Controller
         $businessId = $request->user()?->ownedBusiness?->id ?? $request->user()?->business_id;
 
         abort_unless($businessId && $insight->business_id === $businessId, 403);
+    }
+
+    private function normalizeStatusFilter(?string $status): ?string
+    {
+        return match ($status) {
+            'active', 'low_stock', 'out_of_stock', 'deactivated' => $status,
+            'inactive' => 'out_of_stock',
+            default => null,
+        };
     }
 }

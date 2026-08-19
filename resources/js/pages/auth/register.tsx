@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { authButtonClass, authIconClass, authInputClass, authLabelClass, authLinkClass } from '@/lib/auth-styles';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
@@ -22,22 +23,22 @@ export default function Register({ passwordRules }: Props) {
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
-                className="flex flex-col gap-5"
+                className="flex flex-col gap-4"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-5">
-                            <div className="grid gap-4">
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8AA3A0]">
+                        <div className="grid gap-4">
+                            <div className="grid gap-3">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#006b3f]">
                                     Personal information
                                 </p>
-                                <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="grid gap-3 sm:grid-cols-2">
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="first_name" className="text-xs font-medium text-[#8AA3A0]">
+                                        <Label htmlFor="first_name" className={authLabelClass}>
                                             First name
                                         </Label>
                                         <div className="relative">
-                                            <UserRound className="pointer-events-none absolute right-1 top-1/2 size-4 -translate-y-1/2 text-[#18B6A4]" />
+                                            <UserRound className={authIconClass} />
                                             <Input
                                                 id="first_name"
                                                 type="text"
@@ -47,7 +48,7 @@ export default function Register({ passwordRules }: Props) {
                                                 autoComplete="given-name"
                                                 name="first_name"
                                                 placeholder="First name"
-                                                className="h-10 rounded-none border-x-0 border-t-0 border-b-[#d8ece9] bg-transparent px-0 pr-7 text-sm text-[#071A2B] shadow-none placeholder:text-[#a9c1be] focus-visible:border-b-2 focus-visible:border-[#18B6A4] focus-visible:ring-0"
+                                                className={`${authInputClass} pr-10`}
                                             />
                                         </div>
                                         <InputError
@@ -57,11 +58,11 @@ export default function Register({ passwordRules }: Props) {
                                     </div>
 
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="last_name" className="text-xs font-medium text-[#8AA3A0]">
+                                        <Label htmlFor="last_name" className={authLabelClass}>
                                             Last name
                                         </Label>
                                         <div className="relative">
-                                            <UserRound className="pointer-events-none absolute right-1 top-1/2 size-4 -translate-y-1/2 text-[#18B6A4]" />
+                                            <UserRound className={authIconClass} />
                                             <Input
                                                 id="last_name"
                                                 type="text"
@@ -70,7 +71,7 @@ export default function Register({ passwordRules }: Props) {
                                                 autoComplete="family-name"
                                                 name="last_name"
                                                 placeholder="Last name"
-                                                className="h-10 rounded-none border-x-0 border-t-0 border-b-[#d8ece9] bg-transparent px-0 pr-7 text-sm text-[#071A2B] shadow-none placeholder:text-[#a9c1be] focus-visible:border-b-2 focus-visible:border-[#18B6A4] focus-visible:ring-0"
+                                                className={`${authInputClass} pr-10`}
                                             />
                                         </div>
                                         <InputError
@@ -81,17 +82,17 @@ export default function Register({ passwordRules }: Props) {
                                 </div>
                             </div>
 
-                            <div className="grid gap-4">
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8AA3A0]">
+                            <div className="grid gap-3">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#006b3f]">
                                     Contact information
                                 </p>
-                                <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="grid gap-3 sm:grid-cols-2">
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="phone" className="text-xs font-medium text-[#8AA3A0]">
+                                        <Label htmlFor="phone" className={authLabelClass}>
                                             Phone
                                         </Label>
                                         <div className="relative">
-                                            <Phone className="pointer-events-none absolute right-1 top-1/2 size-4 -translate-y-1/2 text-[#18B6A4]" />
+                                            <Phone className={authIconClass} />
                                             <Input
                                                 id="phone"
                                                 type="text"
@@ -99,18 +100,18 @@ export default function Register({ passwordRules }: Props) {
                                                 autoComplete="tel"
                                                 name="phone"
                                                 placeholder="+251..."
-                                                className="h-10 rounded-none border-x-0 border-t-0 border-b-[#d8ece9] bg-transparent px-0 pr-7 text-sm text-[#071A2B] shadow-none placeholder:text-[#a9c1be] focus-visible:border-b-2 focus-visible:border-[#18B6A4] focus-visible:ring-0"
+                                                className={`${authInputClass} pr-10`}
                                             />
                                         </div>
                                         <InputError message={errors.phone} />
                                     </div>
 
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="email" className="text-xs font-medium text-[#8AA3A0]">
+                                        <Label htmlFor="email" className={authLabelClass}>
                                             Email address
                                         </Label>
                                         <div className="relative">
-                                            <Mail className="pointer-events-none absolute right-1 top-1/2 size-4 -translate-y-1/2 text-[#18B6A4]" />
+                                            <Mail className={authIconClass} />
                                             <Input
                                                 id="email"
                                                 type="email"
@@ -119,7 +120,7 @@ export default function Register({ passwordRules }: Props) {
                                                 autoComplete="email"
                                                 name="email"
                                                 placeholder="email@example.com"
-                                                className="h-10 rounded-none border-x-0 border-t-0 border-b-[#d8ece9] bg-transparent px-0 pr-7 text-sm text-[#071A2B] shadow-none placeholder:text-[#a9c1be] focus-visible:border-b-2 focus-visible:border-[#18B6A4] focus-visible:ring-0"
+                                                className={`${authInputClass} pr-10`}
                                             />
                                         </div>
                                         <InputError message={errors.email} />
@@ -127,17 +128,17 @@ export default function Register({ passwordRules }: Props) {
                                 </div>
                             </div>
 
-                            <div className="grid gap-4">
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8AA3A0]">
+                            <div className="grid gap-3">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#006b3f]">
                                     Security
                                 </p>
-                                <div className="grid gap-4">
+                                <div className="grid gap-3">
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="password" className="text-xs font-medium text-[#8AA3A0]">
+                                        <Label htmlFor="password" className={authLabelClass}>
                                             Password
                                         </Label>
                                         <div className="relative">
-                                            <LockKeyhole className="pointer-events-none absolute right-8 top-1/2 size-3.5 -translate-y-1/2 text-[#18B6A4]" />
+                                            <LockKeyhole className="pointer-events-none absolute right-10 top-1/2 size-3.5 -translate-y-1/2 text-[#006b3f]" />
                                             <PasswordInput
                                                 id="password"
                                                 required
@@ -146,18 +147,18 @@ export default function Register({ passwordRules }: Props) {
                                                 name="password"
                                                 placeholder="Password"
                                                 passwordrules={passwordRules}
-                                                className="h-10 rounded-none border-x-0 border-t-0 border-b-[#d8ece9] bg-transparent px-0 text-sm text-[#071A2B] shadow-none placeholder:text-[#a9c1be] focus-visible:border-b-2 focus-visible:border-[#18B6A4] focus-visible:ring-0"
+                                                className={authInputClass}
                                             />
                                         </div>
                                         <InputError message={errors.password} />
                                     </div>
 
                                     <div className="grid gap-1.5">
-                                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-[#8AA3A0]">
+                                        <Label htmlFor="password_confirmation" className={authLabelClass}>
                                             Confirm password
                                         </Label>
                                         <div className="relative">
-                                            <LockKeyhole className="pointer-events-none absolute right-8 top-1/2 size-3.5 -translate-y-1/2 text-[#18B6A4]" />
+                                            <LockKeyhole className="pointer-events-none absolute right-10 top-1/2 size-3.5 -translate-y-1/2 text-[#006b3f]" />
                                             <PasswordInput
                                                 id="password_confirmation"
                                                 required
@@ -166,7 +167,7 @@ export default function Register({ passwordRules }: Props) {
                                                 name="password_confirmation"
                                                 placeholder="Confirm password"
                                                 passwordrules={passwordRules}
-                                                className="h-10 rounded-none border-x-0 border-t-0 border-b-[#d8ece9] bg-transparent px-0 text-sm text-[#071A2B] shadow-none placeholder:text-[#a9c1be] focus-visible:border-b-2 focus-visible:border-[#18B6A4] focus-visible:ring-0"
+                                                className={authInputClass}
                                             />
                                         </div>
                                         <InputError
@@ -178,7 +179,7 @@ export default function Register({ passwordRules }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mx-auto mt-2 h-11 w-[180px] rounded-full bg-[#18B6A4] text-sm font-semibold text-white shadow-md shadow-[#18B6A4]/25 transition-all hover:-translate-y-0.5 hover:bg-[#149786] hover:shadow-lg hover:shadow-[#18B6A4]/25 active:translate-y-px"
+                                className={`mx-auto mt-1 w-[150px] ${authButtonClass}`}
                                 tabIndex={7}
                                 data-test="register-user-button"
                             >
@@ -187,9 +188,9 @@ export default function Register({ passwordRules }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-slate-500">
+                        <div className="text-center text-[13px] text-[#607568]">
                             Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={8} className="font-semibold text-[#149786] hover:text-[#071A2B]">
+                            <TextLink href={login()} tabIndex={8} className={authLinkClass}>
                                 Sign in
                             </TextLink>
                         </div>
@@ -201,6 +202,6 @@ export default function Register({ passwordRules }: Props) {
 }
 
 Register.layout = {
-    title: 'Create your BizTrack account',
-    description: 'Start managing your business with one powerful platform.',
+    title: 'Create Account',
+    description: 'Start your BizTrack workspace with a secure owner account.',
 };

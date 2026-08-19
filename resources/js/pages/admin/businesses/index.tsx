@@ -15,6 +15,8 @@ type Business = {
     id: number;
     business_name: string;
     business_type: string | null;
+    business_category: string | null;
+    business_category_label: string;
     email: string | null;
     phone: string | null;
     address: string | null;
@@ -37,10 +39,11 @@ type Paginated<T> = { data: T[]; links: PaginationLink[]; from: number | null; t
 type Props = {
     businesses: Paginated<Business>;
     statuses: Array<{ value: string; label: string }>;
-    filters: { search: string | null; status: string | null };
+    businessCategories: Array<{ value: string; label: string }>;
+    filters: { search: string | null; status: string | null; business_category: string | null };
 };
 
-export default function AdminBusinessesIndex({ businesses, statuses, filters }: Props) {
+export default function AdminBusinessesIndex({ businesses, statuses, businessCategories, filters }: Props) {
     const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
 
     const applyFilters = (next: Record<string, string | null>) => router.get(
@@ -48,6 +51,7 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
         {
             search: filters.search ?? '',
             status: filters.status ?? '',
+            business_category: filters.business_category ?? '',
             ...next,
         },
         { preserveState: true, preserveScroll: true, replace: true },
@@ -65,7 +69,7 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
             ),
         },
         { key: 'owner', header: 'Owner', render: (business) => business.owner?.name ?? 'No owner' },
-        { key: 'business_type', header: 'Type', render: (business) => business.business_type ?? 'Not set' },
+        { key: 'business_type', header: 'Type', render: (business) => business.business_category_label },
         {
             key: 'subscription',
             header: 'Subscription',
@@ -122,7 +126,7 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
                     </div>
                 </div>
 
-                <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem]">
+                <div className="grid gap-3 rounded-md border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_12rem_13rem]">
                     <SearchBox
                         defaultValue={filters.search ?? ''}
                         placeholder="Search businesses..."
@@ -141,6 +145,18 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
                             </option>
                         ))}
                     </select>
+                    <select
+                        value={filters.business_category ?? ''}
+                        onChange={(event) => applyFilters({ business_category: event.target.value })}
+                        className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+                    >
+                        <option value="">All business types</option>
+                        {businessCategories.map((category) => (
+                            <option key={category.value} value={category.value}>
+                                {category.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <section className="rounded-md border bg-card p-4 shadow-sm">
@@ -152,20 +168,28 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
             </div>
 
             <Dialog open={Boolean(selectedBusiness)} onOpenChange={(open) => !open && setSelectedBusiness(null)}>
-                <DialogContent className="max-w-3xl">
-                    <DialogHeader>
-                        <DialogTitle>{selectedBusiness?.business_name ?? 'Business details'}</DialogTitle>
-                        <DialogDescription>Existing business data from the current tenant database.</DialogDescription>
+                <DialogContent className="grid max-h-[86vh] max-w-4xl grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden p-0">
+                    <DialogHeader className="border-b px-5 py-4 pr-12">
+                        <DialogTitle className="text-base leading-6">{selectedBusiness?.business_name ?? 'Business details'}</DialogTitle>
+                        <DialogDescription className="text-xs">Existing business data from the current tenant database.</DialogDescription>
                     </DialogHeader>
 
                     {selectedBusiness && (
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="min-h-0 overflow-y-auto px-5 py-4">
+                            <div className="mb-4 grid gap-3 sm:grid-cols-3">
+                                <SummaryTile label="Status" value={selectedBusiness.status_label} />
+                                <SummaryTile label="Access" value={selectedBusiness.access_mode_label} />
+                                <SummaryTile label="Plan" value={selectedBusiness.subscription?.name ?? 'No plan'} />
+                            </div>
+
+                            <div className="grid gap-3 lg:grid-cols-2">
                             <DetailCard
                                 icon={Store}
                                 title="Business"
                                 items={[
                                     ['Name', selectedBusiness.business_name],
-                                    ['Type', selectedBusiness.business_type ?? 'Not set'],
+                                    ['Type', selectedBusiness.business_category_label],
+                                    ['Custom type', selectedBusiness.business_type ?? 'Not set'],
                                     ['Contact email', selectedBusiness.email ?? 'Not set'],
                                     ['Phone', selectedBusiness.phone ?? 'Not set'],
                                 ]}
@@ -220,6 +244,7 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
                                     ['Record id', String(selectedBusiness.id)],
                                 ]}
                             />
+                            </div>
                         </div>
                     )}
                 </DialogContent>
@@ -230,18 +255,27 @@ export default function AdminBusinessesIndex({ businesses, statuses, filters }: 
 
 AdminBusinessesIndex.layout = { breadcrumbs: [{ title: 'Super Admin', href: '/admin' }, { title: 'Businesses', href: '/admin/businesses' }] };
 
+function SummaryTile({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="rounded-md border bg-muted/20 px-3 py-2">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+            <p className="mt-1 truncate text-sm font-semibold">{value}</p>
+        </div>
+    );
+}
+
 function DetailCard({ icon: Icon, title, items }: { icon: LucideIcon; title: string; items: Array<[string, string]> }) {
     return (
-        <section className="rounded-md border bg-background p-4">
+        <section className="rounded-md border bg-background p-3">
             <div className="flex items-center gap-2">
-                <Icon className="size-4 text-primary" />
-                <h3 className="font-semibold">{title}</h3>
+                <Icon className="size-3.5 text-primary" />
+                <h3 className="text-sm font-semibold">{title}</h3>
             </div>
-            <dl className="mt-3 grid gap-2 text-sm">
+            <dl className="mt-3 grid gap-1.5 text-xs">
                 {items.map(([label, value]) => (
-                    <div key={label} className="flex items-start justify-between gap-3 rounded-md bg-muted/30 px-3 py-2">
+                    <div key={label} className="grid grid-cols-[7.5rem_minmax(0,1fr)] gap-3 rounded-md bg-muted/25 px-2.5 py-1.5">
                         <dt className="text-muted-foreground">{label}</dt>
-                        <dd className="text-right font-medium">{value}</dd>
+                        <dd className="min-w-0 text-right font-medium break-words">{value}</dd>
                     </div>
                 ))}
             </dl>

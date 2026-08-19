@@ -6,7 +6,9 @@ use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Events\CashierCreated;
 use App\Models\Business;
+use App\Models\Sale;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -20,8 +22,10 @@ class CashierService
 
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
     {
-        return User::query()
-            ->with('businessRole:id,name')
+        $paginator = User::query()
+            ->with('businessRole.permissions:id,key,name,group')
+            ->withCount(['sales as sales_count_30d' => fn ($query) => $query->whereDate('sold_at', '>=', today()->subDays(29))])
+            ->withSum(['sales as sales_total_30d' => fn ($query) => $query->whereDate('sold_at', '>=', today()->subDays(29))], 'grand_total')
             ->where('business_id', $business->id)
             ->where('role', Role::Cashier)
             ->when($search, function ($query) use ($search): void {
@@ -35,6 +39,36 @@ class CashierService
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
+
+        $paginator->getCollection()->transform(function (User $cashier): User {
+            $cashier->setAttribute('sales_sparkline', $this->salesSparkline($cashier));
+
+            return $cashier;
+        });
+
+        return $paginator;
+    }
+
+    /**
+     * @return list<array{label: string, value: float}>
+     */
+    private function salesSparkline(User $cashier): array
+    {
+        $start = CarbonImmutable::today()->subDays(6);
+        $rows = Sale::query()
+            ->selectRaw('DATE(sold_at) as day, SUM(grand_total) as total')
+            ->where('user_id', $cashier->id)
+            ->whereDate('sold_at', '>=', $start)
+            ->groupBy('day')
+            ->pluck('total', 'day');
+
+        return collect(range(0, 6))
+            ->map(fn (int $offset): array => [
+                'label' => $start->addDays($offset)->format('M j'),
+                'value' => round((float) ($rows[$start->addDays($offset)->toDateString()] ?? 0), 2),
+            ])
+            ->values()
+            ->all();
     }
 
     /**

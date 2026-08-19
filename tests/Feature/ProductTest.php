@@ -54,6 +54,22 @@ test('owner can view product list', function () {
         ->assertOk();
 });
 
+test('product status filter only exposes catalog and stock states', function () {
+    [$owner] = productOwnerWithBusiness();
+
+    $this->actingAs($owner)
+        ->get(route('products.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('statuses', [
+                ['value' => 'active', 'label' => 'Active'],
+                ['value' => 'low_stock', 'label' => 'Low stock'],
+                ['value' => 'out_of_stock', 'label' => 'Out of stock'],
+                ['value' => 'deactivated', 'label' => 'Deactivated'],
+            ])
+        );
+});
+
 test('owner can create a product and inventory record is created automatically', function () {
     [$owner, $business] = productOwnerWithBusiness();
     $category = Category::factory()->create(['business_id' => $business->id]);
@@ -214,5 +230,58 @@ test('owner can search products by barcode and filter by category', function () 
             ->component('products/index')
             ->where('products.data.0.name', 'Filtered Product')
             ->where('products.total', 1)
+        );
+});
+
+test('product out of stock filter returns active products with no available stock', function () {
+    [$owner, $business] = productOwnerWithBusiness();
+
+    $outOfStock = Product::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Empty Shelf Product',
+        'status' => RecordStatus::Active,
+    ]);
+    $outOfStock->inventory()->update(['available_stock' => 0, 'quantity' => 0]);
+
+    $stocked = Product::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Stocked Product',
+        'status' => RecordStatus::Active,
+    ]);
+    $stocked->inventory()->update(['available_stock' => 10, 'quantity' => 10]);
+
+    $this->actingAs($owner)
+        ->get(route('products.index', ['status' => 'out_of_stock']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('filters.status', 'out_of_stock')
+            ->where('products.total', 1)
+            ->where('products.data.0.name', 'Empty Shelf Product')
+        );
+});
+
+test('legacy inactive product filter is treated as out of stock', function () {
+    [$owner, $business] = productOwnerWithBusiness();
+
+    $outOfStock = Product::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Legacy Empty Product',
+        'status' => RecordStatus::Active,
+    ]);
+    $outOfStock->inventory()->update(['available_stock' => 0, 'quantity' => 0]);
+
+    Product::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Deactivated Product',
+        'status' => RecordStatus::Inactive,
+    ]);
+
+    $this->actingAs($owner)
+        ->get(route('products.index', ['status' => 'inactive']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('filters.status', 'out_of_stock')
+            ->where('products.total', 1)
+            ->where('products.data.0.name', 'Legacy Empty Product')
         );
 });

@@ -15,7 +15,7 @@ class TrialStartedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -26,15 +26,4 @@ class TrialStartedNotification extends Notification
             ->action('Open dashboard', url('/dashboard'));
     }
 
-    public function toDatabase(object $notifiable): array
-    {
-        return [
-            'business_id' => $this->business->id,
-            'user_id' => $notifiable->id,
-            'type' => 'trial_started',
-            'title' => 'Trial Started',
-            'message' => $this->business->business_name.' trial started.',
-            'is_read' => false,
-        ];
-    }
 }

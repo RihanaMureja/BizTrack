@@ -1,4 +1,5 @@
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
+import { useAppearance } from '@/hooks/use-appearance';
 import type { BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
@@ -12,7 +13,8 @@ export default function AppLayout({
     children: React.ReactNode;
 }) {
     const { tenantTheme } = usePage<{ tenantTheme?: TenantTheme }>().props;
-    const themeVariables = themeStyle(tenantTheme);
+    const { resolvedAppearance } = useAppearance();
+    const themeVariables = themeStyle(tenantTheme, resolvedAppearance === 'dark');
 
     useEffect(() => {
         applyRootTenantTheme(themeVariables);
@@ -37,7 +39,7 @@ type TenantTheme = {
     text?: string;
 };
 
-function themeStyle(theme?: TenantTheme): CSSProperties {
+function themeStyle(theme?: TenantTheme, isDark = false): CSSProperties {
     const primary = validHex(theme?.primary) ? theme.primary : undefined;
     const secondary = validHex(theme?.secondary) ? theme.secondary : undefined;
     const accent = validHex(theme?.accent) ? theme.accent : undefined;
@@ -46,6 +48,51 @@ function themeStyle(theme?: TenantTheme): CSSProperties {
 
     if (!primary && !secondary && !accent && !background && !text) {
         return {};
+    }
+
+    if (isDark) {
+        const darkPrimary = primary ? tintForDark(primary) : '#4ade80';
+        const darkSecondary = secondary ? mix(secondary, '#111827', 0.74) : '#1f2937';
+        const darkAccent = accent ? tintForDark(accent, 0.2) : '#fbbf24';
+        const darkBackground = primary ? mix(primary, '#020617', 0.9) : '#08111f';
+        const darkCard = primary ? mix(primary, '#0f172a', 0.84) : '#111827';
+        const darkSidebar = primary ? mix(primary, '#020617', 0.82) : '#0f172a';
+        const darkSidebarAccent = accent ? mix(accent, '#111827', 0.72) : '#1f2937';
+        const darkMuted = secondary ? mix(secondary, '#111827', 0.82) : '#1f2937';
+        const darkBorder = primary ? mix(primary, '#ffffff', 0.78) : '#334155';
+
+        return {
+            '--background': darkBackground,
+            '--foreground': '#f1f8f4',
+            '--card': darkCard,
+            '--card-foreground': '#f7fbf8',
+            '--popover': mix(darkCard, '#020617', 0.18),
+            '--popover-foreground': '#f7fbf8',
+            '--primary': darkPrimary,
+            '--primary-foreground': readableOn(darkPrimary),
+            '--secondary': darkSecondary,
+            '--secondary-foreground': '#edf7f1',
+            '--muted': darkMuted,
+            '--muted-foreground': '#b7c8bd',
+            '--accent': darkSidebarAccent,
+            '--accent-foreground': '#f7fbf8',
+            '--border': darkBorder,
+            '--input': mix(darkBorder, '#020617', 0.38),
+            '--ring': darkPrimary,
+            '--chart-1': darkPrimary,
+            '--chart-2': secondary ? tintForDark(secondary, 0.18) : '#38bdf8',
+            '--chart-3': darkAccent,
+            '--chart-4': accent ? mix(accent, '#ffffff', 0.36) : '#f472b6',
+            '--chart-5': secondary ? mix(secondary, '#ffffff', 0.24) : '#a78bfa',
+            '--sidebar': darkSidebar,
+            '--sidebar-foreground': '#f1f8f4',
+            '--sidebar-primary': darkPrimary,
+            '--sidebar-primary-foreground': readableOn(darkPrimary),
+            '--sidebar-accent': darkSidebarAccent,
+            '--sidebar-accent-foreground': '#f7fbf8',
+            '--sidebar-border': mix(darkBorder, '#020617', 0.2),
+            '--sidebar-ring': darkPrimary,
+        } as CSSProperties;
     }
 
     return {
@@ -127,6 +174,12 @@ function mix(from: string, to: string, weight: number) {
 
 function readableOn(hex: string) {
     return contrast(hex, '#ffffff') >= 4.5 ? '#ffffff' : '#0f172a';
+}
+
+function tintForDark(hex: string, whiteWeight = 0.32) {
+    const tinted = mix(hex, '#ffffff', whiteWeight);
+
+    return contrast(tinted, '#020617') >= 4.5 ? tinted : mix(hex, '#ffffff', 0.48);
 }
 
 function contrast(a: string, b: string) {

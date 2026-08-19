@@ -43,8 +43,21 @@ class ProductService
                         ->orWhere('barcode', 'like', '%'.$search.'%');
                 });
             })
-            ->when($categoryId, fn ($query) => $query->where('category_id', $categoryId))
-            ->when($status, fn ($query) => $query->where('status', $status));
+            ->when($categoryId, fn ($query) => $query->where('category_id', $categoryId));
+
+        match ($status) {
+            RecordStatus::Active->value => $products->where('products.status', RecordStatus::Active),
+            'deactivated' => $products->where('products.status', RecordStatus::Inactive),
+            'low_stock' => $products
+                ->where('products.status', RecordStatus::Active)
+                ->whereHas('inventory', fn (Builder $query) => $query
+                    ->whereColumn('available_stock', '<=', 'products.reorder_level')
+                    ->where('available_stock', '>', 0)),
+            'out_of_stock', RecordStatus::Inactive->value => $products
+                ->where('products.status', RecordStatus::Active)
+                ->whereHas('inventory', fn (Builder $query) => $query->where('available_stock', '<=', 0)),
+            default => null,
+        };
 
         match ($sort) {
             'name' => $products->orderBy('name'),

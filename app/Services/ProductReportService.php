@@ -19,13 +19,17 @@ class ProductReportService
      */
     public function productDetail(Business $business, Product $product, CarbonInterface $from, CarbonInterface $to): array
     {
-        $items = SaleItem::query()
-            ->with('sale:id,business_id,invoice_number,sold_at')
-            ->where('product_id', $product->id)
-            ->whereHas('sale', fn ($query) => $query
-                ->where('business_id', $business->id)
-                ->whereBetween('sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()]))
+        $sales = Sale::query()
+            ->where('business_id', $business->id)
+            ->whereBetween('sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
+            ->whereHas('items', fn ($query) => $query->where('product_id', $product->id))
+            ->with(['items' => fn ($query) => $query->where('product_id', $product->id)])
             ->get();
+        $items = $sales->flatMap(fn (Sale $sale): Collection => $sale->items->map(function (SaleItem $item) use ($sale): SaleItem {
+            $item->setRelation('sale', $sale);
+
+            return $item;
+        }));
 
         $revenue = (float) $items->sum('line_total');
         $quantity = (int) $items->sum('quantity');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BusinessCategory;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\User;
@@ -24,28 +25,43 @@ class UserManagementController extends Controller
 
         $filters = [
             'search' => $request->string('search')->toString() ?: null,
-            'role' => $request->string('role')->toString() ?: null,
+            'account_type' => $request->string('account_type')->toString() ?: null,
             'status' => $request->string('status')->toString() ?: null,
+            'business_category' => $request->string('business_category')->toString() ?: null,
         ];
 
         return Inertia::render('admin/users/index', [
             'users' => User::query()
-                ->with(['business:id,business_name'])
+                ->with(['business:id,business_name,business_category,business_type'])
                 ->when($filters['search'], fn (Builder $query, string $search) => $query->where(fn (Builder $searchQuery) => $searchQuery
                     ->where('first_name', 'like', '%'.$search.'%')
                     ->orWhere('last_name', 'like', '%'.$search.'%')
                     ->orWhere('email', 'like', '%'.$search.'%')
                     ->orWhereHas('business', fn (Builder $businessQuery) => $businessQuery->where('business_name', 'like', '%'.$search.'%'))))
-                ->when($filters['role'], fn (Builder $query, string $role) => $query->where('role', $role))
+                ->when($filters['account_type'], function (Builder $query, string $accountType): void {
+                    match ($accountType) {
+                        'employees' => $query->where('role', Role::Cashier),
+                        'owners' => $query->where('role', Role::Owner),
+                        default => null,
+                    };
+                })
                 ->when($filters['status'], fn (Builder $query, string $status) => $query->where('status', $status))
+                ->when($filters['business_category'], fn (Builder $query, string $category) => $query->whereHas('business', fn (Builder $businessQuery) => $businessQuery->where('business_category', $category)))
                 ->latest()
                 ->paginate(12)
                 ->withQueryString(),
-            'roles' => collect(Role::cases())->map(fn (Role $role): array => ['value' => $role->value, 'label' => $role->label()]),
+            'accountTypes' => [
+                ['value' => 'owners', 'label' => 'Business owners'],
+                ['value' => 'employees', 'label' => 'Employees'],
+            ],
             'statuses' => [
                 ['value' => RecordStatus::Active->value, 'label' => 'Active'],
                 ['value' => RecordStatus::Inactive->value, 'label' => 'Inactive'],
             ],
+            'businessCategories' => collect(BusinessCategory::cases())->map(fn (BusinessCategory $category): array => [
+                'value' => $category->value,
+                'label' => $category->label(),
+            ]),
             'filters' => $filters,
             'currentUserId' => $request->user()->id,
         ]);

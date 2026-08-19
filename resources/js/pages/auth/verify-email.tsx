@@ -3,6 +3,7 @@ import { Form, Head } from '@inertiajs/react';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { authButtonClass, authLinkClass } from '@/lib/auth-styles';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
@@ -21,14 +22,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Form {...send.form()} className="space-y-6 text-center">
                 {({ processing }) => (
                     <>
-                        <Button disabled={processing} variant="secondary">
+                        <Button disabled={processing} className={authButtonClass}>
                             {processing && <Spinner />}
                             Resend verification email
                         </Button>
 
                         <TextLink
                             href={logout()}
-                            className="mx-auto block text-sm"
+                            className={`mx-auto block text-sm ${authLinkClass}`}
                         >
                             Log out
                         </TextLink>
@@ -40,7 +41,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
 }
 
 VerifyEmail.layout = {
-    title: 'Email verification',
+    title: 'Email Verification',
     description:
         'Please verify your email address by clicking on the link we just emailed to you.',
 };
