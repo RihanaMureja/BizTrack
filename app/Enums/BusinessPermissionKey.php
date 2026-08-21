@@ -16,6 +16,8 @@ enum BusinessPermissionKey: string
     case ViewReports = 'view_reports';
     case ManageEmployees = 'manage_employees';
     case ViewNotifications = 'view_notifications';
+    case AccessCredit = 'access_credit';
+    case AccessDiscount = 'access_discount';
 
     public function label(): string
     {
@@ -33,7 +35,7 @@ enum BusinessPermissionKey: string
             self::ManageProducts, self::ManageCategories => 'Catalog',
             self::ManageInventory => 'Inventory',
             self::ManageCustomers => 'Customers',
-            self::CreateSales, self::ViewSales => 'Sales',
+            self::CreateSales, self::ViewSales, self::AccessCredit, self::AccessDiscount => 'Sales',
             self::ManagePayments => 'Payments',
             self::ManageExpenses => 'Transactions',
             self::ViewReports => 'Reports',

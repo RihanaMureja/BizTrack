@@ -92,6 +92,21 @@ class SaleController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Sale '.$sale->invoice_number.' sent to checkout.']);
 
+        // Handle multiple payment methods if provided
+        if (! empty($data['checkout_methods']) && is_array($data['checkout_methods'])) {
+            foreach ($data['checkout_methods'] as $methodData) {
+                $this->paymentService->createFromCheckout($sale, $request->user(), [
+                    'method' => $methodData['method'],
+                    'amount' => $methodData['amount'],
+                    'phone' => $methodData['phone'] ?? null,
+                    'notes' => $data['notes'] ?? null,
+                ]);
+            }
+
+            return to_route('sales.index');
+        }
+
+        // Fallback to single checkout method (backward compatibility)
         $checkoutAmount = (float) ($data['cash_amount'] ?? ($sale->is_credit_sale ? 0 : $sale->grand_total));
 
         if (! empty($data['checkout_method']) && $checkoutAmount > 0) {

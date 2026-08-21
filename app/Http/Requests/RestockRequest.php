@@ -20,10 +20,20 @@ class RestockRequest extends FormRequest
         return [
             'quantity' => ['required', 'integer', 'min:1', 'max:1000000'],
             'unit_cost' => ['required', 'numeric', 'min:0', 'max:999999999.99'],
-            'selling_price' => ['nullable', 'numeric', 'min:0', 'max:999999999.99'],
+            'selling_price' => ['nullable', 'numeric', 'min:0', 'max:999999999.99', 'gte:unit_cost'],
             'received_at' => ['nullable', 'date'],
             'expiry_date' => ['nullable', 'date', 'after_or_equal:received_at'],
             'notes' => ['nullable', 'string', 'max:1000'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'selling_price.gte' => 'Selling price must be greater than or equal to unit cost. You cannot sell at a loss!',
         ];
     }
 }

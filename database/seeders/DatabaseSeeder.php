@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             SecurityQuestionSeeder::class,
             BusinessPermissionSeeder::class,
             SubscriptionSeeder::class,
-            DemoDataSeeder::class,
             SuperAdminSeeder::class,
         ]);
     }

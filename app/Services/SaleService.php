@@ -156,7 +156,7 @@ class SaleService
         return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 
-    private function validateCreditSale(?Customer $customer, float $grandTotal): void
+    private function validateCreditSale(?Customer $customer, float $creditAmount): void
     {
         if (! $customer) {
             throw ValidationException::withMessages([
@@ -166,9 +166,10 @@ class SaleService
 
         $availableCredit = max(0, (float) $customer->credit_limit - (float) $customer->current_balance);
 
-        if ($grandTotal > $availableCredit) {
+        // Round both values to avoid floating point precision issues
+        if (round($creditAmount, 2) > round($availableCredit, 2)) {
             throw ValidationException::withMessages([
-                'credit_amount' => 'Credit amount exceeds the customer available credit.',
+                'credit_amount' => 'Credit amount ('.number_format($creditAmount, 2).' ETB) exceeds the customer available credit ('.number_format($availableCredit, 2).' ETB).',
             ]);
         }
     }

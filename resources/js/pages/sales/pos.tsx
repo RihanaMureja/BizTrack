@@ -44,10 +44,8 @@ export default function Pos({ products, customers, business }: Props) {
         discount_amount: '0',
         apply_vat: business?.is_vat_registered ?? false,
         is_credit_sale: false,
-        cash_amount: '0',
         credit_amount: '0',
-        checkout_method: 'cash' as 'cash' | 'telebirr',
-        checkout_phone: '',
+        checkout_methods: [] as Array<{ method: string; amount: string; phone?: string }>,
         notes: '',
         items: [] as Array<{ product_id: number; quantity: number }>,
     });
@@ -91,11 +89,7 @@ export default function Pos({ products, customers, business }: Props) {
               )
             : 0;
     const grandTotal = taxableAmount + vatAmount;
-    const cashAmount = Number(form.data.cash_amount || 0);
     const creditAmount = Number(form.data.credit_amount || 0);
-    const splitTotal = Number((cashAmount + creditAmount).toFixed(2));
-    const splitMismatch =
-        checkoutOpen && splitTotal !== Number(grandTotal.toFixed(2));
     const exceedsCredit =
         form.data.is_credit_sale && selectedCustomer
             ? creditAmount > selectedCustomer.credit.available_credit
@@ -138,45 +132,41 @@ export default function Pos({ products, customers, business }: Props) {
     const removeItem = (id: number) =>
         setCart((items) => items.filter((item) => item.id !== id));
     const clearCart = () => setCart([]);
-    const submit = () => {
+    const submit = (methods: Array<{ id: string; method: string; amount: string; phone?: string }>) => {
+        // Calculate total cash amount from all payment methods
+        const totalPaymentAmount = methods.reduce((sum, m) => sum + Number(m.amount || 0), 0);
+        
         form.transform((data) => ({
             ...data,
             customer_id: data.customer_id || null,
             is_credit_sale: Boolean(data.is_credit_sale),
             apply_vat: Boolean(data.apply_vat),
-            cash_amount: data.cash_amount || '0',
+            cash_amount: String(totalPaymentAmount),
             credit_amount: data.is_credit_sale
                 ? data.credit_amount || '0'
                 : '0',
+            checkout_methods: methods.map(m => ({
+                method: m.method,
+                amount: m.amount,
+                phone: m.phone || undefined
+            })),
             items: cart.map((item) => ({
                 product_id: item.id,
                 quantity: item.quantity,
             })),
         }));
-        form.post('/sales');
+        form.post('/sales', {
+            onSuccess: () => {
+                clearCart();
+                setCheckoutOpen(false);
+                form.reset();
+            },
+            onError: (errors) => {
+                console.error('Sale submission errors:', errors);
+            }
+        });
     };
     const openCheckout = () => {
-        if (!form.data.is_credit_sale) {
-            form.setData((data) => ({
-                ...data,
-                cash_amount: grandTotal.toFixed(2),
-                credit_amount: '0',
-            }));
-        } else if (
-            Number(form.data.cash_amount || 0) === 0 &&
-            Number(form.data.credit_amount || 0) === 0
-        ) {
-            const credit = Math.min(
-                grandTotal,
-                selectedCustomer?.credit.available_credit ?? 0,
-            );
-            form.setData((data) => ({
-                ...data,
-                credit_amount: credit.toFixed(2),
-                cash_amount: Math.max(0, grandTotal - credit).toFixed(2),
-            }));
-        }
-
         setCheckoutOpen(true);
     };
 
@@ -488,29 +478,11 @@ export default function Pos({ products, customers, business }: Props) {
             <ProceedToPaymentModal
                 open={checkoutOpen}
                 onOpenChange={setCheckoutOpen}
-                method={form.data.checkout_method}
-                phone={form.data.checkout_phone}
                 processing={form.processing}
                 total={grandTotal}
-                cashAmount={form.data.cash_amount}
                 creditAmount={form.data.credit_amount}
                 creditEnabled={form.data.is_credit_sale}
                 availableCredit={selectedCustomer?.credit.available_credit}
-                phoneError={form.errors.checkout_phone}
-                splitError={
-                    form.errors.cash_amount ??
-                    form.errors.credit_amount ??
-                    (splitMismatch
-                        ? 'Pay now amount plus credit amount must equal the sale total.'
-                        : undefined)
-                }
-                onMethodChange={(method) =>
-                    form.setData('checkout_method', method)
-                }
-                onPhoneChange={(phone) => form.setData('checkout_phone', phone)}
-                onCashAmountChange={(amount) =>
-                    form.setData('cash_amount', amount)
-                }
                 onCreditAmountChange={(amount) =>
                     form.setData('credit_amount', amount)
                 }

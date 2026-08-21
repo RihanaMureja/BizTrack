@@ -69,10 +69,9 @@ class RBACService
                 ['title' => 'Revenue', 'href' => '/admin/reports/revenue', 'icon' => 'ChartBar'],
                 ['title' => 'Business Growth', 'href' => '/admin/reports/business-growth', 'icon' => 'TrendingUp'],
                 ['title' => 'Subscription Analytics', 'href' => '/admin/reports/subscription-analytics', 'icon' => 'ChartColumnIncreasing'],
-            ]),
+            ], true), // true = collapsible parent
             $this->group('Access Control', [
                 ['title' => 'Roles & Permissions', 'href' => '/admin/roles', 'icon' => 'ShieldCheck'],
-                ['title' => 'Permissions', 'href' => '/admin/permissions', 'icon' => 'KeyRound'],
             ]),
         ];
     }
@@ -134,13 +133,20 @@ class RBACService
 
     /**
      * @param  list<array{title: string, href: string, icon: string}>  $items
-     * @return array{label: string, items: list<array{title: string, href: string, icon: string}>}
+     * @param  bool  $isCollapsible
+     * @return array{label: string, items: list<array{title: string, href: string, icon: string}>, isCollapsible?: bool}
      */
-    private function group(string $label, array $items): array
+    private function group(string $label, array $items, bool $isCollapsible = false): array
     {
-        return [
+        $group = [
             'label' => $label,
             'items' => $items,
         ];
+        
+        if ($isCollapsible) {
+            $group['isCollapsible'] = true;
+        }
+        
+        return $group;
     }
 }

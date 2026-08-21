@@ -17,6 +17,7 @@ export type NavItem = {
 export type NavGroup = {
     label: string;
     items: NavItem[];
+    isCollapsible?: boolean;
 };
 
 export type ServerNavItem = {
@@ -28,6 +29,7 @@ export type ServerNavItem = {
 export type ServerNavGroup = {
     label: string;
     items: ServerNavItem[];
+    isCollapsible?: boolean;
 };
 
 export type SharedNotification = {

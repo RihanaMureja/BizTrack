@@ -28,6 +28,10 @@ class StoreSaleRequest extends FormRequest
             'apply_vat' => ['boolean'],
             'checkout_method' => ['nullable', Rule::in(['cash', 'telebirr'])],
             'checkout_phone' => ['required_if:checkout_method,telebirr', 'nullable', 'string', 'max:30'],
+            'checkout_methods' => ['nullable', 'array'],
+            'checkout_methods.*.method' => ['required', Rule::in(['cash', 'telebirr'])],
+            'checkout_methods.*.amount' => ['required', 'numeric', 'min:0.01', 'max:99999999.99'],
+            'checkout_methods.*.phone' => ['nullable', 'string', 'max:30'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', Rule::exists('products', 'id')->where(fn ($q) => $q->where('business_id', $businessId))],
@@ -59,6 +63,16 @@ class StoreSaleRequest extends FormRequest
 
                 if ((float) $this->input('discount_amount', 0) > $subtotal) {
                     $validator->errors()->add('discount_amount', 'Discount cannot exceed the sale subtotal.');
+                }
+
+                // Validate phone numbers for telebirr payment methods
+                $checkoutMethods = $this->input('checkout_methods', []);
+                foreach ($checkoutMethods as $index => $method) {
+                    if (isset($method['method']) && $method['method'] === 'telebirr') {
+                        if (empty($method['phone'])) {
+                            $validator->errors()->add("checkout_methods.{$index}.phone", 'Phone number is required for mobile money payments.');
+                        }
+                    }
                 }
             },
         ];

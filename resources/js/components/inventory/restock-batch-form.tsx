@@ -6,6 +6,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useForm } from '@inertiajs/react';
 import { PackagePlus } from 'lucide-react';
 import type { FormEvent } from 'react';
+import { useMemo } from 'react';
 
 type InventoryItem = {
     id: number;
@@ -26,8 +27,26 @@ export function RestockBatchForm({ item, onSuccess }: { item: InventoryItem; onS
         notes: '',
     });
 
+    // Check if unit cost is greater than selling price
+    const hasPriceError = useMemo(() => {
+        const unitCost = parseFloat(form.data.unit_cost);
+        const sellingPrice = parseFloat(form.data.selling_price);
+        
+        if (isNaN(unitCost) || isNaN(sellingPrice)) {
+            return false;
+        }
+        
+        return unitCost > sellingPrice;
+    }, [form.data.unit_cost, form.data.selling_price]);
+
     const submit = (event: FormEvent) => {
         event.preventDefault();
+        
+        // Prevent submission if unit cost is greater than selling price
+        if (hasPriceError) {
+            return;
+        }
+        
         form.post(`/inventory/${item.id}/restock`, {
             preserveScroll: true,
             onSuccess: () => {
@@ -60,6 +79,11 @@ export function RestockBatchForm({ item, onSuccess }: { item: InventoryItem; onS
                     <InputError message={form.errors.selling_price} />
                 </div>
             </div>
+            {hasPriceError && (
+                <div className="rounded-md border border-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                    Unit cost cannot be greater than selling price. You would be selling at a loss!
+                </div>
+            )}
             <div className="grid gap-3 sm:grid-cols-2">
                 <div className="grid gap-2">
                     <Label htmlFor="restock_received_at">Received date</Label>
@@ -77,7 +101,7 @@ export function RestockBatchForm({ item, onSuccess }: { item: InventoryItem; onS
                 <Input id="restock_notes" value={form.data.notes} onChange={(event) => form.setData('notes', event.target.value)} placeholder="Supplier, delivery note, or reason" />
                 <InputError message={form.errors.notes} />
             </div>
-            <Button type="submit" className="w-fit" disabled={form.processing}>
+            <Button type="submit" className="w-fit" disabled={form.processing || hasPriceError}>
                 {form.processing ? <Spinner /> : <PackagePlus className="size-4" />}
                 Create batch
             </Button>
