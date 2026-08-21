@@ -102,6 +102,7 @@ test('employee with inventory permission can restock own business inventory only
         ->post(route('inventory.restock', $product->inventory), [
             'quantity' => 8,
             'unit_cost' => 15.50,
+            'selling_price' => 20,
             'notes' => 'Shelf count',
         ])
         ->assertRedirect();
@@ -112,6 +113,7 @@ test('employee with inventory permission can restock own business inventory only
         ->post(route('inventory.restock', $otherProduct->inventory), [
             'quantity' => 8,
             'unit_cost' => 15.50,
+            'selling_price' => 20,
         ])
         ->assertForbidden();
 });
@@ -138,6 +140,7 @@ test('owner can restock product inventory', function () {
         ->post(route('inventory.restock', $inventory), [
             'quantity' => 12,
             'unit_cost' => 18.75,
+            'selling_price' => 24.50,
             'expiry_date' => now()->addYear()->toDateString(),
             'notes' => 'Opening stock',
         ])
@@ -149,6 +152,22 @@ test('owner can restock product inventory', function () {
         ->and($product->inventoryBatches()->count())->toBe(1)
         ->and((float) $product->inventoryBatches()->first()->unit_cost)->toBe(18.75)
         ->and($inventory->transactions()->first()->type)->toBe(InventoryTransactionType::Restock);
+});
+
+test('restock selling price must cover unit cost', function () {
+    [$owner, $business] = inventoryOwnerWithBusiness();
+    $product = productWithInventory($business);
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $product->inventory), [
+            'quantity' => 12,
+            'unit_cost' => 2000,
+            'selling_price' => 1900,
+        ])
+        ->assertSessionHasErrors('selling_price');
+
+    expect($product->inventory->refresh()->available_stock)->toBe(0)
+        ->and($product->inventoryBatches()->count())->toBe(0);
 });
 
 test('restock quantity must be positive', function () {
@@ -236,7 +255,7 @@ test('owner cannot adjust another business inventory', function () {
     $otherProduct = Product::factory()->create();
 
     $this->actingAs($owner)
-        ->post(route('inventory.restock', $otherProduct->inventory), ['quantity' => 5, 'unit_cost' => 10])
+        ->post(route('inventory.restock', $otherProduct->inventory), ['quantity' => 5, 'unit_cost' => 10, 'selling_price' => 15])
         ->assertForbidden();
 });
 
@@ -247,7 +266,7 @@ test('low stock event is dispatched when stock reaches reorder level', function 
     $inventory = $product->inventory;
 
     $this->actingAs($owner)
-        ->post(route('inventory.restock', $inventory), ['quantity' => 5, 'unit_cost' => 10])
+        ->post(route('inventory.restock', $inventory), ['quantity' => 5, 'unit_cost' => 10, 'selling_price' => 15])
         ->assertRedirect();
 
     Event::assertDispatched(InventoryLow::class);
@@ -259,7 +278,7 @@ test('inventory history page shows transaction records', function () {
     $inventory = $product->inventory;
 
     $this->actingAs($owner)
-        ->post(route('inventory.restock', $inventory), ['quantity' => 5, 'unit_cost' => 10])
+        ->post(route('inventory.restock', $inventory), ['quantity' => 5, 'unit_cost' => 10, 'selling_price' => 15])
         ->assertRedirect();
 
     $this->actingAs($owner)

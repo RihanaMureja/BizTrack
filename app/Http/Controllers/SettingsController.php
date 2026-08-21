@@ -12,6 +12,8 @@ class SettingsController extends Controller
 {
     public function edit(Request $request): Response
     {
+        abort_if($request->user()->isSuperAdmin(), 403);
+
         return Inertia::render('settings/preferences', [
             'preferences' => $this->preferences($request->user()->preferences ?? []),
             'options' => [
@@ -37,6 +39,8 @@ class SettingsController extends Controller
 
     public function update(PreferencesUpdateRequest $request): RedirectResponse
     {
+        abort_if($request->user()->isSuperAdmin(), 403);
+
         $request->user()->forceFill([
             'preferences' => $this->preferences($request->validated()),
         ])->save();

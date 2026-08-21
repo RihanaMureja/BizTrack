@@ -1,9 +1,13 @@
 import { ProductCardSparkline } from '@/components/products/product-card-sparkline';
 import { ProductCodePreview } from '@/components/products/product-code-preview';
+import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Lightbulb, Package, Printer, XCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { ArrowLeft, CheckCircle2, Lightbulb, Package, Percent, Printer, XCircle } from 'lucide-react';
+import type { FormEvent } from 'react';
 
 type Insight = {
     id: number;
@@ -15,6 +19,11 @@ type Insight = {
     last_sold_at: string | null;
     detected_at: string | null;
     suggested_action: string | null;
+    discount_price: string | null;
+    discount_percent: string | null;
+    allow_below_cost: boolean;
+    discount_reason: string | null;
+    discount_applied_at: string | null;
 };
 
 type Product = {
@@ -23,8 +32,17 @@ type Product = {
     barcode: string | null;
     qr_payload: string | null;
     description: string | null;
-    buy_price: string;
-    selling_price: string;
+    current_unit_cost?: string | null;
+    current_selling_price?: string | null;
+    effective_selling_price?: number | string | null;
+    is_discounted?: boolean;
+    active_discount?: {
+        price: number | null;
+        percent: number | null;
+        reason: string | null;
+        allow_below_cost: boolean;
+        insight_id: number | null;
+    };
     unit: string | null;
     reorder_level: number;
     status: string;
@@ -50,6 +68,22 @@ export default function ProductShow({ product, preferences }: Props) {
     const stock = product.inventory?.available_stock ?? 0;
     const totalSold = (product.sales_trend ?? []).reduce((sum, point) => sum + point.units, 0);
     const insights = product.movement_insights ?? [];
+    const sellingPrice = Number(product.current_selling_price ?? 0);
+    const effectiveSellingPrice = Number(product.effective_selling_price ?? sellingPrice);
+    const unitCost = Number(product.current_unit_cost ?? 0);
+    const discountForm = useForm({
+        discount_price: '',
+        allow_below_cost: false,
+        discount_reason: '',
+    });
+
+    const applyDiscount = (event: FormEvent, insightId: number) => {
+        event.preventDefault();
+        discountForm.post(`/product-insights/${insightId}/discount`, {
+            preserveScroll: true,
+            onSuccess: () => discountForm.reset(),
+        });
+    };
 
     return (
         <>
@@ -81,12 +115,15 @@ export default function ProductShow({ product, preferences }: Props) {
 
                 <section className="grid gap-4 md:grid-cols-4">
                     <div className="rounded-md border bg-card p-4 shadow-sm">
-                        <p className="text-sm text-muted-foreground">Selling price</p>
-                        <p className="mt-2 text-2xl font-semibold">{Number(product.selling_price).toLocaleString()} ETB</p>
+                        <p className="text-sm text-muted-foreground">{product.is_discounted ? 'Active sale price' : 'Current selling price'}</p>
+                        <p className="mt-2 text-2xl font-semibold">{effectiveSellingPrice > 0 ? `${effectiveSellingPrice.toLocaleString()} ETB` : 'Restock first'}</p>
+                        {product.is_discounted && (
+                            <p className="mt-1 text-xs text-muted-foreground line-through">{sellingPrice.toLocaleString()} ETB regular</p>
+                        )}
                     </div>
                     <div className="rounded-md border bg-card p-4 shadow-sm">
-                        <p className="text-sm text-muted-foreground">Buy price</p>
-                        <p className="mt-2 text-2xl font-semibold">{Number(product.buy_price).toLocaleString()} ETB</p>
+                        <p className="text-sm text-muted-foreground">Current unit cost</p>
+                        <p className="mt-2 text-2xl font-semibold">{unitCost > 0 ? `${unitCost.toLocaleString()} ETB` : 'No batch yet'}</p>
                     </div>
                     <div className="rounded-md border bg-card p-4 shadow-sm">
                         <p className="text-sm text-muted-foreground">Available stock</p>
@@ -163,6 +200,69 @@ export default function ProductShow({ product, preferences }: Props) {
                                         </div>
                                     )}
                                 </div>
+                                {insight.status === 'open' && (
+                                    <div className="mt-4 rounded-md border bg-card p-4">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+                                                <Percent className="size-4" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-semibold">Controlled stagnant discount</h3>
+                                                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                                                    Use this when stock is sitting too long. By default, BizTrack blocks discounts below the latest batch unit cost.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {insight.discount_applied_at && (
+                                            <div className="mt-3 rounded-md bg-primary/5 p-3 text-sm">
+                                                Active discount: <strong>{Number(insight.discount_price ?? 0).toLocaleString()} ETB</strong>
+                                                {insight.discount_percent ? ` (${Number(insight.discount_percent).toFixed(2)}% off)` : ''}
+                                                {insight.allow_below_cost ? ' - below-cost override recorded' : ''}
+                                            </div>
+                                        )}
+                                        <form onSubmit={(event) => applyDiscount(event, insight.id)} className="mt-4 grid gap-3">
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor={`discount_price_${insight.id}`}>Discount price</Label>
+                                                    <Input
+                                                        id={`discount_price_${insight.id}`}
+                                                        type="number"
+                                                        min="0.01"
+                                                        step="0.01"
+                                                        value={discountForm.data.discount_price}
+                                                        onChange={(event) => discountForm.setData('discount_price', event.target.value)}
+                                                        placeholder={`Minimum safe ${unitCost.toFixed(2)} ETB`}
+                                                    />
+                                                    <InputError message={discountForm.errors.discount_price} />
+                                                </div>
+                                                <label className="flex items-center gap-2 self-end rounded-md border bg-background px-3 py-2 text-sm">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={discountForm.data.allow_below_cost}
+                                                        onChange={(event) => discountForm.setData('allow_below_cost', event.target.checked)}
+                                                    />
+                                                    Allow below-cost override
+                                                </label>
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label htmlFor={`discount_reason_${insight.id}`}>Reason</Label>
+                                                <textarea
+                                                    id={`discount_reason_${insight.id}`}
+                                                    rows={3}
+                                                    value={discountForm.data.discount_reason}
+                                                    onChange={(event) => discountForm.setData('discount_reason', event.target.value)}
+                                                    placeholder="Required if selling below cost. Example: expiry clearance, damaged stock, liquidation."
+                                                    className="min-h-20 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                                                />
+                                                <InputError message={discountForm.errors.discount_reason} />
+                                            </div>
+                                            <Button type="submit" className="w-fit" disabled={discountForm.processing}>
+                                                <Percent className="size-4" />
+                                                Apply discount
+                                            </Button>
+                                        </form>
+                                    </div>
+                                )}
                             </div>
                         )) : (
                             <div className="rounded-md border border-dashed bg-background p-6 text-sm text-muted-foreground">

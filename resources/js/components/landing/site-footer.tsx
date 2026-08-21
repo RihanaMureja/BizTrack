@@ -21,7 +21,7 @@ export function SiteFooter({ landingPage = true }: SiteFooterProps) {
                     ]} className={linkClass} />
                     <FooterColumn title="Solutions" links={['Grocery & Mini Market', 'Clothing & Fashion', 'Cosmetics & Beauty', 'Electronics', 'Hardware & Building Materials', 'General Retail'].map((label) => [label, landing('#about')])} className={linkClass} />
                     <FooterColumn title="Company" links={[
-                        ['About Us', landing('#about')], ['How It Works', landing('#how-it-works')], ['FAQ', landing('#faq')],
+                        ['About Us', landing('#about')], ['How It Works', landing('#how-it-works')], ['FAQ', landing('#faq')], ['Contact Us', landing('#contact')],
                     ]} className={linkClass} />
                     <div>
                         <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">Account</h3>

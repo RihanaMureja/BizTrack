@@ -7,6 +7,7 @@ use App\Enums\RecordStatus;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\DateHelper;
 use App\Models\Business;
+use App\Models\Payment;
 use App\Models\Subscription;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -60,6 +61,11 @@ class AdminReportController extends Controller
                     ->values(),
                 'rows' => $rows,
                 'topPlans' => $rows->sortByDesc('estimated_mrr')->take(5)->values(),
+                'gatewayMix' => $this->paymentGatewayMix(),
+                'revenueHealth' => [
+                    ['label' => 'Assigned', 'value' => (float) $assignedBusinesses],
+                    ['label' => 'Unassigned', 'value' => (float) $unassignedBusinesses],
+                ],
             ],
         ]);
     }
@@ -83,6 +89,27 @@ class AdminReportController extends Controller
         $activeCount = Business::where('status', RecordStatus::Active->value)->count();
         $trialCount = Business::where('access_mode', BusinessAccessMode::Trial->value)->count();
         $withPlanCount = Business::whereNotNull('subscription_id')->count();
+        $accessMix = Business::query()
+            ->selectRaw('access_mode as label, COUNT(*) as value')
+            ->groupBy('access_mode')
+            ->orderByDesc('value')
+            ->get()
+            ->map(fn (object $row): array => [
+                'label' => str((string) $row->label)->replace('_', ' ')->title()->toString(),
+                'value' => (float) $row->value,
+            ])
+            ->values();
+        $categoryMix = Business::query()
+            ->selectRaw('business_category as label, COUNT(*) as value')
+            ->groupBy('business_category')
+            ->orderByDesc('value')
+            ->take(6)
+            ->get()
+            ->map(fn (object $row): array => [
+                'label' => str((string) ($row->label ?: 'Unspecified'))->replace('_', ' ')->title()->toString(),
+                'value' => (float) $row->value,
+            ])
+            ->values();
 
         return Inertia::render('admin/reports/business-growth', [
             'report' => [
@@ -96,6 +123,8 @@ class AdminReportController extends Controller
                     ['label' => 'Businesses With Plans', 'value' => (string) $withPlanCount],
                 ],
                 'chart' => $daily,
+                'accessMix' => $accessMix,
+                'categoryMix' => $categoryMix,
                 'rows' => $businesses->map(fn (Business $business): array => [
                     'business_name' => $business->business_name,
                     'owner' => $business->owner ? trim(($business->owner->first_name ?? '').' '.($business->owner->last_name ?? '')) ?: $business->owner->email : 'Unassigned',
@@ -134,6 +163,14 @@ class AdminReportController extends Controller
                     'label' => str($subscription->name)->limit(14)->toString(),
                     'value' => (int) $subscription->businesses_count,
                 ])->values(),
+                'revenueChart' => $subscriptions->map(fn (Subscription $subscription): array => [
+                    'label' => str($subscription->name)->limit(14)->toString(),
+                    'value' => (float) $subscription->price * (int) $subscription->businesses_count,
+                ])->values(),
+                'assignmentMix' => [
+                    ['label' => 'Assigned', 'value' => (float) $activeAssignments],
+                    ['label' => 'No plan', 'value' => (float) $businessesWithoutPlan],
+                ],
                 'rows' => $subscriptions->map(fn (Subscription $subscription): array => [
                     'name' => $subscription->name,
                     'price' => (float) $subscription->price,
@@ -181,6 +218,25 @@ class AdminReportController extends Controller
         }
 
         return $series;
+    }
+
+    /**
+     * @return array<int, array{label: string, value: float, amount: float}>
+     */
+    private function paymentGatewayMix(): array
+    {
+        return Payment::query()
+            ->selectRaw('method, COUNT(*) as value, COALESCE(SUM(amount), 0) as amount')
+            ->groupBy('method')
+            ->orderByDesc('amount')
+            ->get()
+            ->map(fn (object $row): array => [
+                'label' => str((string) $row->method)->replace('_', ' ')->title()->toString(),
+                'value' => (float) $row->value,
+                'amount' => (float) $row->amount,
+            ])
+            ->values()
+            ->all();
     }
 
 }

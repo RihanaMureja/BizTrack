@@ -3,6 +3,7 @@
 use App\Enums\Role;
 use App\Models\Business;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 
 function ownerWithBusiness(): array
@@ -34,6 +35,29 @@ test('owner can view their categories list', function () {
     $this->actingAs($owner)
         ->get(route('categories.index'))
         ->assertOk();
+});
+
+test('category page shares paginated card data with product counts', function () {
+    [$owner, $business] = ownerWithBusiness();
+    $category = Category::factory()->create([
+        'business_id' => $business->id,
+        'name' => 'Pain Relief',
+    ]);
+    Product::factory()->count(2)->create([
+        'business_id' => $business->id,
+        'category_id' => $category->id,
+    ]);
+
+    $this->actingAs($owner)
+        ->get(route('categories.index', ['search' => 'Pain']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('categories/index')
+            ->where('filters.search', 'Pain')
+            ->where('categories.total', 1)
+            ->where('categories.data.0.name', 'Pain Relief')
+            ->where('categories.data.0.products_count', 2)
+            ->has('categories.links'));
 });
 
 test('owner can create a category', function () {

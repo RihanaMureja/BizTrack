@@ -9,7 +9,7 @@ class PreferencesUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return (bool) $this->user();
+        return (bool) $this->user() && ! $this->user()->isSuperAdmin();
     }
 
     /**

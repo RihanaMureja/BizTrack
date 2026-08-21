@@ -15,6 +15,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerCreditController;
 use App\Http\Controllers\CreditDiscountController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
@@ -35,8 +36,11 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdminSystemHealthController;
+use App\Http\Controllers\AdminContactMessageController;
+use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +48,9 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 Route::inertia('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::inertia('/terms-of-service', 'terms-of-service')->name('terms-of-service');
+Route::post('/contact', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('contact.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('onboarding')->name('onboarding.')->middleware('role:owner')->group(function () {
@@ -79,6 +86,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('subscriptions/{subscription}/deactivate', [AdminSubscriptionController::class, 'deactivate'])->name('subscriptions.deactivate');
         Route::resource('subscriptions', AdminSubscriptionController::class)->only(['index', 'store', 'update']);
         Route::get('system-health', [AdminSystemHealthController::class, 'index'])->name('system-health.index');
+        Route::post('system-health/refresh', [AdminSystemHealthController::class, 'refresh'])->name('system-health.refresh');
+        Route::post('system-health/mail-test', [AdminSystemHealthController::class, 'sendTestEmail'])->name('system-health.mail-test');
+        Route::post('system-health/gateways/{gateway}/test', [AdminSystemHealthController::class, 'testGateway'])->name('system-health.gateways.test');
+        Route::post('system-health/failed-jobs/clear', [AdminSystemHealthController::class, 'clearFailedJobs'])->name('system-health.clear-failed-jobs');
+        Route::get('inbox', [AdminContactMessageController::class, 'index'])->name('inbox.index');
+        Route::post('inbox/{contactMessage}/read', [AdminContactMessageController::class, 'markRead'])->name('inbox.read');
+        Route::post('inbox/{contactMessage}/resolve', [AdminContactMessageController::class, 'resolve'])->name('inbox.resolve');
+        Route::get('notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/mark-all-read', [AdminNotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+        Route::post('notifications/{notification}/read', [AdminNotificationController::class, 'markRead'])->name('notifications.read');
+        Route::post('notifications/{notification}/dismiss', [AdminNotificationController::class, 'dismiss'])->name('notifications.dismiss');
         Route::prefix('reports')->name('reports.')->group(function (): void {
             Route::get('revenue', [AdminReportController::class, 'revenue'])->name('revenue');
             Route::get('business-growth', [AdminReportController::class, 'businessGrowth'])->name('business-growth');
@@ -91,6 +109,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:owner')->group(function () {
         Route::redirect('business/profile', '/settings/business')->name('business.profile');
         Route::get('business/subscriptions', [SubscriptionController::class, 'index'])->name('business.subscriptions');
+        Route::get('support', [SupportController::class, 'index'])->name('support.index');
+        Route::post('support', [SupportController::class, 'store'])->middleware('throttle:10,1')->name('support.store');
     });
 
     Route::middleware(['role:owner,cashier', 'business.approved'])->group(function () {
@@ -102,6 +122,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('products/{product}/label', [ProductCodeController::class, 'show'])->name('products.label');
             Route::post('product-insights/{productMovementInsight}/dismiss', [ProductController::class, 'dismissInsight'])->name('product-insights.dismiss');
             Route::post('product-insights/{productMovementInsight}/resolve', [ProductController::class, 'resolveInsight'])->name('product-insights.resolve');
+            Route::post('product-insights/{productMovementInsight}/discount', [ProductController::class, 'applyDiscount'])->name('product-insights.discount');
             Route::resource('products', ProductController::class)->except(['create', 'edit']);
         });
 
@@ -144,6 +165,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('customers', CustomerController::class)->except(['create', 'edit']);
             Route::post('customer-credits/{customerCredit}/overdue', [CustomerCreditController::class, 'overdue'])->name('customer-credits.overdue');
             Route::post('customer-credits/{customerCredit}/remind', [CustomerCreditController::class, 'remind'])->name('customer-credits.remind');
+            Route::post('customer-credits/{customerCredit}/repay', [CustomerCreditController::class, 'repay'])->name('customer-credits.repay');
         });
 
         Route::middleware('role:owner')->group(function () {

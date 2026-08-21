@@ -8,7 +8,7 @@ type Product = {
     name: string;
     barcode: string;
     qr_payload: string | null;
-    selling_price: string;
+    current_selling_price?: string | null;
     unit: string | null;
     business?: { business_name: string } | null;
 };

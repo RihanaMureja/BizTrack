@@ -161,7 +161,7 @@ return;
                             <img
                                 src={slide.image}
                                 alt={slide.eyebrow}
-                                className="h-full w-full object-cover"
+                                className="landing-hero-image h-full w-full object-cover"
                                 loading={index <= 1 ? 'eager' : 'lazy'}
                             />
 

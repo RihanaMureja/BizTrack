@@ -35,6 +35,9 @@ export type SharedNotification = {
     title: string;
     message: string;
     type: string;
+    category?: string | null;
+    priority?: string | null;
+    action_url?: string | null;
     is_read: boolean;
     created_at: string;
 };

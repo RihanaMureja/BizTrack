@@ -24,8 +24,6 @@ function validProductPayload(array $overrides = []): array
         'category_id' => null,
         'name' => 'Bottled Water 500ml',
         'description' => 'Clean bottled water',
-        'buy_price' => 8,
-        'selling_price' => 12,
         'unit' => 'bottle',
         'reorder_level' => 20,
         'status' => RecordStatus::Active->value,
@@ -105,15 +103,15 @@ test('product category must belong to owner business', function () {
         ->assertSessionHasErrors('category_id');
 });
 
-test('selling price must be greater than or equal to buy price', function () {
+test('product pricing is managed by inventory restock instead of product form', function () {
     [$owner] = productOwnerWithBusiness();
 
     $this->actingAs($owner)
         ->post(route('products.store'), validProductPayload([
             'buy_price' => 20,
-            'selling_price' => 10,
+            'selling_price' => 25,
         ]))
-        ->assertSessionHasErrors('selling_price');
+        ->assertSessionHasErrors(['buy_price', 'selling_price']);
 });
 
 test('product name must be unique within the same business category', function () {

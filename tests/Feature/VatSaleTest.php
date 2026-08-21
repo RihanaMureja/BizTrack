@@ -19,14 +19,15 @@ function vatSaleBusinessContext(): array
 function vatSaleStockedProduct(Business $business, int $stock = 10, float $price = 100): Product
 {
     $category = Category::factory()->create(['business_id' => $business->id]);
-    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id, 'selling_price' => $price]);
+    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id]);
     $product->inventory->forceFill(['quantity' => $stock, 'available_stock' => $stock])->save();
     InventoryBatch::factory()->create([
         'product_id' => $product->id,
         'business_id' => $business->id,
         'quantity_received' => $stock,
         'quantity_remaining' => $stock,
-        'unit_cost' => $product->buy_price,
+        'unit_cost' => 40,
+        'selling_price' => $price,
         'received_at' => now()->subDay(),
     ]);
 

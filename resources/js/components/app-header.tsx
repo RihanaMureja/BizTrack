@@ -29,6 +29,7 @@ type Props = {
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const { auth, navigation = [], notificationSummary } = usePage<SharedData>().props;
     const getInitials = useInitials();
+    const notificationsHref = auth.user?.role === 'super_admin' ? '/admin/notifications' : '/notifications';
 
     return (
         <>
@@ -78,7 +79,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         </Button>
                         <AppearanceToggleButton />
                         <Button variant="ghost" size="icon" asChild className="relative">
-                            <Link href="/notifications" aria-label="Notifications">
+                            <Link href={notificationsHref} aria-label="Notifications">
                                 <Bell className="size-5" />
                                 {notificationSummary.unreadCount > 0 && (
                                     <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">

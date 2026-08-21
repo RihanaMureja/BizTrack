@@ -49,6 +49,13 @@ class Product extends Model
         return $this->hasMany(InventoryBatch::class);
     }
 
+    public function latestAvailableBatch(): HasOne
+    {
+        return $this->hasOne(InventoryBatch::class)
+            ->where('quantity_remaining', '>', 0)
+            ->latestOfMany('received_at');
+    }
+
     public function movementInsights(): HasMany
     {
         return $this->hasMany(ProductMovementInsight::class);

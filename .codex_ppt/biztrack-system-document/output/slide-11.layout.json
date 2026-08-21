@@ -1,0 +1,1442 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/ur0udw",
+    "id": "ur0udw",
+    "slide": 11,
+    "layoutId": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#F4FBF7",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/do76d8ju",
+      "id": "1",
+      "bbox": [
+        64,
+        54,
+        860,
+        58
+      ],
+      "geometry": "rect",
+      "text": "The POS connects sales, stock, payments, credit, and receipts",
+      "textPreview": "The POS connects sales, stock, payments, credit, and receipts",
+      "resolvedFontSize": 38,
+      "resolvedTextStyle": {
+        "fontSize": 38,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "The POS connects sales, stock, payments, credit, and"
+          },
+          {
+            "index": 2,
+            "text": "receipts"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "The POS connects sales, stock, payments, credit, and receipts",
+          "resolvedTextStyle": {
+            "fontSize": 38,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "The POS connects sales, stock, payments, credit, and receipts",
+              "fontSize": 38,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6lg7it0j",
+      "id": "2",
+      "bbox": [
+        64,
+        110,
+        940,
+        46
+      ],
+      "geometry": "rect",
+      "text": "A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports.",
+      "textPreview": "A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#53657A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports.",
+              "fontSize": 18,
+              "color": "#53657A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/rmpoby14",
+      "id": "3",
+      "bbox": [
+        64,
+        188,
+        410,
+        96
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#EAF8EF",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4zy5gj2d",
+      "id": "4",
+      "bbox": [
+        96,
+        212,
+        150,
+        28
+      ],
+      "geometry": "rect",
+      "text": "Cart",
+      "textPreview": "Cart",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#008C4A",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Cart"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Cart",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#008C4A",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Cart",
+              "fontSize": 24,
+              "color": "#008C4A",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/50769ojy",
+      "id": "5",
+      "bbox": [
+        260,
+        216,
+        180,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Products added from catalog",
+      "textPreview": "Products added from catalog",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Products added from"
+          },
+          {
+            "index": 2,
+            "text": "catalog"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Products added from catalog",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#53657A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Products added from catalog",
+              "fontSize": 16,
+              "color": "#53657A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ixwnetk7",
+      "id": "6",
+      "bbox": [
+        64,
+        316,
+        410,
+        96
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#E8F4FF",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jy5o7e1s",
+      "id": "7",
+      "bbox": [
+        96,
+        340,
+        150,
+        28
+      ],
+      "geometry": "rect",
+      "text": "Checkout",
+      "textPreview": "Checkout",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#075985",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Checkout"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Checkout",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#075985",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Checkout",
+              "fontSize": 24,
+              "color": "#075985",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ovipsnih",
+      "id": "8",
+      "bbox": [
+        260,
+        344,
+        180,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Cash, wallet, account, and credit split",
+      "textPreview": "Cash, wallet, account, and credit split",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Cash, wallet, account,"
+          },
+          {
+            "index": 2,
+            "text": "and credit split"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Cash, wallet, account, and credit split",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#53657A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Cash, wallet, account, and credit split",
+              "fontSize": 16,
+              "color": "#53657A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pwr6lsj2",
+      "id": "9",
+      "bbox": [
+        64,
+        444,
+        410,
+        96
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFF7E2",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tk7i5cja",
+      "id": "10",
+      "bbox": [
+        96,
+        468,
+        150,
+        28
+      ],
+      "geometry": "rect",
+      "text": "Receipt",
+      "textPreview": "Receipt",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#A16207",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Receipt"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Receipt",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#A16207",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Receipt",
+              "fontSize": 24,
+              "color": "#A16207",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8jy1c7i5",
+      "id": "11",
+      "bbox": [
+        260,
+        472,
+        180,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Invoice, payment breakdown, QR verification",
+      "textPreview": "Invoice, payment breakdown, QR verification",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Invoice, payment"
+          },
+          {
+            "index": 2,
+            "text": "breakdown, QR"
+          },
+          {
+            "index": 3,
+            "text": "verification"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Invoice, payment breakdown, QR verification",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#53657A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Invoice, payment breakdown, QR verification",
+              "fontSize": 16,
+              "color": "#53657A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7ip0321k",
+      "id": "12",
+      "bbox": [
+        560,
+        188,
+        600,
+        352
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6hgjax0z",
+      "id": "13",
+      "bbox": [
+        596,
+        220,
+        470,
+        34
+      ],
+      "geometry": "rect",
+      "text": "Payment methods now supported in POS",
+      "textPreview": "Payment methods now supported in POS",
+      "resolvedFontSize": 28,
+      "resolvedTextStyle": {
+        "fontSize": 28,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Payment methods now supported in"
+          },
+          {
+            "index": 2,
+            "text": "POS"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Payment methods now supported in POS",
+          "resolvedTextStyle": {
+            "fontSize": 28,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Payment methods now supported in POS",
+              "fontSize": 28,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lgni1sje",
+      "id": "14",
+      "bbox": [
+        596,
+        286,
+        138,
+        62
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#F8FCFA",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kfe18nit",
+      "id": "15",
+      "bbox": [
+        612,
+        307,
+        70,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Cash",
+      "textPreview": "Cash",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Cash"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Cash",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Cash",
+              "fontSize": 15,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/je50zi18",
+      "id": "16",
+      "bbox": [
+        766,
+        286,
+        138,
+        62
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#F8FCFA",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 17,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/1kfy1of2",
+      "id": "17",
+      "bbox": [
+        778,
+        298,
+        42,
+        34
+      ],
+      "geometry": "roundRect",
+      "alt": "telebirr logo.png",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 17647"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "8bf8d09f-d2e5-42b9-b09e-cf98e34a6bfd",
+        "contentType": "image/png",
+        "byteLength": 23432
+      }
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5cr2dwji",
+      "id": "18",
+      "bbox": [
+        828,
+        307,
+        70,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Telebirr",
+      "textPreview": "Telebirr",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Telebirr"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Telebirr",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Telebirr",
+              "fontSize": 15,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4bi1krix",
+      "id": "19",
+      "bbox": [
+        936,
+        286,
+        138,
+        62
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#F8FCFA",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 20,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/zahwrydg",
+      "id": "20",
+      "bbox": [
+        948,
+        298,
+        42,
+        34
+      ],
+      "geometry": "roundRect",
+      "alt": "mpesa logo.png",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 17647"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "64954e00-8092-45dd-9969-0195c36a58f9",
+        "contentType": "image/png",
+        "byteLength": 6695
+      }
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pgz2907u",
+      "id": "21",
+      "bbox": [
+        998,
+        307,
+        70,
+        20
+      ],
+      "geometry": "rect",
+      "text": "M-Pesa",
+      "textPreview": "M-Pesa",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "M-Pesa"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "M-Pesa",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "M-Pesa",
+              "fontSize": 15,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2d83el83",
+      "id": "22",
+      "bbox": [
+        596,
+        378,
+        138,
+        62
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#F8FCFA",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 23,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/0bqxk3u1",
+      "id": "23",
+      "bbox": [
+        608,
+        390,
+        42,
+        34
+      ],
+      "geometry": "roundRect",
+      "alt": "cbebirr logo.jpg",
+      "contentType": "image/jpeg",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 17647"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "78dddf8d-6151-411a-853e-f0c92cb6db08",
+        "contentType": "image/jpeg",
+        "byteLength": 49722
+      }
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gr6lcbqd",
+      "id": "24",
+      "bbox": [
+        658,
+        399,
+        70,
+        20
+      ],
+      "geometry": "rect",
+      "text": "CBE Birr",
+      "textPreview": "CBE Birr",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "CBE Birr"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "CBE Birr",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "CBE Birr",
+              "fontSize": 15,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1cz25g7y",
+      "id": "25",
+      "bbox": [
+        766,
+        378,
+        138,
+        62
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#F8FCFA",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 26,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/d8zep8va",
+      "id": "26",
+      "bbox": [
+        778,
+        390,
+        42,
+        34
+      ],
+      "geometry": "roundRect",
+      "alt": "apollo logo.png",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 17647"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "fbd26b7f-6b64-4da1-840b-15da817d101f",
+        "contentType": "image/png",
+        "byteLength": 52481
+      }
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fqxk3qps",
+      "id": "27",
+      "bbox": [
+        828,
+        399,
+        70,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Apollo",
+      "textPreview": "Apollo",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Apollo"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Apollo",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Apollo",
+              "fontSize": 15,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 28,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sn6l8bq1",
+      "id": "28",
+      "bbox": [
+        936,
+        378,
+        138,
+        62
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#F8FCFA",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 29,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tof21g7m",
+      "id": "29",
+      "bbox": [
+        952,
+        399,
+        70,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Credit",
+      "textPreview": "Credit",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Credit"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Credit",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Credit",
+              "fontSize": 15,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 30,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vid4b6to",
+      "id": "30",
+      "bbox": [
+        64,
+        672,
+        170,
+        22
+      ],
+      "geometry": "rect",
+      "text": "BizTrack",
+      "textPreview": "BizTrack",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#008C4A",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#008C4A",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack",
+              "fontSize": 12,
+              "color": "#008C4A",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 31,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/uh43i1s3",
+      "id": "31",
+      "bbox": [
+        1156,
+        672,
+        60,
+        22
+      ],
+      "geometry": "rect",
+      "text": "11",
+      "textPreview": "11",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "11"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "11",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#53657A",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "11",
+              "fontSize": 12,
+              "color": "#53657A",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

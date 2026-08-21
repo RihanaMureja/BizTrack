@@ -88,6 +88,57 @@ test('full payment marks customer credit as paid and clears customer balance', f
         ->and((float) $customer->refresh()->current_balance)->toBe(0.0);
 });
 
+test('owner can collect a split repayment for outstanding customer credit', function () {
+    [$owner, $business] = creditBusinessContext();
+    $customer = Customer::factory()->create(['business_id' => $business->id, 'current_balance' => 0]);
+    $sale = creditSale($business, $owner, $customer, 100);
+    app(\App\Services\CustomerCreditService::class)->syncForSale($sale);
+
+    $credit = CustomerCredit::query()->firstOrFail();
+
+    $this->actingAs($owner)
+        ->post(route('customer-credits.repay', $credit), [
+            'amount' => 65,
+            'payment_lines' => [
+                ['method' => PaymentMethod::Cash->value, 'amount' => 40, 'reference' => 'CASH-REP-1'],
+                ['method' => PaymentMethod::Telebirr->value, 'amount' => 25, 'phone' => '+251912345678', 'reference' => 'TEL-REP-1'],
+            ],
+            'notes' => 'Customer paid part of outstanding credit.',
+        ])
+        ->assertRedirect();
+
+    expect(Payment::query()->count())->toBe(2);
+    expect((float) $credit->refresh()->paid_amount)->toBe(65.0)
+        ->and((float) $credit->remaining_balance)->toBe(35.0)
+        ->and($credit->status)->toBe(PaymentStatus::Partial)
+        ->and((float) $sale->refresh()->paid_amount)->toBe(65.0)
+        ->and((float) $sale->balance_due)->toBe(35.0)
+        ->and((float) $customer->refresh()->current_balance)->toBe(35.0);
+});
+
+test('credit repayment cannot exceed the outstanding balance', function () {
+    [$owner, $business] = creditBusinessContext();
+    $customer = Customer::factory()->create(['business_id' => $business->id, 'current_balance' => 0]);
+    $sale = creditSale($business, $owner, $customer, 50);
+    app(\App\Services\CustomerCreditService::class)->syncForSale($sale);
+
+    $credit = CustomerCredit::query()->firstOrFail();
+
+    $this->actingAs($owner)
+        ->from(route('customers.show', $customer))
+        ->post(route('customer-credits.repay', $credit), [
+            'amount' => 70,
+            'payment_lines' => [
+                ['method' => PaymentMethod::Cash->value, 'amount' => 70],
+            ],
+        ])
+        ->assertSessionHasErrors('amount');
+
+    expect(Payment::query()->count())->toBe(0)
+        ->and((float) $credit->refresh()->remaining_balance)->toBe(50.0)
+        ->and((float) $customer->refresh()->current_balance)->toBe(50.0);
+});
+
 test('pending digital payment does not reduce customer credit until verified', function () {
     [$owner, $business] = creditBusinessContext();
     $customer = Customer::factory()->create(['business_id' => $business->id, 'current_balance' => 0]);
@@ -163,5 +214,14 @@ test('cashier from another business cannot manage credit', function () {
 
     $this->actingAs($cashier)
         ->post(route('customer-credits.remind', $credit))
+        ->assertForbidden();
+
+    $this->actingAs($cashier)
+        ->post(route('customer-credits.repay', $credit), [
+            'amount' => 10,
+            'payment_lines' => [
+                ['method' => PaymentMethod::Cash->value, 'amount' => 10],
+            ],
+        ])
         ->assertForbidden();
 });

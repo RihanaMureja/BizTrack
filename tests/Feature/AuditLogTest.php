@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ExpenseStatus;
+use App\Enums\BusinessCategory;
 use App\Enums\PaymentStatus;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
@@ -43,6 +44,67 @@ test('owner can view only own business audit logs', function () {
             ->where('auditLogs.data.0.action', 'product.created'));
 });
 
+test('owner audit log search cannot reveal another business activity', function () {
+    [$owner, $business] = auditOwnerWithBusiness();
+    [$otherOwner, $otherBusiness] = auditOwnerWithBusiness();
+
+    AuditLog::factory()->create([
+        'business_id' => $business->id,
+        'user_id' => $owner->id,
+        'action' => 'product.created',
+        'table_name' => 'products',
+    ]);
+    AuditLog::factory()->create([
+        'business_id' => $otherBusiness->id,
+        'user_id' => $otherOwner->id,
+        'action' => 'salary.changed',
+        'table_name' => 'employees',
+    ]);
+
+    $this->actingAs($owner)
+        ->get(route('admin.audit-logs.index', ['search' => $otherBusiness->business_name]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/audit-logs/index')
+            ->where('auditLogs.total', 0)
+            ->where('actions', ['product.created']));
+
+    $this->actingAs($owner)
+        ->get(route('admin.audit-logs.index', ['search' => $otherOwner->email]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/audit-logs/index')
+            ->where('auditLogs.total', 0));
+});
+
+test('owner action filter cannot reveal another business action names', function () {
+    [$owner, $business] = auditOwnerWithBusiness();
+    [, $otherBusiness] = auditOwnerWithBusiness();
+
+    AuditLog::factory()->create([
+        'business_id' => $business->id,
+        'action' => 'product.created',
+    ]);
+    AuditLog::factory()->create([
+        'business_id' => $otherBusiness->id,
+        'action' => 'private.employee.updated',
+    ]);
+
+    $this->actingAs($owner)
+        ->get(route('admin.audit-logs.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/audit-logs/index')
+            ->where('actions', ['product.created']));
+
+    $this->actingAs($owner)
+        ->get(route('admin.audit-logs.index', ['action' => 'private.employee.updated']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/audit-logs/index')
+            ->where('auditLogs.total', 0));
+});
+
 test('super admin can view all audit logs', function () {
     $superAdmin = User::factory()->create(['role' => Role::SuperAdmin]);
     AuditLog::factory()->count(2)->create();
@@ -51,6 +113,46 @@ test('super admin can view all audit logs', function () {
         ->get(route('admin.audit-logs.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page->where('auditLogs.total', 2));
+});
+
+test('super admin audit explorer supports platform filters and derived metadata', function () {
+    $superAdmin = User::factory()->create(['role' => Role::SuperAdmin]);
+    [$owner, $business] = auditOwnerWithBusiness();
+    $business->forceFill(['business_category' => BusinessCategory::Pharmacy])->save();
+    [, $otherBusiness] = auditOwnerWithBusiness();
+    $otherBusiness->forceFill(['business_category' => BusinessCategory::Boutique])->save();
+
+    AuditLog::factory()->create([
+        'business_id' => $business->id,
+        'user_id' => $owner->id,
+        'action' => 'payment.completed',
+        'table_name' => 'payments',
+    ]);
+    AuditLog::factory()->create([
+        'business_id' => $otherBusiness->id,
+        'action' => 'product.created',
+        'table_name' => 'products',
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->get(route('admin.audit-logs.index', [
+            'business_category' => BusinessCategory::Pharmacy->value,
+            'role' => Role::Owner->value,
+            'action_group' => 'payments',
+            'table_name' => 'payments',
+            'risk_level' => 'important',
+        ]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/audit-logs/index')
+            ->where('isSuperAdmin', true)
+            ->where('auditLogs.total', 1)
+            ->where('auditLogs.data.0.action', 'payment.completed')
+            ->where('auditLogs.data.0.action_group', 'payments')
+            ->where('auditLogs.data.0.risk_level', 'important')
+            ->where('auditLogs.data.0.business.business_category', BusinessCategory::Pharmacy->value)
+            ->has('visuals.dailyTrend')
+            ->has('quickFilters'));
 });
 
 test('cashier cannot view audit logs', function () {

@@ -26,14 +26,15 @@ function saleBusinessContext(): array
 function stockedProduct(Business $business, int $stock = 10, float $price = 25): Product
 {
     $category = Category::factory()->create(['business_id' => $business->id]);
-    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id, 'selling_price' => $price]);
+    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id]);
     $product->inventory->forceFill(['quantity' => $stock, 'available_stock' => $stock])->save();
     InventoryBatch::factory()->create([
         'product_id' => $product->id,
         'business_id' => $business->id,
         'quantity_received' => $stock,
         'quantity_remaining' => $stock,
-        'unit_cost' => $product->buy_price,
+        'unit_cost' => 10,
+        'selling_price' => $price,
         'received_at' => now()->subDay(),
     ]);
     return $product->refresh();
@@ -190,7 +191,6 @@ test('sale that drops stock to reorder level dispatches low stock event and noti
     $product = Product::factory()->create([
         'business_id' => $business->id,
         'category_id' => $category->id,
-        'selling_price' => 10,
         'reorder_level' => 5,
     ]);
     $product->inventory->forceFill(['quantity' => 8, 'available_stock' => 8])->save();
@@ -199,7 +199,8 @@ test('sale that drops stock to reorder level dispatches low stock event and noti
         'business_id' => $business->id,
         'quantity_received' => 8,
         'quantity_remaining' => 8,
-        'unit_cost' => $product->buy_price,
+        'unit_cost' => 5,
+        'selling_price' => 10,
         'received_at' => now()->subDay(),
     ]);
     $product->refresh();
@@ -220,7 +221,6 @@ test('low stock event from a sale creates an in app notification for the owner',
     $product = Product::factory()->create([
         'business_id' => $business->id,
         'category_id' => $category->id,
-        'selling_price' => 10,
         'reorder_level' => 5,
     ]);
     $product->inventory->forceFill(['quantity' => 6, 'available_stock' => 6])->save();
@@ -229,7 +229,8 @@ test('low stock event from a sale creates an in app notification for the owner',
         'business_id' => $business->id,
         'quantity_received' => 6,
         'quantity_remaining' => 6,
-        'unit_cost' => $product->buy_price,
+        'unit_cost' => 5,
+        'selling_price' => 10,
         'received_at' => now()->subDay(),
     ]);
     $product->refresh();

@@ -27,8 +27,11 @@ class ProductCodeController extends Controller
             ])->save();
         }
 
+        $product->load(['business', 'category', 'latestAvailableBatch']);
+        $product->setAttribute('current_selling_price', $product->latestAvailableBatch?->selling_price);
+
         return Inertia::render('products/label', [
-            'product' => $product->load(['business', 'category']),
+            'product' => $product,
         ]);
     }
 }

@@ -1,0 +1,641 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/gzb5eq",
+    "id": "gzb5eq",
+    "slide": 19,
+    "layoutId": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FFFBF7",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8jexcjm9",
+      "id": "1",
+      "bbox": [
+        64,
+        54,
+        860,
+        58
+      ],
+      "geometry": "rect",
+      "text": "Security is built into identity, access, and traceability",
+      "textPreview": "Security is built into identity, access, and traceability",
+      "resolvedFontSize": 38,
+      "resolvedTextStyle": {
+        "fontSize": 38,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Security is built into identity, access, and traceability"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Security is built into identity, access, and traceability",
+          "resolvedTextStyle": {
+            "fontSize": 38,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Security is built into identity, access, and traceability",
+              "fontSize": 38,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7i5wje5o",
+      "id": "2",
+      "bbox": [
+        64,
+        110,
+        940,
+        46
+      ],
+      "geometry": "rect",
+      "text": "BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records.",
+      "textPreview": "BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#53657A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records.",
+              "fontSize": 18,
+              "color": "#53657A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6xwfat43",
+      "id": "3",
+      "bbox": [
+        120,
+        190,
+        760,
+        250
+      ],
+      "geometry": "rect",
+      "text": "• Email verification happens during sign-up before onboarding continues.\n• Phone OTP supports trial activation and account trust.\n• Temporary employee passwords must be reset.\n• Employee permissions are scoped to the owner’s business.\n• Super admin cannot silently change owner plans from the business directory.\n• Audit logs answer who did what, where, when, and what changed.",
+      "textPreview": "• Email verification happens during sign-up before onboarding continues. | • Phone OTP supports trial activation and account trust. | • T...",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 6,
+        "lines": [
+          {
+            "index": 1,
+            "text": "• Email verification happens during sign-up before onboarding continues."
+          },
+          {
+            "index": 2,
+            "text": "• Phone OTP supports trial activation and account trust."
+          },
+          {
+            "index": 3,
+            "text": "• Temporary employee passwords must be reset."
+          },
+          {
+            "index": 4,
+            "text": "• Employee permissions are scoped to the owner’s business."
+          },
+          {
+            "index": 5,
+            "text": "• Super admin cannot silently change owner plans from the business directory."
+          },
+          {
+            "index": 6,
+            "text": "• Audit logs answer who did what, where, when, and what changed."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "• Email verification happens during sign-up before onboarding continues.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Email verification happens during sign-up before onboarding continues.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "• Phone OTP supports trial activation and account trust.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Phone OTP supports trial activation and account trust.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 3,
+          "text": "• Temporary employee passwords must be reset.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Temporary employee passwords must be reset.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 4,
+          "text": "• Employee permissions are scoped to the owner’s business.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Employee permissions are scoped to the owner’s business.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 5,
+          "text": "• Super admin cannot silently change owner plans from the business directory.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Super admin cannot silently change owner plans from the business directory.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 6,
+          "text": "• Audit logs answer who did what, where, when, and what changed.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Audit logs answer who did what, where, when, and what changed.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lwnehoni",
+      "id": "4",
+      "bbox": [
+        930,
+        210,
+        210,
+        230
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#0B2B1D",
+      "lineColor": "#0B2B1D",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kvex8jmx",
+      "id": "5",
+      "bbox": [
+        962,
+        250,
+        150,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Trust",
+      "textPreview": "Trust",
+      "resolvedFontSize": 34,
+      "resolvedTextStyle": {
+        "fontSize": 34,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Trust"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Trust",
+          "resolvedTextStyle": {
+            "fontSize": 34,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Trust",
+              "fontSize": 34,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ju5wfe5s",
+      "id": "6",
+      "bbox": [
+        962,
+        316,
+        150,
+        76
+      ],
+      "geometry": "rect",
+      "text": "is not a feature; it is the behavior of the whole system.",
+      "textPreview": "is not a feature; it is the behavior of the whole system.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#DFF7E8",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "is not a feature; it"
+          },
+          {
+            "index": 2,
+            "text": "is the behavior of"
+          },
+          {
+            "index": 3,
+            "text": "the whole"
+          },
+          {
+            "index": 4,
+            "text": "system."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "is not a feature; it is the behavior of the whole system.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#DFF7E8",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "is not a feature; it is the behavior of the whole system.",
+              "fontSize": 18,
+              "color": "#DFF7E8",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ytcf6947",
+      "id": "7",
+      "bbox": [
+        64,
+        672,
+        170,
+        22
+      ],
+      "geometry": "rect",
+      "text": "BizTrack",
+      "textPreview": "BizTrack",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#008C4A",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#008C4A",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack",
+              "fontSize": 12,
+              "color": "#008C4A",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5s7yt8n2",
+      "id": "8",
+      "bbox": [
+        1156,
+        672,
+        60,
+        22
+      ],
+      "geometry": "rect",
+      "text": "19",
+      "textPreview": "19",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "19"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "19",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#53657A",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "19",
+              "fontSize": 12,
+              "color": "#53657A",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

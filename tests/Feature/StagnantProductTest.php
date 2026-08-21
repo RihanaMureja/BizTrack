@@ -5,6 +5,7 @@ use App\Enums\ProductInsightType;
 use App\Enums\RecordStatus;
 use App\Enums\Role;
 use App\Models\Business;
+use App\Models\InventoryBatch;
 use App\Models\Inventory;
 use App\Models\Notification;
 use App\Models\Product;
@@ -50,6 +51,22 @@ function stagnantStockedProduct(Business $business, int $stock = 10): Product
     );
 
     return $product;
+}
+
+function stagnantPricedProduct(Business $business, int $stock = 10, float $unitCost = 80, float $sellingPrice = 100): Product
+{
+    $product = stagnantStockedProduct($business, $stock);
+    InventoryBatch::factory()->create([
+        'business_id' => $business->id,
+        'product_id' => $product->id,
+        'quantity_received' => $stock,
+        'quantity_remaining' => $stock,
+        'unit_cost' => $unitCost,
+        'selling_price' => $sellingPrice,
+        'received_at' => now()->subDays(10),
+    ]);
+
+    return $product->refresh();
 }
 
 test('command detects stagnant products and notifies owner', function () {
@@ -132,6 +149,95 @@ test('owner can view and update product insight status', function () {
 
     expect($insight->refresh()->status)->toBe(ProductInsightStatus::Dismissed)
         ->and($insight->dismissed_at)->not->toBeNull();
+});
+
+test('owner can apply a safe stagnant product discount', function () {
+    [$owner, $business] = stagnantBusinessContext();
+    $product = stagnantPricedProduct($business, 8, 80, 100);
+    $insight = ProductMovementInsight::factory()->create([
+        'business_id' => $business->id,
+        'product_id' => $product->id,
+        'status' => ProductInsightStatus::Open,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('product-insights.discount', $insight), [
+            'discount_price' => 90,
+            'discount_reason' => 'Move slow stock this week.',
+        ])
+        ->assertRedirect();
+
+    expect((float) $insight->refresh()->discount_price)->toBe(90.0)
+        ->and((float) $insight->discount_percent)->toBe(10.0)
+        ->and($insight->allow_below_cost)->toBeFalse()
+        ->and($insight->discount_applied_at)->not->toBeNull();
+
+    $this->assertDatabaseHas('audit_logs', [
+        'business_id' => $business->id,
+        'action' => 'stagnant_discount_applied',
+        'table_name' => 'product_movement_insights',
+        'record_id' => $insight->id,
+    ]);
+});
+
+test('stagnant discount below unit cost requires an override reason', function () {
+    [$owner, $business] = stagnantBusinessContext();
+    $product = stagnantPricedProduct($business, 8, 80, 100);
+    $insight = ProductMovementInsight::factory()->create([
+        'business_id' => $business->id,
+        'product_id' => $product->id,
+        'status' => ProductInsightStatus::Open,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('product-insights.discount', $insight), [
+            'discount_price' => 70,
+        ])
+        ->assertSessionHasErrors('discount_price');
+
+    $this->actingAs($owner)
+        ->post(route('product-insights.discount', $insight), [
+            'discount_price' => 70,
+            'allow_below_cost' => true,
+        ])
+        ->assertSessionHasErrors('discount_reason');
+
+    $this->actingAs($owner)
+        ->post(route('product-insights.discount', $insight), [
+            'discount_price' => 70,
+            'allow_below_cost' => true,
+            'discount_reason' => 'Expiry clearance approved by owner.',
+        ])
+        ->assertRedirect();
+
+    expect((float) $insight->refresh()->discount_price)->toBe(70.0)
+        ->and($insight->allow_below_cost)->toBeTrue();
+});
+
+test('sale uses active stagnant discount price', function () {
+    [$owner, $business] = stagnantBusinessContext();
+    $product = stagnantPricedProduct($business, 8, 80, 100);
+    ProductMovementInsight::factory()->create([
+        'business_id' => $business->id,
+        'product_id' => $product->id,
+        'status' => ProductInsightStatus::Open,
+        'discount_price' => 90,
+        'discount_percent' => 10,
+        'discount_reason' => 'Move slow stock.',
+        'discount_applied_at' => now(),
+        'discount_applied_by' => $owner->id,
+    ]);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        ])
+        ->assertRedirect(route('sales.index'));
+
+    $sale = Sale::query()->firstOrFail();
+
+    expect((float) $sale->subtotal)->toBe(180.0)
+        ->and((float) $sale->items()->first()->unit_price)->toBe(90.0);
 });
 
 test('cashier cannot manage product insights', function () {

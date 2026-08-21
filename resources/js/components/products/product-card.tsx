@@ -14,8 +14,8 @@ export type CatalogProduct = {
     barcode: string | null;
     qr_payload?: string | null;
     description: string | null;
-    buy_price: string;
-    selling_price: string;
+    buy_price?: string | null;
+    selling_price?: string | null;
     unit: string | null;
     reorder_level: number;
     status: string;
@@ -32,6 +32,17 @@ export type CatalogProduct = {
         stock_on_hand: number;
         suggested_action: string | null;
     } | null;
+    current_unit_cost?: string | null;
+    current_selling_price?: string | null;
+    effective_selling_price?: number | string | null;
+    is_discounted?: boolean;
+    active_discount?: {
+        price: number | null;
+        percent: number | null;
+        reason: string | null;
+        allow_below_cost: boolean;
+        insight_id: number | null;
+    };
 };
 
 type Props = {
@@ -47,16 +58,14 @@ export function ProductCard({ product, onEdit, onDeactivate }: Props) {
     const visual = visualForBusinessCategory(auth.user?.business_category);
     const Icon = visual.Icon;
 
-    const sellingPrice =
-        product.inventory?.selling_price !== null &&
-        product.inventory?.selling_price !== undefined
-            ? Number(product.inventory.selling_price)
-            : Number(product.selling_price);
+    const regularSellingPrice = Number(product.current_selling_price ?? product.selling_price ?? 0);
+    const sellingPrice = Number(product.effective_selling_price ?? regularSellingPrice);
+    const unitCost = Number(product.current_unit_cost ?? product.buy_price ?? 0);
     const totalUnitsSold = (product.sales_trend ?? []).reduce(
         (sum, point) => sum + point.units,
         0,
     );
-    const margin = sellingPrice - Number(product.buy_price);
+    const margin = sellingPrice - unitCost;
     const marginPercent = sellingPrice > 0 ? (margin / sellingPrice) * 100 : 0;
 
     const stop = (event: MouseEvent) => {
@@ -110,15 +119,20 @@ export function ProductCard({ product, onEdit, onDeactivate }: Props) {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-xl border bg-background p-3">
                         <p className="text-xs text-muted-foreground">
-                            Selling price
+                            {product.is_discounted ? 'Active sale price' : 'Current selling price'}
                         </p>
                         <p className="mt-1 font-semibold">
-                            {sellingPrice.toLocaleString()} ETB
+                            {sellingPrice > 0 ? `${sellingPrice.toLocaleString()} ETB` : 'Restock first'}
                         </p>
+                        {product.is_discounted && (
+                            <p className="mt-1 text-xs text-muted-foreground line-through">
+                                {regularSellingPrice.toLocaleString()} ETB
+                            </p>
+                        )}
                     </div>
                     <div className="rounded-xl border bg-background p-3">
                         <p className="text-xs text-muted-foreground">
-                            Gross margin
+                            Batch margin
                         </p>
                         <p
                             className={
@@ -150,6 +164,11 @@ export function ProductCard({ product, onEdit, onDeactivate }: Props) {
                             No sales for{' '}
                             {product.open_insight.days_without_sale} days
                         </div>
+                        {product.is_discounted && product.active_discount?.percent && (
+                            <p className="mt-1 font-medium text-primary">
+                                Discount active: {Number(product.active_discount.percent).toFixed(0)}% off
+                            </p>
+                        )}
                         <p className="mt-1 line-clamp-2">
                             {product.open_insight.suggested_action ??
                                 'Review pricing or promotion.'}

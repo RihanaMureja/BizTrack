@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Bell, Mail, Phone, ReceiptText, UserRound } from 'lucide-react';
+import { useState } from 'react';
+import { CreditRepaymentModal } from '@/components/customers/credit-repayment-modal';
 
 type Props = {
     customer: {
@@ -34,6 +36,8 @@ type Credit = {
 
 export default function CustomerShow({ customer, purchaseHistory }: Props) {
     const activeCredits = customer.credits.filter((credit) => Number(credit.remaining_balance) > 0);
+    const [repayingCredit, setRepayingCredit] = useState<Credit | null>(null);
+    const [repaymentProcessing, setRepaymentProcessing] = useState(false);
 
     return (
         <>
@@ -124,6 +128,9 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                                             <Button type="button" variant="outline" onClick={() => router.post(`/customer-credits/${credit.id}/overdue`, {}, { preserveScroll: true })}>
                                                 Mark overdue
                                             </Button>
+                                            <Button type="button" onClick={() => setRepayingCredit(credit)}>
+                                                Repay
+                                            </Button>
                                         </div>
                                     </div>
                                 ))}
@@ -132,6 +139,35 @@ export default function CustomerShow({ customer, purchaseHistory }: Props) {
                     </CardContent>
                 </Card>
             </div>
+            <CreditRepaymentModal
+                credit={repayingCredit}
+                open={repayingCredit !== null}
+                processing={repaymentProcessing}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setRepayingCredit(null);
+                    }
+                }}
+                onConfirm={(amount, lines) => {
+                    if (!repayingCredit) {
+                        return;
+                    }
+
+                    setRepaymentProcessing(true);
+                    router.post(
+                        `/customer-credits/${repayingCredit.id}/repay`,
+                        {
+                            amount,
+                            payment_lines: lines,
+                        },
+                        {
+                            preserveScroll: true,
+                            onFinish: () => setRepaymentProcessing(false),
+                            onSuccess: () => setRepayingCredit(null),
+                        },
+                    );
+                }}
+            />
         </>
     );
 }

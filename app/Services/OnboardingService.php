@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Enums\BusinessAccessMode;
 use App\Enums\RecordStatus;
+use App\Events\BusinessOnboardingCompleted;
+use App\Events\BusinessSubscriptionChanged;
 use App\Models\Business;
 use App\Models\Notification as AppNotification;
 use App\Models\Subscription;
@@ -37,6 +39,8 @@ class OnboardingService
 
     public function startTrial(Business $business): Business
     {
+        $wasIncomplete = $business->onboarding_completed_at === null;
+
         $business->forceFill([
             'access_mode' => BusinessAccessMode::Trial,
             'status' => RecordStatus::Active,
@@ -60,11 +64,20 @@ class OnboardingService
             ]);
         }
 
-        return $business->refresh();
+        $business = $business->refresh();
+
+        if ($wasIncomplete) {
+            BusinessOnboardingCompleted::dispatch($business, BusinessAccessMode::Trial);
+        }
+
+        return $business;
     }
 
     public function activatePaidPlan(Business $business, Subscription $subscription): Business
     {
+        $previousSubscriptionId = $business->subscription_id;
+        $wasIncomplete = $business->onboarding_completed_at === null;
+
         $business->forceFill([
             'subscription_id' => $subscription->id,
             'access_mode' => BusinessAccessMode::Active,
@@ -72,6 +85,14 @@ class OnboardingService
             'onboarding_completed_at' => now(),
         ])->save();
 
-        return $business->refresh();
+        $business = $business->refresh()->loadMissing('subscription');
+
+        BusinessSubscriptionChanged::dispatch($business, $subscription, $previousSubscriptionId);
+
+        if ($wasIncomplete) {
+            BusinessOnboardingCompleted::dispatch($business, BusinessAccessMode::Active);
+        }
+
+        return $business;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProductInsightStatus;
+use App\Http\Requests\StoreStagnantProductDiscountRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
@@ -129,6 +130,15 @@ class ProductController extends Controller
         $this->productService->updateInsightStatus($productMovementInsight, ProductInsightStatus::Resolved);
 
         return back()->with('success', 'Product insight resolved.');
+    }
+
+    public function applyDiscount(StoreStagnantProductDiscountRequest $request, ProductMovementInsight $productMovementInsight): RedirectResponse
+    {
+        $this->productService->applyStagnantDiscount($productMovementInsight, $request->validated());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Stagnant product discount applied.']);
+
+        return back();
     }
 
     private function authorizeInsight(Request $request, ProductMovementInsight $insight): void

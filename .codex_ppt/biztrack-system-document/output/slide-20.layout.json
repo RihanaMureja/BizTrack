@@ -1,0 +1,518 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/kq9p2m",
+    "id": "kq9p2m",
+    "slide": 20,
+    "layoutId": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#F5FFF9",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qhs36p0r",
+      "id": "1",
+      "bbox": [
+        64,
+        54,
+        860,
+        58
+      ],
+      "geometry": "rect",
+      "text": "BizTrack can feel like each business’s own workspace",
+      "textPreview": "BizTrack can feel like each business’s own workspace",
+      "resolvedFontSize": 38,
+      "resolvedTextStyle": {
+        "fontSize": 38,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack can feel like each business’s own workspace"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack can feel like each business’s own workspace",
+          "resolvedTextStyle": {
+            "fontSize": 38,
+            "color": "#092033",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack can feel like each business’s own workspace",
+              "fontSize": 38,
+              "color": "#092033",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dkjmh4ji",
+      "id": "2",
+      "bbox": [
+        64,
+        110,
+        940,
+        46
+      ],
+      "geometry": "rect",
+      "text": "Tenant themes use business category, logo-driven palettes, and manual appearance settings.",
+      "textPreview": "Tenant themes use business category, logo-driven palettes, and manual appearance settings.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Tenant themes use business category, logo-driven palettes, and manual appearance settings."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Tenant themes use business category, logo-driven palettes, and manual appearance settings.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#53657A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Tenant themes use business category, logo-driven palettes, and manual appearance settings.",
+              "fontSize": 18,
+              "color": "#53657A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/5ovups7q",
+      "id": "3",
+      "bbox": [
+        720,
+        160,
+        400,
+        400
+      ],
+      "geometry": "roundRect",
+      "alt": "d432096c74d423af0a4732dce3107970.jpg",
+      "contentType": "image/jpeg",
+      "imageFit": "cover",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 4000"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "e8d7f8bc-211e-4213-b31a-9168397dc997",
+        "contentType": "image/jpeg",
+        "byteLength": 105533
+      }
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3e1kbu10",
+      "id": "4",
+      "bbox": [
+        90,
+        192,
+        520,
+        330
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(255, 255, 255, 0.94118)",
+      "lineColor": "#CFE1D9",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2ds32p0v",
+      "id": "5",
+      "bbox": [
+        126,
+        232,
+        460,
+        220
+      ],
+      "geometry": "rect",
+      "text": "• Business category is selected during onboarding.\n• Uploaded logos can influence brand palette.\n• Manual color pickers let owners adjust without knowing hex codes.\n• CSS variables allow the UI to change consistently.\n• Dashboard guidance can adapt to business type.",
+      "textPreview": "• Business category is selected during onboarding. | • Uploaded logos can influence brand palette. | • Manual color pickers let owners ad...",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#092033",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 6,
+        "lines": [
+          {
+            "index": 1,
+            "text": "• Business category is selected during onboarding."
+          },
+          {
+            "index": 2,
+            "text": "• Uploaded logos can influence brand palette."
+          },
+          {
+            "index": 3,
+            "text": "• Manual color pickers let owners adjust without knowing"
+          },
+          {
+            "index": 4,
+            "text": "hex codes."
+          },
+          {
+            "index": 5,
+            "text": "• CSS variables allow the UI to change consistently."
+          },
+          {
+            "index": 6,
+            "text": "• Dashboard guidance can adapt to business type."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "• Business category is selected during onboarding.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Business category is selected during onboarding.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "• Uploaded logos can influence brand palette.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Uploaded logos can influence brand palette.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 3,
+          "text": "• Manual color pickers let owners adjust without knowing hex codes.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Manual color pickers let owners adjust without knowing hex codes.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 4,
+          "text": "• CSS variables allow the UI to change consistently.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• CSS variables allow the UI to change consistently.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 5,
+          "text": "• Dashboard guidance can adapt to business type.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#092033",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Dashboard guidance can adapt to business type.",
+              "fontSize": 18,
+              "color": "#092033",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pgj2dkj6",
+      "id": "6",
+      "bbox": [
+        64,
+        672,
+        170,
+        22
+      ],
+      "geometry": "rect",
+      "text": "BizTrack",
+      "textPreview": "BizTrack",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#008C4A",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#008C4A",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack",
+              "fontSize": 12,
+              "color": "#008C4A",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ofal4zil",
+      "id": "7",
+      "bbox": [
+        1156,
+        672,
+        60,
+        22
+      ],
+      "geometry": "rect",
+      "text": "20",
+      "textPreview": "20",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#53657A",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "20"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "20",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#53657A",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "20",
+              "fontSize": 12,
+              "color": "#53657A",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

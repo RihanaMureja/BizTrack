@@ -33,7 +33,7 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Backup',
+        title: 'Recovery Questions',
         href: '/settings/security-questions',
         icon: null,
     },
@@ -60,7 +60,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             <Heading
                 title="Settings"
                 description={auth.user.role === 'super_admin'
-                    ? 'Manage profile, security, backup, and display mode settings'
+                    ? 'Manage platform-owner profile, security, recovery, and display mode settings'
                     : 'Manage general, notification, security, payment, backup, and appearance settings'}
             />
 

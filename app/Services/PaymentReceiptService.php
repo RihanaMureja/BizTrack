@@ -30,6 +30,7 @@ class PaymentReceiptService
         $payment->loadMissing([
             'business.owner',
             'sale.items.product',
+            'sale.payments',
             'customer',
             'user',
         ]);
@@ -83,6 +84,18 @@ class PaymentReceiptService
                 'unit_price' => (float) $item->unit_price,
                 'line_total' => (float) $item->line_total,
             ])->values(),
+            'payment_breakdown' => $payment->sale->payments
+                ->sortBy('id')
+                ->map(fn (Payment $salePayment): array => [
+                    'payment_number' => $salePayment->payment_number,
+                    'receipt_number' => $salePayment->receipt_number,
+                    'method' => $salePayment->method->label(),
+                    'status' => $salePayment->status->label(),
+                    'amount' => (float) $salePayment->amount,
+                    'reference' => $salePayment->reference,
+                    'gateway_reference' => $salePayment->gateway_reference,
+                ])
+                ->values(),
         ];
     }
 

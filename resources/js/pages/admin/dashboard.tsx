@@ -1,5 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Activity, Building2, CreditCard, Users, WalletCards } from 'lucide-react';
+import { AdminAreaPanel, AdminDonutPanel, AdminGatewayGrid, AdminRankedBars } from '@/components/admin/admin-analytics';
+import type { AdminPoint } from '@/components/admin/admin-analytics';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { StatCard } from '@/components/stat-card/stat-card';
@@ -8,9 +10,18 @@ import { Badge } from '@/components/ui/badge';
 type Stat = { label: string; value: string; trend: string };
 type Business = { id: number; business_name: string; business_type: string | null; status: string; owner: { email: string } | null; subscription: { name: string } | null };
 type ActivityLog = { id: number; action: string; created_at: string; business: { business_name: string } | null; user: { email: string } | null };
-type Props = { stats: Stat[]; recentBusinesses: Business[]; recentActivity: ActivityLog[] };
+type Props = {
+    stats: Stat[];
+    growthSeries: AdminPoint[];
+    planRevenue: AdminPoint[];
+    accessMix: AdminPoint[];
+    categoryMix: AdminPoint[];
+    gatewayMix: AdminPoint[];
+    recentBusinesses: Business[];
+    recentActivity: ActivityLog[];
+};
 
-export default function AdminDashboard({ stats, recentBusinesses, recentActivity }: Props) {
+export default function AdminDashboard({ stats, growthSeries, planRevenue, accessMix, categoryMix, gatewayMix, recentBusinesses, recentActivity }: Props) {
     const businessColumns: DataTableColumn<Business>[] = [
         { key: 'business_name', header: 'Business', render: (business) => <div><p className="font-medium">{business.business_name}</p><p className="text-xs text-muted-foreground">{business.owner?.email ?? 'No owner'}</p></div> },
         { key: 'business_type', header: 'Type' },
@@ -42,6 +53,35 @@ export default function AdminDashboard({ stats, recentBusinesses, recentActivity
                         <StatCard key={stat.label} {...stat} icon={[Building2, Users, CreditCard, WalletCards][index] ?? Activity} tone={(['emerald', 'blue', 'amber', 'rose'] as const)[index] ?? 'emerald'} />
                     ))}
                 </div>
+
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(22rem,0.8fr)]">
+                    <AdminAreaPanel
+                        title="Business growth"
+                        description="New business registrations over the last 30 days."
+                        data={growthSeries}
+                    />
+                    <AdminDonutPanel
+                        title="Access mode"
+                        description="Trial, active, onboarding, and restricted business states."
+                        data={accessMix}
+                    />
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-2">
+                    <AdminRankedBars
+                        title="Plan revenue contribution"
+                        description="Estimated monthly recurring revenue by active assigned plan."
+                        data={planRevenue}
+                        valueSuffix="ETB"
+                    />
+                    <AdminDonutPanel
+                        title="Business categories"
+                        description="Tenant business types across the platform."
+                        data={categoryMix}
+                    />
+                </div>
+
+                <AdminGatewayGrid data={gatewayMix} />
 
                 <div className="grid gap-4 xl:grid-cols-2">
                     <section className="rounded-md border bg-card p-4 shadow-sm">

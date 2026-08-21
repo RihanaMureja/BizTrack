@@ -1,7 +1,5 @@
 import { CategoryForm } from '@/components/forms/category-form';
 import { IconButton } from '@/components/buttons/icon-button';
-import { DataTable } from '@/components/data-table/data-table';
-import type { DataTableColumn } from '@/components/data-table/data-table';
 import { DeleteDialog } from '@/components/confirm-dialog/delete-dialog';
 import { Pagination } from '@/components/pagination/pagination';
 import type { PaginationLink } from '@/components/pagination/pagination';
@@ -16,7 +14,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, Boxes, Pencil, Plus, Tags, Trash2 } from 'lucide-react';
+import { AlertTriangle, Boxes, FolderSearch, Pencil, Plus, Tags, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -101,47 +99,6 @@ export default function CategoriesIndex({ categories, filters }: Props) {
         'var(--accent)',
     ];
 
-    const columns: DataTableColumn<Category>[] = [
-        { key: 'name', header: 'Name' },
-        {
-            key: 'description',
-            header: 'Description',
-            render: (category) => (
-                <span className="text-muted-foreground">
-                    {category.description || '—'}
-                </span>
-            ),
-        },
-        {
-            key: 'products_count',
-            header: 'Products',
-            render: (category) => (
-                <Badge variant="secondary">{category.products_count}</Badge>
-            ),
-        },
-        {
-            key: 'actions',
-            header: '',
-            className: 'text-right',
-            render: (category) => (
-                <div className="flex justify-end gap-2">
-                    <IconButton
-                        variant="outline"
-                        icon={Pencil}
-                        label={`Edit ${category.name}`}
-                        onClick={() => setEditingCategory(category)}
-                    />
-                    <IconButton
-                        variant="outline"
-                        icon={Trash2}
-                        label={`Delete ${category.name}`}
-                        onClick={() => setDeletingCategory(category)}
-                    />
-                </div>
-            ),
-        },
-    ];
-
     return (
         <>
             <Head title="Categories" />
@@ -184,6 +141,12 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                     </Alert>
                 ) : (
                     <div className="flex flex-col gap-4">
+                        <SearchBox
+                            defaultValue={filters.search ?? ''}
+                            placeholder="Search categories..."
+                            onSearch={handleSearch}
+                        />
+
                         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
                             <section className="rounded-xl border bg-card p-5 shadow-sm">
                                 <div className="flex items-center justify-between gap-3">
@@ -201,22 +164,45 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                                         {categories.total} categories
                                     </Badge>
                                 </div>
-                                <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                                    {categories.data.map((category, index) => (
+
+                                {categories.data.length === 0 ? (
+                                    <div className="mt-5 flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 p-8 text-center">
+                                        <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                            <FolderSearch className="size-6" />
+                                        </div>
+                                        <h3 className="mt-4 font-semibold">
+                                            No categories found
+                                        </h3>
+                                        <p className="mt-1 max-w-md text-sm text-muted-foreground">
+                                            Adjust your search or create a
+                                            category to organize products.
+                                        </p>
+                                        <Button
+                                            type="button"
+                                            className="mt-4"
+                                            onClick={() => setCreateOpen(true)}
+                                        >
+                                            <Plus className="size-4" />
+                                            New category
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                                        {categories.data.map((category, index) => (
                                         <article
                                             key={category.id}
-                                            className="group rounded-xl border bg-background p-4 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                                            className="group flex min-h-52 flex-col rounded-xl border bg-background p-4 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
                                         >
                                             <div className="flex items-start justify-between gap-3">
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex min-w-0 items-center gap-3">
                                                     <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                                                         <Tags className="size-5" />
                                                     </div>
-                                                    <div>
-                                                        <h3 className="font-semibold">
+                                                    <div className="min-w-0">
+                                                        <h3 className="truncate font-semibold">
                                                             {category.name}
                                                         </h3>
-                                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                                        <p className="mt-0.5 line-clamp-2 text-xs leading-5 text-muted-foreground">
                                                             {category.description ||
                                                                 'No description'}
                                                         </p>
@@ -254,7 +240,7 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="mt-4 flex justify-end gap-2">
+                                            <div className="mt-auto flex justify-end gap-2 pt-4">
                                                 <IconButton
                                                     variant="outline"
                                                     icon={Pencil}
@@ -277,8 +263,9 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                                                 />
                                             </div>
                                         </article>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                )}
                             </section>
 
                             <section className="rounded-xl border bg-card p-5 shadow-sm">
@@ -331,19 +318,6 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                                 )}
                             </section>
                         </div>
-
-                        <SearchBox
-                            defaultValue={filters.search ?? ''}
-                            placeholder="Search categories..."
-                            onSearch={handleSearch}
-                        />
-
-                        <DataTable
-                            columns={columns}
-                            data={categories.data}
-                            rowKey={(category) => category.id}
-                            emptyMessage="No categories yet. Create your first one to start organizing products."
-                        />
 
                         <Pagination
                             links={categories.links}

@@ -54,6 +54,11 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'email_logo_url' => env(
+        'APP_EMAIL_LOGO_URL',
+        'https://res.cloudinary.com/glyvpbfy/image/upload/f_auto,q_auto/biztrack-logo',
+    ),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

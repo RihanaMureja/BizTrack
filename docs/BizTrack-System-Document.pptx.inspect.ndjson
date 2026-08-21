@@ -1,0 +1,341 @@
+{"kind":"deck","id":"pr/gqo6zk","name":"Deck"}
+{"kind":"layout","layoutId":"060bd905-0fba-40b9-9a01-246ee76411be","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"261a3bef-3dc6-4789-a919-3fe717009605","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/07yp99","slide":1,"title":"SYSTEM DOCUMENT","textShapes":10}
+{"kind":"shape","id":"sh/zudkvu10","slide":1,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/dsv2tkju","slide":1,"bbox":[64,160,170,34]}
+{"kind":"textbox","id":"sh/crm10fi9","slide":1,"text":"SYSTEM DOCUMENT","textPreview":"SYSTEM DOCUMENT","textChars":15,"textLines":1,"bbox":[78,168,142,18]}
+{"kind":"textbox","id":"sh/rqt0ra14","slide":1,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,225,560,72]}
+{"kind":"textbox","id":"sh/qpkjy50j","slide":1,"text":"A Complete Internal Operations Management System for Businesses","textPreview":"A Complete Internal Operations Management System for Businesses","textChars":63,"textLines":1,"bbox":[64,305,760,72]}
+{"kind":"textbox","id":"sh/xof254ze","slide":1,"text":"Designed to manage sales, inventory, payments, employees, customers, subscriptions, reporting, and business performance from one platform.","textPreview":"Designed to manage sales, inventory, payments, employees, customers, subscriptions, reporting, and business performance from one platform.","textChars":138,"textLines":1,"bbox":[64,400,720,88]}
+{"kind":"shape","id":"sh/wn61cjit","slide":1,"bbox":[830,220,300,116]}
+{"kind":"textbox","id":"sh/6d4b6x43","slide":1,"text":"18+","textPreview":"18+","textChars":3,"textLines":1,"bbox":[852,244,256,34]}
+{"kind":"textbox","id":"sh/redsz2lo","slide":1,"text":"Integrated operating modules","textPreview":"Integrated operating modules","textChars":28,"textLines":1,"bbox":[852,287,256,32]}
+{"kind":"shape","id":"sh/sz6t87m9","slide":1,"bbox":[830,356,300,116]}
+{"kind":"textbox","id":"sh/t0fa1c3u","slide":1,"text":"27","textPreview":"27","textChars":2,"textLines":1,"bbox":[852,380,256,34]}
+{"kind":"textbox","id":"sh/i94r2x47","slide":1,"text":"Domain database tables","textPreview":"Domain database tables","textChars":22,"textLines":1,"bbox":[852,423,256,32]}
+{"kind":"shape","id":"sh/jadsv2ls","slide":1,"bbox":[830,492,300,116]}
+{"kind":"textbox","id":"sh/4bm94nmx","slide":1,"text":"3+","textPreview":"3+","textChars":2,"textLines":1,"bbox":[852,516,256,34]}
+{"kind":"textbox","id":"sh/5cvaxs3i","slide":1,"text":"Built-in platform roles","textPreview":"Built-in platform roles","textChars":23,"textLines":1,"bbox":[852,559,256,32]}
+{"kind":"image","id":"im/tcv6poju","slide":1,"name":"","geometry":"rect","alt":"hero-bg.png.png","bbox":[0,0,1280,720]}
+{"kind":"image","id":"im/7qdone1o","slide":1,"name":"","geometry":"roundRect","alt":"biztrack-logo.jpg","bbox":[64,54,172,76]}
+{"kind":"notes","id":"nt/07yp99","slide":1,"text":"Open by positioning BizTrack as a complete operating system for business owners rather than a single sales or inventory tool.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/0s95g6","slide":2,"title":"BizTrack turns daily business activity into one controlled workflow","textShapes":12}
+{"kind":"textbox","id":"sh/s3yhcnit","slide":2,"text":"BizTrack turns daily business activity into one controlled workflow","textPreview":"BizTrack turns daily business activity into one controlled workflow","textChars":67,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/r2pgji18","slide":2,"text":"The system reduces scattered tools by connecting core operations, money movement, employees, and reporting.","textPreview":"The system reduces scattered tools by connecting core operations, money movement, employees, and reporting.","textChars":107,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/5gnyh8j2","slide":2,"bbox":[64,230,250,220]}
+{"kind":"textbox","id":"sh/kfeh83ix","slide":2,"text":"Control","textPreview":"Control","textChars":7,"textLines":1,"bbox":[88,260,200,34]}
+{"kind":"textbox","id":"sh/je5gfy1c","slide":2,"text":"Owners see activity, access, stock, credit, and cash movement clearly.","textPreview":"Owners see activity, access, stock, credit, and cash movement clearly.","textChars":70,"textLines":1,"bbox":[88,315,198,92]}
+{"kind":"shape","id":"sh/idwz6t0r","slide":2,"bbox":[354,230,250,220]}
+{"kind":"textbox","id":"sh/xcnyd8j6","slide":2,"text":"Speed","textPreview":"Speed","textChars":5,"textLines":1,"bbox":[378,260,200,34]}
+{"kind":"textbox","id":"sh/wbeh43il","slide":2,"text":"Cashiers and employees perform daily work through focused, role-aware screens.","textPreview":"Cashiers and employees perform daily work through focused, role-aware screens.","textChars":78,"textLines":1,"bbox":[378,315,198,92]}
+{"kind":"shape","id":"sh/69c7ed0v","slide":2,"bbox":[644,230,250,220]}
+{"kind":"textbox","id":"sh/ral8ni1g","slide":2,"text":"Trust","textPreview":"Trust","textChars":5,"textLines":1,"bbox":[668,260,200,34]}
+{"kind":"textbox","id":"sh/sbupgni1","slide":2,"text":"Audit logs, receipts, payments, and permissions make actions traceable.","textPreview":"Audit logs, receipts, payments, and permissions make actions traceable.","textChars":71,"textLines":1,"bbox":[668,315,198,92]}
+{"kind":"shape","id":"sh/tw3qpsjm","slide":2,"bbox":[934,230,250,220]}
+{"kind":"textbox","id":"sh/i5s7ad0z","slide":2,"text":"Growth","textPreview":"Growth","textChars":6,"textLines":1,"bbox":[958,260,200,34]}
+{"kind":"textbox","id":"sh/j6loji1k","slide":2,"text":"Subscriptions, analytics, and notifications support recurring platform revenue.","textPreview":"Subscriptions, analytics, and notifications support recurring platform revenue.","textChars":79,"textLines":1,"bbox":[958,315,198,92]}
+{"kind":"textbox","id":"sh/47upc3i5","slide":2,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/583ql8ja","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/rax07ad8","slide":2,"name":"","geometry":"roundRect","alt":"biztrack-logo.jpg","bbox":[1060,48,130,58]}
+{"kind":"notes","id":"nt/0s95g6","slide":2,"text":"Explain the four benefits as management outcomes, not just software features.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/a3t8kp","slide":3,"title":"The target business problem is operational fragmentation","textShapes":6}
+{"kind":"textbox","id":"sh/jup8vyxo","slide":3,"text":"The target business problem is operational fragmentation","textPreview":"The target business problem is operational fragmentation","textChars":56,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/kvyp4jy9","slide":3,"text":"Small and growing businesses often manage stock, sales, credit, payments, and staff in disconnected places.","textPreview":"Small and growing businesses often manage stock, sales, credit, payments, and staff in disconnected places.","textChars":107,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/6xg76tgf","slide":3,"bbox":[64,178,580,390]}
+{"kind":"textbox","id":"sh/7y98zyx0","slide":3,"text":"• Sales records do not automatically update inventory.\n• Customer credit is tracked manually and becomes risky.\n• Employees often have too much or too little access.\n• Reports are delayed because data is spread across modules.\n• Payments, receipts, and audit history are difficult to verify.","textPreview":"• Sales records do not automatically update inventory. | • Customer credit is tracked manually and becomes risky. | • Employees often hav...","textChars":291,"textLines":5,"bbox":[100,220,520,250]}
+{"kind":"textbox","id":"sh/szi983y5","slide":3,"text":"BizTrack’s purpose is to make the business easier to control every day.","textPreview":"BizTrack’s purpose is to make the business easier to control every day.","textChars":71,"textLines":1,"bbox":[100,492,520,38]}
+{"kind":"textbox","id":"sh/t0rq18fq","slide":3,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/m1w7u9gv","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/wnaxo36t","slide":3,"name":"","geometry":"roundRect","alt":"5227a4b3c6c2999c5850c10dc9f39b8b.jpg","bbox":[728,168,440,390]}
+{"kind":"notes","id":"nt/a3t8kp","slide":3,"text":"Use this slide to frame the pain before introducing modules.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/nhly3g","slide":4,"title":"The solution is a connected business operating layer","textShapes":22}
+{"kind":"textbox","id":"sh/jy54v6ho","slide":4,"text":"The solution is a connected business operating layer","textPreview":"The solution is a connected business operating layer","textChars":52,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/4ze54by9","slide":4,"text":"BizTrack connects the actions that happen during the day to the records owners need at night.","textPreview":"BizTrack connects the actions that happen during the day to the records owners need at night.","textChars":93,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/50nmxgzu","slide":4,"bbox":[90,260,140,120]}
+{"kind":"textbox","id":"sh/61wn6lgf","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[110,280,36,32]}
+{"kind":"textbox","id":"sh/r254z6h0","slide":4,"text":"Onboard","textPreview":"Onboard","textChars":7,"textLines":1,"bbox":[110,326,96,30]}
+{"kind":"textbox","id":"sh/s3e58byl","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[240,302,34,40]}
+{"kind":"shape","id":"sh/t4n61gz6","slide":4,"bbox":[280,260,140,120]}
+{"kind":"textbox","id":"sh/m5s3uhgb","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[300,280,36,32]}
+{"kind":"textbox","id":"sh/7614nmhw","slide":4,"text":"Catalog","textPreview":"Catalog","textChars":7,"textLines":1,"bbox":[300,326,96,30]}
+{"kind":"textbox","id":"sh/bqd8jy9w","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[430,302,34,40]}
+{"kind":"shape","id":"sh/ap4ratsb","slide":4,"bbox":[470,260,140,120]}
+{"kind":"textbox","id":"sh/xsvql8rm","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[490,280,36,32]}
+{"kind":"textbox","id":"sh/wrm9c3ah","slide":4,"text":"Stock","textPreview":"Stock","textChars":5,"textLines":1,"bbox":[490,326,96,30]}
+{"kind":"textbox","id":"sh/n2t8fy9k","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[620,302,34,40]}
+{"kind":"shape","id":"sh/m1kr6tsz","slide":4,"bbox":[660,260,140,120]}
+{"kind":"textbox","id":"sh/9ovqhorq","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[680,280,36,32]}
+{"kind":"textbox","id":"sh/on2983a5","slide":4,"text":"Sell","textPreview":"Sell","textChars":4,"textLines":1,"bbox":[680,326,96,30]}
+{"kind":"textbox","id":"sh/zyt8be9o","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[810,302,34,40]}
+{"kind":"shape","id":"sh/exk729s3","slide":4,"bbox":[850,260,140,120]}
+{"kind":"textbox","id":"sh/2t0re9cv","slide":4,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[870,280,36,32]}
+{"kind":"textbox","id":"sh/3u9snedg","slide":4,"text":"Collect","textPreview":"Collect","textChars":7,"textLines":1,"bbox":[870,326,96,30]}
+{"kind":"textbox","id":"sh/4vi9gju1","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[1000,302,34,40]}
+{"kind":"shape","id":"sh/pwrapovm","slide":4,"bbox":[1040,260,140,120]}
+{"kind":"textbox","id":"sh/qxkritc7","slide":4,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[1060,280,36,32]}
+{"kind":"textbox","id":"sh/rytsrydc","slide":4,"text":"Report","textPreview":"Report","textChars":6,"textLines":1,"bbox":[1060,326,96,30]}
+{"kind":"textbox","id":"sh/cz29kjux","slide":4,"text":"Each module feeds the next: inventory informs sales, payments inform credit and reports, and audit logs preserve accountability.","textPreview":"Each module feeds the next: inventory informs sales, payments inform credit and reports, and audit logs preserve accountability.","textChars":128,"textLines":1,"bbox":[150,458,980,64]}
+{"kind":"textbox","id":"sh/elkrmtc3","slide":4,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/zmtsvydo","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/218fepg7","slide":4,"name":"","geometry":"roundRect","alt":"biztrack-logo.jpg","bbox":[1060,48,130,58]}
+{"kind":"notes","id":"nt/nhly3g","slide":4,"text":"Highlight the workflow logic: this is not a collection of separate pages.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/up3oa4","slide":5,"title":"Role-based access keeps every user inside the right boundary","textShapes":10}
+{"kind":"textbox","id":"sh/4fa18fm9","slide":5,"text":"Role-based access keeps every user inside the right boundary","textPreview":"Role-based access keeps every user inside the right boundary","textChars":60,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/jehkzalo","slide":5,"text":"BizTrack combines fixed platform roles with flexible employee permissions owned by each business.","textPreview":"BizTrack combines fixed platform roles with flexible employee permissions owned by each business.","textChars":97,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/id8j6p43","slide":5,"bbox":[64,190,340,370]}
+{"kind":"textbox","id":"sh/hczixk3i","slide":5,"text":"Super Admin","textPreview":"Super Admin","textChars":11,"textLines":1,"bbox":[90,224,280,36]}
+{"kind":"textbox","id":"sh/wbq14fmx","slide":5,"text":"• Manage platform visibility\n• View businesses and users\n• Monitor health and audit logs\n• Manage subscriptions and inbox","textPreview":"• Manage platform visibility | • View businesses and users | • Monitor health and audit logs | • Manage subscriptions and inbox","textChars":121,"textLines":4,"bbox":[94,292,286,190]}
+{"kind":"shape","id":"sh/vah0vals","slide":5,"bbox":[448,190,340,370]}
+{"kind":"textbox","id":"sh/up8j2547","slide":5,"text":"Business Owner","textPreview":"Business Owner","textChars":14,"textLines":1,"bbox":[474,224,280,36]}
+{"kind":"textbox","id":"sh/9ozit03m","slide":5,"text":"• Complete onboarding\n• Manage catalog and stock\n• Create employees and permissions\n• Review reports and transactions","textPreview":"• Complete onboarding | • Manage catalog and stock | • Create employees and permissions | • Review reports and transactions","textChars":117,"textLines":4,"bbox":[478,292,286,190]}
+{"kind":"shape","id":"sh/8n610vm1","slide":5,"bbox":[832,190,340,370]}
+{"kind":"textbox","id":"sh/mdsjmho7","slide":5,"text":"Employee","textPreview":"Employee","textChars":8,"textLines":1,"bbox":[858,224,280,36]}
+{"kind":"textbox","id":"sh/7e1kvm5c","slide":5,"text":"• Access only assigned modules\n• Sell, stock, or support workflows\n• Use dashboard when a module is granted\n• Cannot cross business boundaries","textPreview":"• Access only assigned modules | • Sell, stock, or support workflows | • Use dashboard when a module is granted | • Cannot cross business...","textChars":142,"textLines":4,"bbox":[862,292,286,190]}
+{"kind":"textbox","id":"sh/8falor6x","slide":5,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/9gj2xcni","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/up3oa4","slide":5,"text":"Mention that business owners can define employee roles dynamically while platform roles remain protected.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/fgcikh","slide":6,"title":"Onboarding is intentionally simple before access is granted","textShapes":15}
+{"kind":"textbox","id":"sh/y1sju54v","slide":6,"text":"Onboarding is intentionally simple before access is granted","textPreview":"Onboarding is intentionally simple before access is granted","textChars":59,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/l432pk3m","slide":6,"text":"A new owner signs up, verifies email and phone, creates a minimal business profile, then chooses trial or paid access.","textPreview":"A new owner signs up, verifies email and phone, creates a minimal business profile, then chooses trial or paid access.","textChars":118,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/03u1wf21","slide":6,"bbox":[100,230,178,190]}
+{"kind":"textbox","id":"sh/by1kjalk","slide":6,"text":"Sign up","textPreview":"Sign up","textChars":7,"textLines":1,"bbox":[120,260,132,30]}
+{"kind":"textbox","id":"sh/qxsjq54z","slide":6,"text":"Create account with strong password","textPreview":"Create account with strong password","textChars":35,"textLines":1,"bbox":[120,310,132,68]}
+{"kind":"shape","id":"sh/d0j2lk3a","slide":6,"bbox":[315,230,178,190]}
+{"kind":"textbox","id":"sh/cza1sfmp","slide":6,"text":"Verify","textPreview":"Verify","textChars":6,"textLines":1,"bbox":[335,260,132,30]}
+{"kind":"textbox","id":"sh/vulkvulo","slide":6,"text":"Email and phone confirm identity","textPreview":"Email and phone confirm identity","textChars":32,"textLines":1,"bbox":[335,310,132,68]}
+{"kind":"shape","id":"sh/atc329k3","slide":6,"bbox":[530,230,178,190]}
+{"kind":"textbox","id":"sh/gfut07it","slide":6,"text":"Profile","textPreview":"Profile","textChars":7,"textLines":1,"bbox":[550,260,132,30]}
+{"kind":"textbox","id":"sh/hg3utcje","slide":6,"text":"Business name, category, optional logo","textPreview":"Business name, category, optional logo","textChars":38,"textLines":1,"bbox":[550,310,132,68]}
+{"kind":"shape","id":"sh/udsbyx03","slide":6,"bbox":[745,230,178,190]}
+{"kind":"textbox","id":"sh/fe1cr21o","slide":6,"text":"Plan","textPreview":"Plan","textChars":4,"textLines":1,"bbox":[765,260,132,30]}
+{"kind":"textbox","id":"sh/sbatwnix","slide":6,"text":"Trial or paid subscription","textPreview":"Trial or paid subscription","textChars":26,"textLines":1,"bbox":[765,310,132,68]}
+{"kind":"shape","id":"sh/tcjupsji","slide":6,"bbox":[960,230,178,190]}
+{"kind":"textbox","id":"sh/69sbux0r","slide":6,"text":"Access","textPreview":"Access","textChars":6,"textLines":1,"bbox":[980,260,132,30]}
+{"kind":"textbox","id":"sh/7a1cn21c","slide":6,"text":"Dashboard opens after trial or payment","textPreview":"Dashboard opens after trial or payment","textChars":38,"textLines":1,"bbox":[980,310,132,68]}
+{"kind":"textbox","id":"sh/k7atsnil","slide":6,"text":"Document upload review is no longer the gate for access; access is driven by verified trial or payment status.","textPreview":"Document upload review is no longer the gate for access; access is driven by verified trial or payment status.","textChars":110,"textLines":1,"bbox":[150,492,980,50]}
+{"kind":"textbox","id":"sh/l8julsj6","slide":6,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/1sri9k7y","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/fgcikh","slide":6,"text":"Clarify the modern onboarding decision: identity and payment/trial drive access.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/tb0lxx","slide":7,"title":"The owner workspace centers the modules used every day","textShapes":14}
+{"kind":"textbox","id":"sh/gbip0rip","slide":7,"text":"The owner workspace centers the modules used every day","textPreview":"The owner workspace centers the modules used every day","textChars":54,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/fa987614","slide":7,"text":"The sidebar is organized by work context so the system feels professional and predictable.","textPreview":"The sidebar is organized by work context so the system feels professional and predictable.","textChars":90,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/e907y10z","slide":7,"bbox":[64,198,330,140]}
+{"kind":"textbox","id":"sh/p0bqdgjm","slide":7,"text":"Workspace","textPreview":"Workspace","textChars":9,"textLines":1,"bbox":[86,224,270,30]}
+{"kind":"textbox","id":"sh/oz2p4bi1","slide":7,"text":"Dashboard, notifications","textPreview":"Dashboard, notifications","textChars":24,"textLines":1,"bbox":[86,268,270,36]}
+{"kind":"shape","id":"sh/3y98b61g","slide":7,"bbox":[454,198,330,140]}
+{"kind":"textbox","id":"sh/2x07210v","slide":7,"text":"Catalog","textPreview":"Catalog","textChars":7,"textLines":1,"bbox":[476,224,270,30]}
+{"kind":"textbox","id":"sh/54761cj2","slide":7,"text":"Categories, products, inventory","textPreview":"Categories, products, inventory","textChars":31,"textLines":1,"bbox":[476,268,270,36]}
+{"kind":"shape","id":"sh/43yps7ih","slide":7,"bbox":[844,198,330,140]}
+{"kind":"textbox","id":"sh/ix8j6h47","slide":7,"text":"Operations","textPreview":"Operations","textChars":10,"textLines":1,"bbox":[866,224,270,30]}
+{"kind":"textbox","id":"sh/jih0fmls","slide":7,"text":"Sales, payments, customers, credit, transactions, reports","textPreview":"Sales, payments, customers, credit, transactions, reports","textChars":57,"textLines":1,"bbox":[866,268,270,36]}
+{"kind":"shape","id":"sh/kjq18rmd","slide":7,"bbox":[260,420,330,140]}
+{"kind":"textbox","id":"sh/5kzihw3i","slide":7,"text":"Team","textPreview":"Team","textChars":4,"textLines":1,"bbox":[282,446,270,30]}
+{"kind":"textbox","id":"sh/6lsja143","slide":7,"text":"Employees, roles, permissions","textPreview":"Employees, roles, permissions","textChars":29,"textLines":1,"bbox":[282,490,270,36]}
+{"kind":"shape","id":"sh/7m1kjmlo","slide":7,"bbox":[650,420,330,140]}
+{"kind":"textbox","id":"sh/sna1crm9","slide":7,"text":"Settings","textPreview":"Settings","textChars":8,"textLines":1,"bbox":[672,446,270,30]}
+{"kind":"textbox","id":"sh/toj2lw3u","slide":7,"text":"Profile, business, appearance, plan","textPreview":"Profile, business, appearance, plan","textChars":35,"textLines":1,"bbox":[672,490,270,36]}
+{"kind":"textbox","id":"sh/upsje14f","slide":7,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/fq1kn6l0","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/tb0lxx","slide":7,"text":"This slide communicates the navigation philosophy and shows why modules are grouped.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/4g4ol2","slide":8,"title":"Catalog and inventory create the product source of truth","textShapes":5}
+{"kind":"textbox","id":"sh/szi9o3md","slide":8,"text":"Catalog and inventory create the product source of truth","textPreview":"Catalog and inventory create the product source of truth","textChars":56,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/ryp8fyls","slide":8,"text":"Products are simplified while inventory batches carry cost, selling price, expiry, stock health, and FIFO movement.","textPreview":"Products are simplified while inventory batches carry cost, selling price, expiry, stock health, and FIFO movement.","textChars":115,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/5w7qdo3m","slide":8,"bbox":[64,178,620,372]}
+{"kind":"textbox","id":"sh/4vy9kjm1","slide":8,"text":"• Categories are created before products for clean reporting.\n• Product barcode and QR labels are generated automatically.\n• Restocks create batch and lot records with unit cost and selling price.\n• Sales consume stock FIFO, oldest batch first.\n• Inventory cards show stock health, available stock, and batch breakdown.","textPreview":"• Categories are created before products for clean reporting. | • Product barcode and QR labels are generated automatically. | • Restocks...","textChars":319,"textLines":5,"bbox":[102,220,560,250]}
+{"kind":"textbox","id":"sh/3up8belg","slide":8,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/itgrit4b","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/r21czexs","slide":8,"name":"","geometry":"roundRect","alt":"b3f3743f15d27aec911389d80c3a9c7c.jpg","bbox":[760,170,360,380]}
+{"kind":"notes","id":"nt/4g4ol2","slide":8,"text":"Explain why product creation is kept clean while inventory carries pricing and batch data.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/vudjuo","slide":9,"title":"The POS connects sales, stock, payments, credit, and receipts","textShapes":17}
+{"kind":"textbox","id":"sh/jmp47etg","slide":9,"text":"The POS connects sales, stock, payments, credit, and receipts","textPreview":"The POS connects sales, stock, payments, credit, and receipts","textChars":61,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/4nylgja1","slide":9,"text":"A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports.","textPreview":"A sale is not just a record; it updates inventory, payment history, customer credit, receipt QR, and reports.","textChars":109,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/587m9obm","slide":9,"bbox":[64,188,410,96]}
+{"kind":"textbox","id":"sh/69g3its7","slide":9,"text":"Cart","textPreview":"Cart","textChars":4,"textLines":1,"bbox":[96,212,150,28]}
+{"kind":"textbox","id":"sh/rap4bets","slide":9,"text":"Products added from catalog","textPreview":"Products added from catalog","textChars":27,"textLines":1,"bbox":[260,216,180,40]}
+{"kind":"shape","id":"sh/sbylkjax","slide":9,"bbox":[64,316,410,96]}
+{"kind":"textbox","id":"sh/dc7mdobi","slide":9,"text":"Checkout","textPreview":"Checkout","textChars":8,"textLines":1,"bbox":[96,340,150,28]}
+{"kind":"textbox","id":"sh/mdc36psn","slide":9,"text":"Cash, wallet, account, and credit split","textPreview":"Cash, wallet, account, and credit split","textChars":39,"textLines":1,"bbox":[260,344,180,40]}
+{"kind":"shape","id":"sh/7e5kzut8","slide":9,"bbox":[64,444,410,96]}
+{"kind":"textbox","id":"sh/fm9cfy5w","slide":9,"text":"Receipt","textPreview":"Receipt","textChars":7,"textLines":1,"bbox":[96,468,150,28]}
+{"kind":"textbox","id":"sh/ulgb6d4b","slide":9,"text":"Invoice, payment breakdown, QR verification","textPreview":"Invoice, payment breakdown, QR verification","textChars":43,"textLines":1,"bbox":[260,472,180,40]}
+{"kind":"shape","id":"sh/h8ruh83m","slide":9,"bbox":[560,188,600,352]}
+{"kind":"textbox","id":"sh/gnit83mh","slide":9,"text":"Payment methods now supported in POS","textPreview":"Payment methods now supported in POS","textChars":36,"textLines":1,"bbox":[596,220,470,34]}
+{"kind":"shape","id":"sh/7ipcby5k","slide":9,"bbox":[596,286,138,62]}
+{"kind":"textbox","id":"sh/6hgb2t4z","slide":9,"text":"Cash","textPreview":"Cash","textChars":4,"textLines":1,"bbox":[612,307,70,20]}
+{"kind":"shape","id":"sh/tk7ud8nq","slide":9,"bbox":[766,286,138,62]}
+{"kind":"textbox","id":"sh/jepc7e5o","slide":9,"text":"Telebirr","textPreview":"Telebirr","textChars":8,"textLines":1,"bbox":[828,307,70,20]}
+{"kind":"shape","id":"sh/idwby943","slide":9,"bbox":[936,286,138,62]}
+{"kind":"textbox","id":"sh/nq5cjepg","slide":9,"text":"M-Pesa","textPreview":"M-Pesa","textChars":6,"textLines":1,"bbox":[998,307,70,20]}
+{"kind":"shape","id":"sh/8bedcj61","slide":9,"bbox":[596,378,138,62]}
+{"kind":"textbox","id":"sh/adwveto7","slide":9,"text":"CBE Birr","textPreview":"CBE Birr","textChars":8,"textLines":1,"bbox":[658,399,70,20]}
+{"kind":"shape","id":"sh/ve5cnyps","slide":9,"bbox":[766,378,138,62]}
+{"kind":"textbox","id":"sh/xg7epo7i","slide":9,"text":"Apollo","textPreview":"Apollo","textChars":6,"textLines":1,"bbox":[828,399,70,20]}
+{"kind":"shape","id":"sh/ihgvito3","slide":9,"bbox":[936,378,138,62]}
+{"kind":"textbox","id":"sh/jipwrypo","slide":9,"text":"Credit","textPreview":"Credit","textChars":6,"textLines":1,"bbox":[952,399,70,20]}
+{"kind":"textbox","id":"sh/tcryhsrq","slide":9,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/sbixo7q5","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/jy18zqlc","slide":9,"name":"","geometry":"roundRect","alt":"telebirr logo.png","bbox":[778,298,42,34]}
+{"kind":"image","id":"im/10r6tsv2","slide":9,"name":"","geometry":"roundRect","alt":"mpesa logo.png","bbox":[948,298,42,34]}
+{"kind":"image","id":"im/exgnidcb","slide":9,"name":"","geometry":"roundRect","alt":"cbebirr logo.jpg","bbox":[608,390,42,34]}
+{"kind":"image","id":"im/3m9ov2ds","slide":9,"name":"","geometry":"roundRect","alt":"apollo logo.png","bbox":[778,390,42,34]}
+{"kind":"notes","id":"nt/vudjuo","slide":9,"text":"Use this slide to explain the recent split payment enhancement and why it matters.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/5vidbj","slide":10,"title":"Customer logic combines identity, credit, and loyalty behavior","textShapes":11}
+{"kind":"textbox","id":"sh/kfylc3ax","slide":10,"text":"Customer logic combines identity, credit, and loyalty behavior","textPreview":"Customer logic combines identity, credit, and loyalty behavior","textChars":62,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/jep4jytc","slide":10,"text":"Customers can be individuals, companies, or government accounts, with credit and discount logic derived from real activity.","textPreview":"Customers can be individuals, companies, or government accounts, with credit and discount logic derived from real activity.","textChars":123,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/itg3atsr","slide":10,"bbox":[64,194,300,116]}
+{"kind":"textbox","id":"sh/xs7mhob6","slide":10,"text":"3 types","textPreview":"3 types","textChars":7,"textLines":1,"bbox":[86,218,256,34]}
+{"kind":"textbox","id":"sh/wryl8jal","slide":10,"text":"Flexible customer identity","textPreview":"Flexible customer identity","textChars":26,"textLines":1,"bbox":[86,261,256,32]}
+{"kind":"shape","id":"sh/vqp4fyt0","slide":10,"bbox":[410,194,300,116]}
+{"kind":"textbox","id":"sh/apg36tsf","slide":10,"text":"0 ETB","textPreview":"0 ETB","textChars":5,"textLines":1,"bbox":[432,218,256,34]}
+{"kind":"textbox","id":"sh/hobmtsba","slide":10,"text":"Credit starts safely","textPreview":"Credit starts safely","textChars":20,"textLines":1,"bbox":[432,261,256,32]}
+{"kind":"shape","id":"sh/gn25knap","slide":10,"bbox":[756,194,300,116]}
+{"kind":"textbox","id":"sh/qlwva9g7","slide":10,"text":"Rules","textPreview":"Rules","textChars":5,"textLines":1,"bbox":[778,218,256,34]}
+{"kind":"textbox","id":"sh/rmpc3ehs","slide":10,"text":"Discounts can be automatic","textPreview":"Discounts can be automatic","textChars":26,"textLines":1,"bbox":[778,261,256,32]}
+{"kind":"shape","id":"sh/snydcjyd","slide":10,"bbox":[64,370,1040,150]}
+{"kind":"textbox","id":"sh/do7u5ozy","slide":10,"text":"The owner can define spend-based discounts and override credit limits, while the system suggests limits from purchase and payment behavior.","textPreview":"The owner can define spend-based discounts and override credit limits, while the system suggests limits from purchase and payment behavior.","textChars":139,"textLines":1,"bbox":[106,414,920,54]}
+{"kind":"textbox","id":"sh/ihwv69gb","slide":10,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/3i5czehw","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/5vidbj","slide":10,"text":"Explain the core customer design: credit is not typed casually during creation; it grows from activity and owner decisions.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/grlig2","slide":11,"title":"Transactions unify money movement into one view","textShapes":5}
+{"kind":"textbox","id":"sh/fe1sv29w","slide":11,"text":"Transactions unify money movement into one view","textPreview":"Transactions unify money movement into one view","textChars":47,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/0fa9o7qh","slide":11,"text":"Expense and revenue history are easier to understand when they are shown together and separately.","textPreview":"Expense and revenue history are easier to understand when they are shown together and separately.","textChars":97,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/q98rixsf","slide":11,"bbox":[690,198,420,300]}
+{"kind":"textbox","id":"sh/rah8r290","slide":11,"text":"• Manual expenses remain supported.\n• Restock expenses are generated automatically.\n• Payroll expenses can be scheduled.\n• Reports can filter by transaction source.","textPreview":"• Manual expenses remain supported. | • Restock expenses are generated automatically. | • Payroll expenses can be scheduled. | • Reports ...","textChars":164,"textLines":4,"bbox":[728,240,354,170]}
+{"kind":"textbox","id":"sh/sbq9k7al","slide":11,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/dczatsrq","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"chart","id":"ch/dcju1w3i","slide":11,"name":"","chartType":"bar","bbox":[64,196,530,310]}
+{"kind":"notes","id":"nt/grlig2","slide":11,"text":"The chart is an illustrative visual treatment showing revenue, expense, and net logic rather than audited business data.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/m5cxhg","slide":12,"title":"Reporting turns operational records into owner decisions","textShapes":6}
+{"kind":"textbox","id":"sh/elk3ipsb","slide":12,"text":"Reporting turns operational records into owner decisions","textPreview":"Reporting turns operational records into owner decisions","textChars":56,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/1ob2d4r2","slide":12,"text":"Reports combine sales, inventory, product performance, credit, expenses, and profit analytics.","textPreview":"Reports combine sales, inventory, product performance, credit, expenses, and profit analytics.","textChars":94,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/0n2lkzah","slide":12,"bbox":[64,178,340,340]}
+{"kind":"textbox","id":"sh/nqdkfu9s","slide":12,"text":"Reports answer","textPreview":"Reports answer","textChars":14,"textLines":1,"bbox":[100,216,240,30]}
+{"kind":"textbox","id":"sh/mp43m9s7","slide":12,"text":"• Which products sell best?\n• Which items are stagnant?\n• What is real product profit?\n• Where is money going?\n• Which customers carry credit?","textPreview":"• Which products sell best? | • Which items are stagnant? | • What is real product profit? | • Where is money going? | • Which customers ...","textChars":142,"textLines":5,"bbox":[100,274,270,176]}
+{"kind":"textbox","id":"sh/ormlozad","slide":12,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/budkje94","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"chart","id":"ch/5gzutwz6","slide":12,"name":"","chartType":"line","bbox":[480,190,610,300]}
+{"kind":"notes","id":"nt/m5cxhg","slide":12,"text":"Describe reports as decision support. Trend values are illustrative visual examples.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/1hkjiq","slide":13,"title":"Super admin manages the platform, not each owner’s business choices","textShapes":11}
+{"kind":"textbox","id":"sh/gn218zq5","slide":13,"text":"Super admin manages the platform, not each owner’s business choices","textPreview":"Super admin manages the platform, not each owner’s business choices","textChars":67,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/vmt0fupk","slide":13,"text":"The super admin monitors platform health, subscriptions, businesses, users, inbox, notifications, and audit explorer.","textPreview":"The super admin monitors platform health, subscriptions, businesses, users, inbox, notifications, and audit explorer.","textChars":117,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/u1kj6p8z","slide":13,"bbox":[64,198,330,104]}
+{"kind":"textbox","id":"sh/t0ridk7u","slide":13,"text":"Platform dashboard","textPreview":"Platform dashboard","textChars":18,"textLines":1,"bbox":[86,234,270,28]}
+{"kind":"shape","id":"sh/8zi14fq9","slide":13,"bbox":[444,198,330,104]}
+{"kind":"textbox","id":"sh/7y90bapo","slide":13,"text":"Business directory","textPreview":"Business directory","textChars":18,"textLines":1,"bbox":[466,234,270,28]}
+{"kind":"shape","id":"sh/6x0j2p83","slide":13,"bbox":[824,198,330,104]}
+{"kind":"textbox","id":"sh/dwv2po7y","slide":13,"text":"Users and account status","textPreview":"Users and account status","textChars":24,"textLines":1,"bbox":[846,234,270,28]}
+{"kind":"shape","id":"sh/svm1gjqd","slide":13,"bbox":[64,348,330,104]}
+{"kind":"textbox","id":"sh/6hozuh4z","slide":13,"text":"System health","textPreview":"System health","textChars":13,"textLines":1,"bbox":[86,384,270,28]}
+{"kind":"shape","id":"sh/7ixgnm5k","slide":13,"bbox":[444,348,330,104]}
+{"kind":"textbox","id":"sh/sj6hwrm5","slide":13,"text":"Inbox and notifications","textPreview":"Inbox and notifications","textChars":23,"textLines":1,"bbox":[466,384,270,28]}
+{"kind":"shape","id":"sh/tkfypwna","slide":13,"bbox":[824,348,330,104]}
+{"kind":"textbox","id":"sh/it4zqhon","slide":13,"text":"Audit explorer","textPreview":"Audit explorer","textChars":14,"textLines":1,"bbox":[846,384,270,28]}
+{"kind":"textbox","id":"sh/juxgjm58","slide":13,"text":"Plan changes belong to business owners through their subscription flow; the admin directory is display and oversight focused.","textPreview":"Plan changes belong to business owners through their subscription flow; the admin directory is display and oversight focused.","textChars":125,"textLines":1,"bbox":[140,548,1000,42]}
+{"kind":"textbox","id":"sh/kv6hs7mt","slide":13,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/5wfylcne","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/1hkjiq","slide":13,"text":"Clarify the platform governance boundary.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/crormu","slide":14,"title":"The business model is subscription-led","textShapes":13}
+{"kind":"textbox","id":"sh/g7edk32l","slide":14,"text":"The business model is subscription-led","textPreview":"The business model is subscription-led","textChars":38,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/v65cry10","slide":14,"text":"BizTrack monetizes through recurring business subscriptions while payment gateways remain swappable integration points.","textPreview":"BizTrack monetizes through recurring business subscriptions while payment gateways remain swappable integration points.","textChars":119,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/u5wbidkf","slide":14,"bbox":[64,178,1080,360]}
+{"kind":"shape","id":"sh/5w7uxsj2","slide":14,"bbox":[120,240,280,210]}
+{"kind":"textbox","id":"sh/4bedon2h","slide":14,"text":"Starter","textPreview":"Starter","textChars":7,"textLines":1,"bbox":[148,276,220,32]}
+{"kind":"textbox","id":"sh/3a5cvi1w","slide":14,"text":"Trial / entry access","textPreview":"Trial / entry access","textChars":20,"textLines":1,"bbox":[148,332,220,56]}
+{"kind":"textbox","id":"sh/i9wvmdkb","slide":14,"text":"Payment confirmation gates active access","textPreview":"Payment confirmation gates active access","textChars":40,"textLines":1,"bbox":[148,402,220,34]}
+{"kind":"shape","id":"sh/lg3ulo3y","slide":14,"bbox":[470,240,280,210]}
+{"kind":"textbox","id":"sh/kfutcj2d","slide":14,"text":"Growth","textPreview":"Growth","textChars":6,"textLines":1,"bbox":[498,276,220,32]}
+{"kind":"textbox","id":"sh/u54fet07","slide":14,"text":"Paid plan for active operations","textPreview":"Paid plan for active operations","textChars":31,"textLines":1,"bbox":[498,332,220,56]}
+{"kind":"textbox","id":"sh/v6xwnyhs","slide":14,"text":"Payment confirmation gates active access","textPreview":"Payment confirmation gates active access","textChars":40,"textLines":1,"bbox":[498,402,220,34]}
+{"kind":"shape","id":"sh/g76xg3id","slide":14,"bbox":[820,240,280,210]}
+{"kind":"textbox","id":"sh/h8fep8zy","slide":14,"text":"Enterprise","textPreview":"Enterprise","textChars":10,"textLines":1,"bbox":[848,276,220,32]}
+{"kind":"textbox","id":"sh/i9ofid0j","slide":14,"text":"Larger team and operational limits","textPreview":"Larger team and operational limits","textChars":34,"textLines":1,"bbox":[848,332,220,56]}
+{"kind":"textbox","id":"sh/3axgrih4","slide":14,"text":"Payment confirmation gates active access","textPreview":"Payment confirmation gates active access","textChars":40,"textLines":1,"bbox":[848,402,220,34]}
+{"kind":"textbox","id":"sh/4b6xknip","slide":14,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/5cfytszu","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/crormu","slide":14,"text":"State that service fee was decommissioned and subscriptions are the main revenue mechanism.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/m66ugg","slide":15,"title":"Gateway design is demo-ready now and integration-ready later","textShapes":9}
+{"kind":"textbox","id":"sh/ytsn6h0j","slide":15,"text":"Gateway design is demo-ready now and integration-ready later","textPreview":"Gateway design is demo-ready now and integration-ready later","textChars":60,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/lw361wza","slide":15,"text":"The UI already models real provider selection, customer references, confirmation, receipts, and ledger history.","textPreview":"The UI already models real provider selection, customer references, confirmation, receipts, and ledger history.","textChars":111,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/kvu58rip","slide":15,"bbox":[140,220,190,180]}
+{"kind":"textbox","id":"sh/a5sn2h0n","slide":15,"text":"Telebirr","textPreview":"Telebirr","textChars":8,"textLines":1,"bbox":[164,340,142,24]}
+{"kind":"shape","id":"sh/xsj6xcjy","slide":15,"bbox":[390,220,190,180]}
+{"kind":"textbox","id":"sh/vm5o76hc","slide":15,"text":"M-Pesa","textPreview":"M-Pesa","textChars":6,"textLines":1,"bbox":[414,340,142,24]}
+{"kind":"shape","id":"sh/u1c7e10r","slide":15,"bbox":[640,220,190,180]}
+{"kind":"textbox","id":"sh/p0ralcvy","slide":15,"text":"CBE Birr","textPreview":"CBE Birr","textChars":8,"textLines":1,"bbox":[664,340,142,24]}
+{"kind":"shape","id":"sh/2xgrahcn","slide":15,"bbox":[890,220,190,180]}
+{"kind":"textbox","id":"sh/gvy987uh","slide":15,"text":"Apollo","textPreview":"Apollo","textChars":6,"textLines":1,"bbox":[914,340,142,24]}
+{"kind":"textbox","id":"sh/hw7ahcv2","slide":15,"text":"The current demo checkout can later hand off to real APIs without changing the business workflow.","textPreview":"The current demo checkout can later hand off to real APIs without changing the business workflow.","textChars":97,"textLines":1,"bbox":[180,480,920,46]}
+{"kind":"textbox","id":"sh/utgr6xcb","slide":15,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/fupsf2dw","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/e5kjehw3","slide":15,"name":"","geometry":"roundRect","alt":"telebirr logo.png","bbox":[185,250,100,62]}
+{"kind":"image","id":"im/18b2pcve","slide":15,"name":"","geometry":"roundRect","alt":"mpesa logo.png","bbox":[435,250,100,62]}
+{"kind":"image","id":"im/bqpcz294","slide":15,"name":"","geometry":"roundRect","alt":"cbebirr logo.jpg","bbox":[685,250,100,62]}
+{"kind":"image","id":"im/cryds7ap","slide":15,"name":"","geometry":"roundRect","alt":"apollo logo.png","bbox":[935,250,100,62]}
+{"kind":"notes","id":"nt/m66ugg","slide":15,"text":"Explain that gateway choice is represented structurally even before production API credentials are connected.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/jgjvnv","slide":16,"title":"The database separates BizTrack business data from Laravel system support","textShapes":14}
+{"kind":"textbox","id":"sh/jupsra54","slide":16,"text":"The database separates BizTrack business data from Laravel system support","textPreview":"The database separates BizTrack business data from Laravel system support","textChars":73,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/kvytkvmp","slide":16,"text":"This keeps domain logic readable while the framework tables handle sessions, jobs, cache, and authentication support.","textPreview":"This keeps domain logic readable while the framework tables handle sessions, jobs, cache, and authentication support.","textChars":117,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/5w7at0na","slide":16,"bbox":[110,210,340,116]}
+{"kind":"textbox","id":"sh/6x0bm54f","slide":16,"text":"27","textPreview":"27","textChars":2,"textLines":1,"bbox":[132,234,296,34]}
+{"kind":"textbox","id":"sh/7y9sval0","slide":16,"text":"BizTrack domain tables","textPreview":"BizTrack domain tables","textChars":22,"textLines":1,"bbox":[132,277,296,32]}
+{"kind":"shape","id":"sh/szitofml","slide":16,"bbox":[470,210,340,116]}
+{"kind":"textbox","id":"sh/tkruxk36","slide":16,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[492,234,296,34]}
+{"kind":"textbox","id":"sh/ul0bqp4r","slide":16,"text":"Laravel/system tables","textPreview":"Laravel/system tables","textChars":21,"textLines":1,"bbox":[492,277,296,32]}
+{"kind":"shape","id":"sh/fm9czulc","slide":16,"bbox":[830,210,340,116]}
+{"kind":"textbox","id":"sh/be9snapg","slide":16,"text":"36","textPreview":"36","textChars":2,"textLines":1,"bbox":[852,234,296,34]}
+{"kind":"textbox","id":"sh/qd0be5ov","slide":16,"text":"Total current tables","textPreview":"Total current tables","textChars":20,"textLines":1,"bbox":[852,277,296,32]}
+{"kind":"shape","id":"sh/dgrapk7m","slide":16,"bbox":[110,390,500,150]}
+{"kind":"textbox","id":"sh/cfitgf61","slide":16,"text":"BizTrack tables","textPreview":"BizTrack tables","textChars":15,"textLines":1,"bbox":[140,420,300,28]}
+{"kind":"textbox","id":"sh/3q9sjapk","slide":16,"text":"Businesses, products, inventory, sales, payments, customers, credits, reports, notifications, audit logs, subscriptions, employees, and transactions.","textPreview":"Businesses, products, inventory, sales, payments, customers, credits, reports, notifications, audit logs, subscriptions, employees, and t...","textChars":149,"textLines":1,"bbox":[140,466,430,52]}
+{"kind":"shape","id":"sh/2pgba5oz","slide":16,"bbox":[670,390,500,150]}
+{"kind":"textbox","id":"sh/psral07q","slide":16,"text":"Laravel/system tables","textPreview":"Laravel/system tables","textChars":21,"textLines":1,"bbox":[700,420,330,28]}
+{"kind":"textbox","id":"sh/oritcf65","slide":16,"text":"Cache, sessions, jobs, failed jobs, migrations, password reset tokens, passkeys, and framework support records.","textPreview":"Cache, sessions, jobs, failed jobs, migrations, password reset tokens, passkeys, and framework support records.","textChars":111,"textLines":1,"bbox":[700,466,430,52]}
+{"kind":"textbox","id":"sh/nmtcvu5o","slide":16,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/mlkbmpo3","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/jgjvnv","slide":16,"text":"Use this as a database summary slide rather than listing every table one by one.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/bozmbg","slide":17,"title":"Security is built into identity, access, and traceability","textShapes":7}
+{"kind":"textbox","id":"sh/9svexkre","slide":17,"text":"Security is built into identity, access, and traceability","textPreview":"Security is built into identity, access, and traceability","textChars":57,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/m54vm5sn","slide":17,"text":"BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records.","textPreview":"BizTrack protects the platform through verification, strong passwords, role boundaries, and audit records.","textChars":106,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"textbox","id":"sh/n6dwva98","slide":17,"text":"• Email verification happens during sign-up before onboarding continues.\n• Phone OTP supports trial activation and account trust.\n• Temporary employee passwords must be reset.\n• Employee permissions are scoped to the owner’s business.\n• Super admin cannot silently change owner plans from the business directory.\n• Audit logs answer who did what, where, when, and what changed.","textPreview":"• Email verification happens during sign-up before onboarding continues. | • Phone OTP supports trial activation and account trust. | • T...","textChars":377,"textLines":6,"bbox":[120,190,760,250]}
+{"kind":"shape","id":"sh/wvmdsfap","slide":17,"bbox":[930,210,210,230]}
+{"kind":"textbox","id":"sh/xwve1kra","slide":17,"text":"Trust","textPreview":"Trust","textChars":5,"textLines":1,"bbox":[962,250,150,40]}
+{"kind":"textbox","id":"sh/at4vq5sj","slide":17,"text":"is not a feature; it is the behavior of the whole system.","textPreview":"is not a feature; it is the behavior of the whole system.","textChars":57,"textLines":1,"bbox":[962,316,150,76]}
+{"kind":"textbox","id":"sh/budwza94","slide":17,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/kz6dwza1","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/bozmbg","slide":17,"text":"Position security as a cross-cutting design, not only a login page.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/ac99dd","slide":18,"title":"BizTrack can feel like each business’s own workspace","textShapes":5}
+{"kind":"textbox","id":"sh/0v6lcved","slide":18,"text":"BizTrack can feel like each business’s own workspace","textPreview":"BizTrack can feel like each business’s own workspace","textChars":52,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/zuxk3qd8","slide":18,"text":"Tenant themes use business category, logo-driven palettes, and manual appearance settings.","textPreview":"Tenant themes use business category, logo-driven palettes, and manual appearance settings.","textChars":90,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/90zm90va","slide":18,"bbox":[90,192,520,330]}
+{"kind":"textbox","id":"sh/ozqlgvep","slide":18,"text":"• Business category is selected during onboarding.\n• Uploaded logos can influence brand palette.\n• Manual color pickers let owners adjust without knowing hex codes.\n• CSS variables allow the UI to change consistently.\n• Dashboard guidance can adapt to business type.","textPreview":"• Business category is selected during onboarding. | • Uploaded logos can influence brand palette. | • Manual color pickers let owners ad...","textChars":266,"textLines":5,"bbox":[126,232,460,220]}
+{"kind":"textbox","id":"sh/nyh47qd4","slide":18,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/mx83elwj","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"image","id":"im/3y1wv69g","slide":18,"name":"","geometry":"roundRect","alt":"d432096c74d423af0a4732dce3107970.jpg","bbox":[720,160,400,400]}
+{"kind":"notes","id":"nt/ac99dd","slide":18,"text":"Explain that multi-tenant theming is about emotional ownership as well as brand consistency.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/1i1noi","slide":19,"title":"The business owner benefits from clarity, control, and faster decisions","textShapes":12}
+{"kind":"textbox","id":"sh/547u5wne","slide":19,"text":"The business owner benefits from clarity, control, and faster decisions","textPreview":"The business owner benefits from clarity, control, and faster decisions","textChars":71,"textLines":1,"bbox":[64,54,860,58]}
+{"kind":"textbox","id":"sh/i1gbuhon","slide":19,"text":"BizTrack makes daily business management less dependent on memory, notebooks, and scattered conversations.","textPreview":"BizTrack makes daily business management less dependent on memory, notebooks, and scattered conversations.","textChars":106,"textLines":1,"bbox":[64,110,940,46]}
+{"kind":"shape","id":"sh/j2pc3m58","slide":19,"bbox":[64,190,500,126]}
+{"kind":"textbox","id":"sh/wzets76x","slide":19,"text":"Clarity","textPreview":"Clarity","textChars":7,"textLines":1,"bbox":[90,218,180,30]}
+{"kind":"textbox","id":"sh/x0nu1cni","slide":19,"text":"One dashboard for sales, stock, payments, credit, and performance.","textPreview":"One dashboard for sales, stock, payments, credit, and performance.","textChars":66,"textLines":1,"bbox":[274,220,250,54]}
+{"kind":"shape","id":"sh/axwbqhor","slide":19,"bbox":[634,190,500,126]}
+{"kind":"textbox","id":"sh/by5cz25c","slide":19,"text":"Control","textPreview":"Control","textChars":7,"textLines":1,"bbox":[660,218,180,30]}
+{"kind":"textbox","id":"sh/gvid4b61","slide":19,"text":"Permissions, audit logs, and business-scoped data reduce risk.","textPreview":"Permissions, audit logs, and business-scoped data reduce risk.","textChars":62,"textLines":1,"bbox":[844,220,250,54]}
+{"kind":"shape","id":"sh/hwrudgnm","slide":19,"bbox":[64,360,500,126]}
+{"kind":"textbox","id":"sh/hkbu5kzq","slide":19,"text":"Speed","textPreview":"Speed","textChars":5,"textLines":1,"bbox":[90,388,180,30]}
+{"kind":"textbox","id":"sh/wj2dcfyl","slide":19,"text":"POS, restock, receipts, and reports reduce repeated manual work.","textPreview":"POS, restock, receipts, and reports reduce repeated manual work.","textChars":64,"textLines":1,"bbox":[274,390,250,54]}
+{"kind":"shape","id":"sh/vytc3ah0","slide":19,"bbox":[634,360,500,126]}
+{"kind":"textbox","id":"sh/uxkva5gf","slide":19,"text":"Confidence","textPreview":"Confidence","textChars":10,"textLines":1,"bbox":[660,388,180,30]}
+{"kind":"textbox","id":"sh/9wru10zu","slide":19,"text":"Analytics and notifications show what needs attention.","textPreview":"Analytics and notifications show what needs attention.","textChars":54,"textLines":1,"bbox":[844,390,250,54]}
+{"kind":"textbox","id":"sh/8vit8fy9","slide":19,"text":"BizTrack","textPreview":"BizTrack","textChars":8,"textLines":1,"bbox":[64,672,170,22]}
+{"kind":"textbox","id":"sh/7u9czaho","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[1156,672,60,22]}
+{"kind":"notes","id":"nt/1i1noi","slide":19,"text":"This is the executive value slide. Keep it practical and owner-centered.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}
+{"kind":"slide","id":"sl/cdldx8","slide":20,"title":"Recommended next steps","textShapes":4}
+{"kind":"textbox","id":"sh/svqtoja1","slide":20,"text":"Recommended next steps","textPreview":"Recommended next steps","textChars":22,"textLines":1,"bbox":[64,178,760,58]}
+{"kind":"textbox","id":"sh/dwjuhor6","slide":20,"text":"BizTrack already has a strong operating foundation. The next focus should be production readiness, payment gateway integration, stronger demos, and deployment discipline.","textPreview":"BizTrack already has a strong operating foundation. The next focus should be production readiness, payment gateway integration, stronger ...","textChars":170,"textLines":1,"bbox":[64,250,820,78]}
+{"kind":"shape","id":"sh/exsbqtsr","slide":20,"bbox":[64,382,1080,142]}
+{"kind":"textbox","id":"sh/fy1cjy9c","slide":20,"text":"• Connect real gateway APIs after demo checkout flows are approved.\n• Prepare clean seeded demo businesses for presentations.\n• Run full Herd PHP test suite before every shared push.\n• Finalize deployment environment, mail domain, storage, and backups.","textPreview":"• Connect real gateway APIs after demo checkout flows are approved. | • Prepare clean seeded demo businesses for presentations. | • Run f...","textChars":252,"textLines":4,"bbox":[100,414,980,86]}
+{"kind":"textbox","id":"sh/0zats3ax","slide":20,"text":"BizTrack: one business workspace, many daily decisions made easier.","textPreview":"BizTrack: one business workspace, many daily decisions made easier.","textChars":67,"textLines":1,"bbox":[64,598,980,36]}
+{"kind":"image","id":"im/2h8butsr","slide":20,"name":"","geometry":"roundRect","alt":"biztrack-logo.jpg","bbox":[64,54,160,72]}
+{"kind":"notes","id":"nt/cdldx8","slide":20,"text":"Close by giving a concrete forward path.\n\n[Sources] Internal BizTrack project scope, implemented module list, database table split, and system decisions from the local project conversation. No external research claims were used."}

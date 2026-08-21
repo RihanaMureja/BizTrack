@@ -7,6 +7,7 @@ use App\Enums\ProductInsightStatus;
 use App\Enums\ProductInsightType;
 use App\Enums\RecordStatus;
 use App\Models\Business;
+use App\Models\InventoryBatch;
 use App\Models\Product;
 use App\Models\ProductMovementInsight;
 use App\Models\SaleItem;
@@ -21,6 +22,8 @@ class ProductService
     public function __construct(
         private readonly NotificationService $notificationService,
         private readonly ProductCodeGeneratorService $productCodeGenerator,
+        private readonly ProductPricingService $productPricingService,
+        private readonly AuditLogService $auditLogService,
     ) {}
 
     public function paginateForBusiness(
@@ -32,7 +35,7 @@ class ProductService
         int $perPage = 10,
     ): LengthAwarePaginator {
         $products = Product::query()
-            ->with(['category', 'inventory', 'movementInsights' => fn ($query) => $query
+            ->with(['category', 'inventory', 'latestAvailableBatch', 'movementInsights' => fn ($query) => $query
                 ->where('status', ProductInsightStatus::Open)
                 ->latest('detected_at')])
             ->where('business_id', $business->id)
@@ -61,8 +64,24 @@ class ProductService
 
         match ($sort) {
             'name' => $products->orderBy('name'),
-            'price_high' => $products->orderByDesc('selling_price'),
-            'price_low' => $products->orderBy('selling_price'),
+            'price_high' => $products->orderByDesc(
+                InventoryBatch::query()
+                    ->select('selling_price')
+                    ->whereColumn('inventory_batches.product_id', 'products.id')
+                    ->where('quantity_remaining', '>', 0)
+                    ->latest('received_at')
+                    ->latest('id')
+                    ->limit(1)
+            ),
+            'price_low' => $products->orderBy(
+                InventoryBatch::query()
+                    ->select('selling_price')
+                    ->whereColumn('inventory_batches.product_id', 'products.id')
+                    ->where('quantity_remaining', '>', 0)
+                    ->latest('received_at')
+                    ->latest('id')
+                    ->limit(1)
+            ),
             'stock_low' => $products
                 ->leftJoin('inventory', 'inventory.product_id', '=', 'products.id')
                 ->select('products.*')
@@ -83,6 +102,7 @@ class ProductService
         return $this->attachCatalogMetrics($product->load([
             'category',
             'inventory',
+            'latestAvailableBatch',
             'movementInsights' => fn ($query) => $query->latest('detected_at'),
         ]));
     }
@@ -136,6 +156,55 @@ class ProductService
             'dismissed_at' => $status === ProductInsightStatus::Dismissed ? now() : $insight->dismissed_at,
             'resolved_at' => $status === ProductInsightStatus::Resolved ? now() : $insight->resolved_at,
         ])->save();
+
+        return $insight->refresh();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function applyStagnantDiscount(ProductMovementInsight $insight, array $data): ProductMovementInsight
+    {
+        $insight->loadMissing('product.latestAvailableBatch');
+        $regularPrice = (float) $insight->product->latestAvailableBatch->selling_price;
+        $discountPrice = (float) $data['discount_price'];
+        $discountPercent = $regularPrice > 0
+            ? round((($regularPrice - $discountPrice) / $regularPrice) * 100, 2)
+            : 0.0;
+
+        $oldValues = $insight->only([
+            'discount_price',
+            'discount_percent',
+            'allow_below_cost',
+            'discount_reason',
+            'discount_applied_at',
+            'discount_applied_by',
+        ]);
+
+        $insight->forceFill([
+            'discount_price' => $discountPrice,
+            'discount_percent' => max(0, $discountPercent),
+            'allow_below_cost' => (bool) ($data['allow_below_cost'] ?? false),
+            'discount_reason' => $data['discount_reason'] ?? null,
+            'discount_applied_at' => now(),
+            'discount_applied_by' => auth()->id(),
+        ])->save();
+
+        $this->auditLogService->log(
+            action: $insight->allow_below_cost ? 'stagnant_discount_below_cost_applied' : 'stagnant_discount_applied',
+            auditable: $insight,
+            business: $insight->business,
+            oldValues: $oldValues,
+            newValues: $insight->only([
+                'discount_price',
+                'discount_percent',
+                'allow_below_cost',
+                'discount_reason',
+                'discount_applied_at',
+                'discount_applied_by',
+            ]),
+            user: auth()->user(),
+        );
 
         return $insight->refresh();
     }
@@ -241,6 +310,20 @@ class ProductService
 
     private function attachCatalogMetrics(Product $product): Product
     {
+        $batch = $product->latestAvailableBatch;
+        $pricing = $this->productPricingService->priceFor($product);
+
+        $product->setAttribute('current_unit_cost', $batch?->unit_cost);
+        $product->setAttribute('current_selling_price', $batch?->selling_price);
+        $product->setAttribute('effective_selling_price', $pricing['effective_price']);
+        $product->setAttribute('is_discounted', $pricing['is_discounted']);
+        $product->setAttribute('active_discount', [
+            'price' => $pricing['discount_price'],
+            'percent' => $pricing['discount_percent'],
+            'reason' => $pricing['discount_reason'],
+            'allow_below_cost' => $pricing['allow_below_cost'],
+            'insight_id' => $pricing['insight_id'],
+        ]);
         $product->setAttribute('sales_trend', $this->salesTrend($product));
         $product->setAttribute('open_insight', $product->movementInsights
             ->first(fn (ProductMovementInsight $insight) => $insight->status === ProductInsightStatus::Open));

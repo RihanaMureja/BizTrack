@@ -19,6 +19,7 @@ test('every restock creates an inventory batch with cost and optional expiry', f
         ->post(route('inventory.restock', $product->inventory), [
             'quantity' => 25,
             'unit_cost' => 42.75,
+            'selling_price' => 55,
             'expiry_date' => now()->addMonths(8)->toDateString(),
             'notes' => 'Supplier delivery',
         ])

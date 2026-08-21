@@ -16,12 +16,13 @@ class InventoryService
     public function __construct(
         private readonly InventoryBatchService $inventoryBatchService,
         private readonly FifoStockAllocationService $fifoStockAllocationService,
+        private readonly ProductPricingService $productPricingService,
     ) {}
 
     public function paginateForBusiness(Business $business, ?string $search = null, ?string $status = null, int $perPage = 10): LengthAwarePaginator
     {
         return Inventory::query()
-            ->with(['product.category'])
+            ->with(['product.category', 'product.latestAvailableBatch', 'product.movementInsights'])
             ->whereHas('product', function ($query) use ($business, $search, $status): void {
                 $query
                     ->where('business_id', $business->id)
@@ -37,7 +38,25 @@ class InventoryService
             })
             ->orderBy('available_stock')
             ->paginate($perPage)
-            ->withQueryString();
+            ->withQueryString()
+            ->through(function (Inventory $inventory): Inventory {
+                if ($inventory->product) {
+                    $pricing = $this->productPricingService->priceFor($inventory->product);
+                    $inventory->product->setAttribute('current_unit_cost', $pricing['unit_cost']);
+                    $inventory->product->setAttribute('current_selling_price', $pricing['regular_price']);
+                    $inventory->product->setAttribute('effective_selling_price', $pricing['effective_price']);
+                    $inventory->product->setAttribute('is_discounted', $pricing['is_discounted']);
+                    $inventory->product->setAttribute('active_discount', [
+                        'price' => $pricing['discount_price'],
+                        'percent' => $pricing['discount_percent'],
+                        'reason' => $pricing['discount_reason'],
+                        'allow_below_cost' => $pricing['allow_below_cost'],
+                        'insight_id' => $pricing['insight_id'],
+                    ]);
+                }
+
+                return $inventory;
+            });
     }
 
     public function transactionsForInventory(Inventory $inventory, int $perPage = 15): LengthAwarePaginator
@@ -68,7 +87,7 @@ class InventoryService
         match ($type) {
             InventoryTransactionType::Adjustment => $this->setStock($inventory, $quantity, $notes, $user),
             InventoryTransactionType::Damaged => $this->fifoStockAllocationService->deduct($inventory, $quantity, InventoryTransactionType::Damaged, $notes, $user),
-            InventoryTransactionType::Return => $this->inventoryBatchService->restock($inventory, $quantity, (float) $inventory->product->buy_price, null, null, $notes, $user, InventoryTransactionType::Return),
+            InventoryTransactionType::Return => $this->inventoryBatchService->restock($inventory, $quantity, $this->latestUnitCost($inventory), null, null, $notes, $user, InventoryTransactionType::Return, $this->latestSellingPrice($inventory)),
             default => throw ValidationException::withMessages(['type' => 'Unsupported inventory adjustment type.']),
         };
     }
@@ -84,12 +103,13 @@ class InventoryService
                 $this->inventoryBatchService->restock(
                     $locked,
                     $delta,
-                    (float) $locked->product->buy_price,
+                    $this->latestUnitCost($locked),
                     null,
                     null,
                     $notes,
                     $user,
                     InventoryTransactionType::Adjustment,
+                    $this->latestSellingPrice($locked),
                 );
 
                 return;
@@ -99,5 +119,25 @@ class InventoryService
                 $this->fifoStockAllocationService->deduct($locked, abs($delta), InventoryTransactionType::Adjustment, $notes, $user);
             }
         });
+    }
+
+    private function latestUnitCost(Inventory $inventory): float
+    {
+        return (float) (InventoryBatch::query()
+            ->where('product_id', $inventory->product_id)
+            ->where('business_id', $inventory->product->business_id)
+            ->latest('received_at')
+            ->latest('id')
+            ->value('unit_cost') ?? 0);
+    }
+
+    private function latestSellingPrice(Inventory $inventory): float
+    {
+        return (float) (InventoryBatch::query()
+            ->where('product_id', $inventory->product_id)
+            ->where('business_id', $inventory->product->business_id)
+            ->latest('received_at')
+            ->latest('id')
+            ->value('selling_price') ?? 0);
     }
 }

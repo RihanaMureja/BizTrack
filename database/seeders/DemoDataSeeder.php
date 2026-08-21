@@ -294,8 +294,6 @@ class DemoDataSeeder extends Seeder
                 'barcode' => $this->productCode($business, $index + 1),
                 'qr_payload' => $this->productQrPayload($business, $productData['name']),
                 'description' => 'Demo product for '.$business->business_name.'.',
-                'buy_price' => $productData['buy_price'],
-                'selling_price' => $productData['selling_price'],
                 'unit' => 'pcs',
                 'reorder_level' => $productData['reorder_level'],
                 'status' => RecordStatus::Active,
@@ -317,6 +315,7 @@ class DemoDataSeeder extends Seeder
                 'quantity_received' => $productData['stock'],
                 'quantity_remaining' => $productData['stock'],
                 'unit_cost' => $productData['buy_price'],
+                'selling_price' => $productData['selling_price'],
                 'received_at' => now()->subDays(20 - $index),
                 'expiry_date' => $productData['expiry_date'] ?? null,
             ]);
@@ -391,6 +390,8 @@ class DemoDataSeeder extends Seeder
     {
         $saleProduct = $products->first();
         $creditProduct = $products->last();
+        $salePrice = (float) $saleProduct->latestAvailableBatch()->value('selling_price');
+        $creditPrice = (float) $creditProduct->latestAvailableBatch()->value('selling_price');
         $customer = $customers->first();
         $creditCustomer = $customers->last();
 
@@ -400,13 +401,13 @@ class DemoDataSeeder extends Seeder
             'user_id' => $employee->id,
             'invoice_number' => 'INV-'.$business->id.'-0001',
             'is_credit_sale' => false,
-            'subtotal' => $saleProduct->selling_price * 2,
-            'tax_amount' => $business->is_vat_registered ? ($saleProduct->selling_price * 2) * 0.15 : 0,
+            'subtotal' => $salePrice * 2,
+            'tax_amount' => $business->is_vat_registered ? ($salePrice * 2) * 0.15 : 0,
             'discount_amount' => 0,
             'vat_enabled' => $business->is_vat_registered,
             'vat_rate' => $business->is_vat_registered ? 15 : 0,
-            'grand_total' => $business->is_vat_registered ? ($saleProduct->selling_price * 2) * 1.15 : $saleProduct->selling_price * 2,
-            'paid_amount' => $business->is_vat_registered ? ($saleProduct->selling_price * 2) * 1.15 : $saleProduct->selling_price * 2,
+            'grand_total' => $business->is_vat_registered ? ($salePrice * 2) * 1.15 : $salePrice * 2,
+            'paid_amount' => $business->is_vat_registered ? ($salePrice * 2) * 1.15 : $salePrice * 2,
             'balance_due' => 0,
             'status' => SaleStatus::Completed,
             'payment_status' => PaymentStatus::Completed,
@@ -418,8 +419,8 @@ class DemoDataSeeder extends Seeder
             'sale_id' => $sale->id,
             'product_id' => $saleProduct->id,
             'quantity' => 2,
-            'unit_price' => $saleProduct->selling_price,
-            'line_total' => $saleProduct->selling_price * 2,
+            'unit_price' => $salePrice,
+            'line_total' => $salePrice * 2,
         ]);
 
         Payment::create([
@@ -444,7 +445,7 @@ class DemoDataSeeder extends Seeder
             'verified_at' => now()->subDays(4),
         ]);
 
-        $creditSubtotal = $creditProduct->selling_price * 3;
+        $creditSubtotal = $creditPrice * 3;
         $creditSale = Sale::create([
             'business_id' => $business->id,
             'customer_id' => $creditCustomer->id,
@@ -469,7 +470,7 @@ class DemoDataSeeder extends Seeder
             'sale_id' => $creditSale->id,
             'product_id' => $creditProduct->id,
             'quantity' => 3,
-            'unit_price' => $creditProduct->selling_price,
+            'unit_price' => $creditPrice,
             'line_total' => $creditSubtotal,
         ]);
 

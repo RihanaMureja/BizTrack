@@ -5,8 +5,10 @@ namespace App\Models;
 use App\Enums\RecordStatus;
 use App\Enums\BusinessPermissionKey;
 use App\Enums\Role;
+use App\Notifications\ResetPasswordNotification;
+use App\Notifications\VerifyEmailNotification;
 use App\Traits\HasRoles;
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -36,7 +38,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  */
 #[Fillable(['business_id', 'business_role_id', 'first_name', 'last_name', 'name', 'email', 'phone', 'password', 'role', 'status', 'salary', 'preferences', 'must_reset_password', 'password_changed_at', 'temporary_password_expires_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable implements PasskeyUser
+class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
@@ -108,6 +110,16 @@ class User extends Authenticatable implements PasskeyUser
             'business_id' => $this->business_id,
             'user_id' => $this->id,
         ];
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification);
     }
 
     public function getRoleLabelAttribute(): string

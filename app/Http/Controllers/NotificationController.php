@@ -29,10 +29,12 @@ class NotificationController extends Controller
         return Inertia::render('notifications/index', [
             'notifications' => $this->notificationService->paginateForUser($request->user(), $filters),
             'unreadCount' => $this->notificationService->unreadCountForUser($request->user()),
-            'types' => collect(NotificationType::cases())->map(fn (NotificationType $type): array => [
-                'value' => $type->value,
-                'label' => $type->label(),
-            ])->values(),
+            'types' => collect(NotificationType::cases())
+                ->reject(fn (NotificationType $type): bool => str_starts_with($type->value, 'platform_'))
+                ->map(fn (NotificationType $type): array => [
+                    'value' => $type->value,
+                    'label' => $type->label(),
+                ])->values(),
             'filters' => $filters,
         ]);
     }

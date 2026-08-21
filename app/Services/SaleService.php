@@ -22,6 +22,8 @@ class SaleService
         private readonly CustomerCreditService $customerCreditService,
         private readonly FifoStockAllocationService $fifoStockAllocationService,
         private readonly DiscountEngineService $discountEngineService,
+        private readonly ProductPricingService $productPricingService,
+        private readonly PaymentService $paymentService,
     ) {}
 
     public function paginateForBusiness(Business $business, ?string $search = null, int $perPage = 10): LengthAwarePaginator
@@ -43,7 +45,7 @@ class SaleService
         return DB::transaction(function () use ($business, $user, $data): Sale {
             $items = collect($data['items']);
             $products = Product::query()
-                ->with('inventory')
+                ->with(['inventory', 'latestAvailableBatch'])
                 ->where('business_id', $business->id)
                 ->whereIn('id', $items->pluck('product_id'))
                 ->get()
@@ -68,9 +70,17 @@ class SaleService
                     ]);
                 }
 
-                $lineTotal = (float) $product->selling_price * $quantity;
+                $unitPrice = $this->productPricingService->priceFor($product)['effective_price'];
+
+                if ($unitPrice <= 0) {
+                    throw ValidationException::withMessages([
+                        'items' => $product->name.' must be restocked with a selling price before it can be sold.',
+                    ]);
+                }
+
+                $lineTotal = $unitPrice * $quantity;
                 $subtotal += $lineTotal;
-                $saleItems[] = compact('product', 'quantity', 'lineTotal', 'inventory');
+                $saleItems[] = compact('product', 'quantity', 'unitPrice', 'lineTotal', 'inventory');
             }
 
             $customer = ! empty($data['customer_id'])
@@ -127,7 +137,7 @@ class SaleService
                 $sale->items()->create([
                     'product_id' => $item['product']->id,
                     'quantity' => $item['quantity'],
-                    'unit_price' => $item['product']->selling_price,
+                    'unit_price' => $item['unitPrice'],
                     'line_total' => $item['lineTotal'],
                 ]);
 
@@ -141,6 +151,18 @@ class SaleService
             }
 
             $sale = $sale->load(['customer', 'user', 'items.product']);
+
+            foreach ($split['payments'] as $paymentLine) {
+                $this->paymentService->createCompletedSalePayment($sale, $user, [
+                    ...$paymentLine,
+                    'notes' => $data['notes'] ?? null,
+                ]);
+            }
+
+            if ($split['payments'] !== []) {
+                $sale = $this->paymentService->syncSaleAfterPayments($sale);
+            }
+
             $this->customerCreditService->syncForSale($sale);
             SaleCompleted::dispatch($sale);
 
@@ -175,10 +197,14 @@ class SaleService
 
     /**
      * @param array<string, mixed> $data
-     * @return array{cash: float, credit: float}
+     * @return array{cash: float, credit: float, payments: array<int, array<string, mixed>>}
      */
     private function paymentSplit(array $data, float $grandTotal): array
     {
+        if (! empty($data['payment_lines']) && is_array($data['payment_lines'])) {
+            return $this->paymentLinesSplit($data, $grandTotal);
+        }
+
         $hasCashAmount = array_key_exists('cash_amount', $data) && $data['cash_amount'] !== null && $data['cash_amount'] !== '';
         $hasCreditAmount = array_key_exists('credit_amount', $data) && $data['credit_amount'] !== null && $data['credit_amount'] !== '';
         $isCreditSale = (bool) ($data['is_credit_sale'] ?? false);
@@ -187,6 +213,7 @@ class SaleService
             return [
                 'cash' => $isCreditSale ? 0.0 : $grandTotal,
                 'credit' => $isCreditSale ? $grandTotal : 0.0,
+                'payments' => [],
             ];
         }
 
@@ -205,6 +232,60 @@ class SaleService
             ]);
         }
 
-        return ['cash' => $cashAmount, 'credit' => $creditAmount];
+        return ['cash' => $cashAmount, 'credit' => $creditAmount, 'payments' => []];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array{cash: float, credit: float, payments: array<int, array<string, mixed>>}
+     */
+    private function paymentLinesSplit(array $data, float $grandTotal): array
+    {
+        $payments = [];
+        $payNowAmount = 0.0;
+        $creditAmount = 0.0;
+
+        foreach ($data['payment_lines'] as $line) {
+            $amount = round((float) ($line['amount'] ?? 0), 2);
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $method = (string) ($line['method'] ?? '');
+
+            if ($method === 'credit') {
+                $creditAmount += $amount;
+
+                continue;
+            }
+
+            $payNowAmount += $amount;
+            $payments[] = [
+                'method' => $method,
+                'amount' => $amount,
+                'phone' => $line['phone'] ?? null,
+                'account_number' => $line['account_number'] ?? null,
+                'reference' => $line['reference'] ?? null,
+            ];
+        }
+
+        if ($creditAmount > 0 && ! (bool) ($data['is_credit_sale'] ?? false)) {
+            throw ValidationException::withMessages([
+                'is_credit_sale' => 'Enable credit sale before assigning part of the sale to customer credit.',
+            ]);
+        }
+
+        if (round($payNowAmount + $creditAmount, 2) !== round($grandTotal, 2)) {
+            throw ValidationException::withMessages([
+                'payment_lines' => 'Cash, wallet, account, and credit amounts must equal the sale total.',
+            ]);
+        }
+
+        return [
+            'cash' => round($payNowAmount, 2),
+            'credit' => round($creditAmount, 2),
+            'payments' => $payments,
+        ];
     }
 }

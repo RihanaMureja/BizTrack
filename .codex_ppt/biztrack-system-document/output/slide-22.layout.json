@@ -1,0 +1,432 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/qig8ir",
+    "id": "qig8ir",
+    "slide": 22,
+    "layoutId": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#0B2B1D",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "88a4adf4-0e35-4505-a452-0667aa4967a1",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "b5e1981e-cd5f-4384-9127-19b6d0c3ddab",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/l4zmxsbm",
+      "id": "1",
+      "bbox": [
+        64,
+        54,
+        160,
+        72
+      ],
+      "geometry": "roundRect",
+      "alt": "biztrack-logo.jpg",
+      "contentType": "image/jpeg",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 11111"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "73c3bbaa-b840-4123-aad9-3a7fa9e8e1f8",
+        "contentType": "image/jpeg",
+        "byteLength": 56179
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vuh4zatc",
+      "id": "2",
+      "bbox": [
+        64,
+        178,
+        760,
+        58
+      ],
+      "geometry": "rect",
+      "text": "Recommended next steps",
+      "textPreview": "Recommended next steps",
+      "resolvedFontSize": 44,
+      "resolvedTextStyle": {
+        "fontSize": 44,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Recommended next steps"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Recommended next steps",
+          "resolvedTextStyle": {
+            "fontSize": 44,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Recommended next steps",
+              "fontSize": 44,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/atonq5sr",
+      "id": "3",
+      "bbox": [
+        64,
+        250,
+        820,
+        78
+      ],
+      "geometry": "rect",
+      "text": "BizTrack already has a strong operating foundation. The next focus should be production readiness, payment gateway integration, stronger demos, and deployment discipline.",
+      "textPreview": "BizTrack already has a strong operating foundation. The next focus should be production readiness, payment gateway integration, stronger ...",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "fontSize": 22,
+        "typeface": "+mn-lt",
+        "color": "#DFF7E8",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack already has a strong operating foundation. The next focus should be production"
+          },
+          {
+            "index": 2,
+            "text": "readiness, payment gateway integration, stronger demos, and deployment discipline."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack already has a strong operating foundation. The next focus should be production readiness, payment gateway integration, stronger demos, and deployment discipline.",
+          "resolvedTextStyle": {
+            "fontSize": 22,
+            "color": "#DFF7E8",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack already has a strong operating foundation. The next focus should be production readiness, payment gateway integration, stronger demos, and deployment discipline.",
+              "fontSize": 22,
+              "color": "#DFF7E8",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/50zm5kbe",
+      "id": "4",
+      "bbox": [
+        64,
+        382,
+        1080,
+        142
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(255, 255, 255, 0.07059)",
+      "lineColor": "rgba(255, 255, 255, 0.20784)",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kzq5wfat",
+      "id": "5",
+      "bbox": [
+        100,
+        414,
+        980,
+        86
+      ],
+      "geometry": "rect",
+      "text": "• Connect real gateway APIs after demo checkout flows are approved.\n• Prepare clean seeded demo businesses for presentations.\n• Run full Herd PHP test suite before every shared push.\n• Finalize deployment environment, mail domain, storage, and backups.",
+      "textPreview": "• Connect real gateway APIs after demo checkout flows are approved. | • Prepare clean seeded demo businesses for presentations. | • Run f...",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "• Connect real gateway APIs after demo checkout flows are approved."
+          },
+          {
+            "index": 2,
+            "text": "• Prepare clean seeded demo businesses for presentations."
+          },
+          {
+            "index": 3,
+            "text": "• Run full Herd PHP test suite before every shared push."
+          },
+          {
+            "index": 4,
+            "text": "• Finalize deployment environment, mail domain, storage, and backups."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "• Connect real gateway APIs after demo checkout flows are approved.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#FFFFFF",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Connect real gateway APIs after demo checkout flows are approved.",
+              "fontSize": 18,
+              "color": "#FFFFFF",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "• Prepare clean seeded demo businesses for presentations.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#FFFFFF",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Prepare clean seeded demo businesses for presentations.",
+              "fontSize": 18,
+              "color": "#FFFFFF",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 3,
+          "text": "• Run full Herd PHP test suite before every shared push.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#FFFFFF",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Run full Herd PHP test suite before every shared push.",
+              "fontSize": 18,
+              "color": "#FFFFFF",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 4,
+          "text": "• Finalize deployment environment, mail domain, storage, and backups.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#FFFFFF",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "• Finalize deployment environment, mail domain, storage, and backups.",
+              "fontSize": 18,
+              "color": "#FFFFFF",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jyh43ut8",
+      "id": "6",
+      "bbox": [
+        64,
+        598,
+        980,
+        36
+      ],
+      "geometry": "rect",
+      "text": "BizTrack: one business workspace, many daily decisions made easier.",
+      "textPreview": "BizTrack: one business workspace, many daily decisions made easier.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#F5B942",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "BizTrack: one business workspace, many daily decisions made easier."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "BizTrack: one business workspace, many daily decisions made easier.",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#F5B942",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "BizTrack: one business workspace, many daily decisions made easier.",
+              "fontSize": 24,
+              "color": "#F5B942",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

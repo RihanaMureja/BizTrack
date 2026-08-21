@@ -34,7 +34,7 @@ export default function AppLogo() {
         );
     }
 
-    // When expanded, show logo with business name and "Powered by Laravel"
+    // When expanded, show logo with business name and "Powered By Biztrack Team"
     return (
         <div className="grid flex-1 text-left gap-1 min-w-0">
             <div className="relative flex items-center gap-2">
@@ -52,7 +52,7 @@ export default function AppLogo() {
                 <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="truncate text-sm font-semibold">{businessName}</div>
                     <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                        Powered by Laravel
+                        Powered By Biztrack Team
                     </span>
                 </div>
             </div>

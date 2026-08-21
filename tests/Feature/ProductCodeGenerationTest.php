@@ -26,8 +26,6 @@ function phase28ValidProductPayload(array $overrides = []): array
         'category_id' => null,
         'name' => 'Phase 28 Product',
         'description' => 'Generated code product',
-        'buy_price' => 10,
-        'selling_price' => 15,
         'unit' => 'pcs',
         'reorder_level' => 3,
         'status' => RecordStatus::Active->value,
@@ -47,8 +45,6 @@ test('product barcode and qr payload are generated on creation', function () {
     $this->actingAs($owner)
         ->post(route('products.store'), [
             'name' => 'Generated Code Product',
-            'buy_price' => 10,
-            'selling_price' => 15,
             'unit' => 'pcs',
             'reorder_level' => 3,
             'status' => RecordStatus::Active->value,

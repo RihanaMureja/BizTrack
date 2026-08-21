@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Building2, Clock3, CreditCard, Users } from 'lucide-react';
-import { RevenueOverview } from '@/components/charts/revenue-overview';
+import { AdminAreaPanel, AdminDonutPanel, AdminRankedBars } from '@/components/admin/admin-analytics';
+import type { AdminPoint } from '@/components/admin/admin-analytics';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { StatCard } from '@/components/stat-card/stat-card';
@@ -9,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 type SummaryPoint = { label: string; value: string };
 type ChartPoint = { label: string; value: number };
 type GrowthRow = { business_name: string; owner: string; plan: string; access_mode: string; status: string; created_at: string };
-type Props = { report: { title: string; date_from: string; date_to: string; summary: SummaryPoint[]; chart: ChartPoint[]; rows: GrowthRow[] } };
+type Props = { report: { title: string; date_from: string; date_to: string; summary: SummaryPoint[]; chart: ChartPoint[]; accessMix: AdminPoint[]; categoryMix: AdminPoint[]; rows: GrowthRow[] } };
 
 export default function AdminBusinessGrowth({ report }: Props) {
     const columns: DataTableColumn<GrowthRow>[] = [
@@ -38,7 +39,24 @@ export default function AdminBusinessGrowth({ report }: Props) {
                     ))}
                 </div>
 
-                <RevenueOverview title={report.title} description={`${report.date_from} to ${report.date_to}`} data={report.chart} />
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(22rem,0.85fr)]">
+                    <AdminAreaPanel
+                        title={report.title}
+                        description={`${report.date_from} to ${report.date_to}`}
+                        data={report.chart}
+                    />
+                    <AdminDonutPanel
+                        title="Access state mix"
+                        description="How businesses are distributed across trial, active, onboarding, and suspended states."
+                        data={report.accessMix}
+                    />
+                </div>
+
+                <AdminRankedBars
+                    title="Category growth"
+                    description="Most common business categories currently represented on BizTrack."
+                    data={report.categoryMix}
+                />
 
                 <section className="rounded-md border bg-card p-4 shadow-sm">
                     <h2 className="mb-4 font-semibold">New businesses</h2>

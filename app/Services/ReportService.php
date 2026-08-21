@@ -160,25 +160,83 @@ class ReportService
     private function profit(Business $business, CarbonInterface $from, CarbonInterface $to, ?string $expenseSource = null, mixed $categoryId = null): array
     {
         $sales = $this->sales($business, $from, $to, $categoryId);
-        $expenses = $this->expenses($business, $from, $to, $expenseSource);
         $revenue = (float) $sales['summary']['revenue'];
-        $expenseTotal = (float) $expenses['summary']['expenses'];
+        $cogs = $this->cogs($business, $from, $to, $categoryId);
+        $grossProfit = $revenue - $cogs;
+        $operatingExpenses = $this->operatingExpenses($business, $from, $to, $expenseSource);
+        $restockPurchases = $this->restockPurchases($business, $from, $to, $expenseSource);
+        $netProfit = $grossProfit - $operatingExpenses;
 
         return [
             'summary' => [
                 'revenue' => $revenue,
-                'expenses' => $expenseTotal,
-                'profit' => $revenue - $expenseTotal,
-                'margin' => $revenue > 0 ? round((($revenue - $expenseTotal) / $revenue) * 100, 2) : 0,
+                'cogs' => $cogs,
+                'gross_profit' => $grossProfit,
+                'operating_expenses' => $operatingExpenses,
+                'restock_purchases' => $restockPurchases,
+                'net_profit' => $netProfit,
+                'expenses' => $operatingExpenses,
+                'profit' => $netProfit,
+                'margin' => $revenue > 0 ? round(($netProfit / $revenue) * 100, 2) : 0,
             ],
-            'chart' => $this->mergeProfitSeries($sales['chart'], $expenses['chart']),
+            'chart' => $this->profitSeries($business, $from, $to, $categoryId, $expenseSource),
             'rows' => [
                 ['label' => 'Revenue', 'amount' => $revenue],
-                ['label' => 'Expenses', 'amount' => $expenseTotal],
-                ['label' => 'Profit', 'amount' => $revenue - $expenseTotal],
+                ['label' => 'COGS', 'amount' => $cogs],
+                ['label' => 'Gross Profit', 'amount' => $grossProfit],
+                ['label' => 'Operating Expenses', 'amount' => $operatingExpenses],
+                ['label' => 'Restock Purchases', 'amount' => $restockPurchases],
+                ['label' => 'Net Profit', 'amount' => $netProfit],
             ],
             'productProfit' => $sales['productProfit'] ?? [],
         ];
+    }
+
+    private function cogs(Business $business, CarbonInterface $from, CarbonInterface $to, mixed $categoryId = null): float
+    {
+        return $this->productReportService->batchCostForItems(
+            $this->saleItems($business, $from, $to, $categoryId),
+        );
+    }
+
+    private function operatingExpenses(Business $business, CarbonInterface $from, CarbonInterface $to, ?string $expenseSource = null): float
+    {
+        if ($expenseSource === ExpenseSource::Restock->value) {
+            return 0.0;
+        }
+
+        return (float) Expense::query()
+            ->where('business_id', $business->id)
+            ->whereDate('expense_date', '>=', $from->toDateString())
+            ->whereDate('expense_date', '<=', $to->toDateString())
+            ->where('source', '!=', ExpenseSource::Restock->value)
+            ->when($expenseSource, fn ($query) => $query->where('source', $expenseSource))
+            ->sum('amount');
+    }
+
+    private function restockPurchases(Business $business, CarbonInterface $from, CarbonInterface $to, ?string $expenseSource = null): float
+    {
+        if ($expenseSource && $expenseSource !== ExpenseSource::Restock->value) {
+            return 0.0;
+        }
+
+        return (float) Expense::query()
+            ->where('business_id', $business->id)
+            ->whereDate('expense_date', '>=', $from->toDateString())
+            ->whereDate('expense_date', '<=', $to->toDateString())
+            ->where('source', ExpenseSource::Restock->value)
+            ->sum('amount');
+    }
+
+    private function saleItems(Business $business, CarbonInterface $from, CarbonInterface $to, mixed $categoryId = null): Collection
+    {
+        return SaleItem::query()
+            ->with('sale:id,business_id,invoice_number,sold_at')
+            ->whereHas('sale', fn ($query) => $query
+                ->where('business_id', $business->id)
+                ->whereBetween('sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()]))
+            ->when($categoryId, fn ($query) => $query->whereHas('product', fn ($productQuery) => $productQuery->where('category_id', $categoryId)))
+            ->get();
     }
 
     private function profitByProduct(Business $business, CarbonInterface $from, CarbonInterface $to, mixed $categoryId = null): array
@@ -221,11 +279,11 @@ class ReportService
     private function inventory(Business $business): array
     {
         $products = Product::query()
-            ->with(['category', 'inventory'])
+            ->with(['category', 'inventory', 'inventoryBatches' => fn ($query) => $query->where('quantity_remaining', '>', 0)])
             ->where('business_id', $business->id)
             ->orderBy('name')
             ->get();
-        $stockValue = $products->sum(fn (Product $product): float => (float) $product->buy_price * (int) ($product->inventory?->available_stock ?? 0));
+        $stockValue = $products->sum(fn (Product $product): float => $this->batchStockValue($product));
         $lowStock = $products->filter(fn (Product $product): bool => (int) ($product->inventory?->available_stock ?? 0) <= (int) $product->reorder_level);
 
         return [
@@ -243,9 +301,22 @@ class ReportService
                 'category' => $product->category?->name ?? 'Uncategorized',
                 'stock' => (int) ($product->inventory?->available_stock ?? 0),
                 'reorder_level' => (int) $product->reorder_level,
-                'stock_value' => (float) $product->buy_price * (int) ($product->inventory?->available_stock ?? 0),
+                'stock_value' => $this->batchStockValue($product),
             ])->values(),
         ];
+    }
+
+    private function batchStockValue(Product $product): float
+    {
+        $batchValue = (float) $product->inventoryBatches->sum(
+            fn ($batch): float => (int) $batch->quantity_remaining * (float) $batch->unit_cost,
+        );
+
+        if ($batchValue > 0) {
+            return $batchValue;
+        }
+
+        return (float) $product->buy_price * (int) ($product->inventory?->available_stock ?? 0);
     }
 
     private function tax(Business $business, CarbonInterface $from, CarbonInterface $to): array
@@ -293,12 +364,32 @@ class ReportService
         return $series;
     }
 
-    private function mergeProfitSeries(array $sales, array $expenses): array
+    private function profitSeries(Business $business, CarbonInterface $from, CarbonInterface $to, mixed $categoryId = null, ?string $expenseSource = null): array
     {
-        return collect($sales)->map(fn (array $point, int $index): array => [
-            'label' => $point['label'],
-            'value' => (float) $point['value'] - (float) ($expenses[$index]['value'] ?? 0),
-        ])->values()->all();
+        $series = [];
+        $cursor = Carbon::parse($from)->startOfDay();
+        $end = Carbon::parse($to)->startOfDay();
+
+        while ($cursor <= $end) {
+            $dayFrom = $cursor->copy()->startOfDay();
+            $dayTo = $cursor->copy()->endOfDay();
+            $revenue = (float) Sale::query()
+                ->where('business_id', $business->id)
+                ->whereBetween('sold_at', [$dayFrom, $dayTo])
+                ->when($categoryId, fn ($query) => $query->whereHas('items.product', fn ($productQuery) => $productQuery->where('category_id', $categoryId)))
+                ->sum('grand_total');
+            $cogs = $this->cogs($business, $dayFrom, $dayTo, $categoryId);
+            $operatingExpenses = $this->operatingExpenses($business, $dayFrom, $dayTo, $expenseSource);
+
+            $series[] = [
+                'label' => DateHelper::label($cursor),
+                'value' => $revenue - $cogs - $operatingExpenses,
+            ];
+
+            $cursor = $cursor->addDay();
+        }
+
+        return $series;
     }
 
     public function formatSummary(array $summary): array

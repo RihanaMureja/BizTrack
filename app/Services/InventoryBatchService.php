@@ -51,14 +51,10 @@ class InventoryBatchService
                 'quantity_received' => $quantity,
                 'quantity_remaining' => $quantity,
                 'unit_cost' => $unitCost,
-                'selling_price' => $sellingPrice ?? $product->selling_price,
+                'selling_price' => $sellingPrice ?? $this->latestSellingPrice($product),
                 'received_at' => $receivedAt ? Carbon::parse($receivedAt) : now(),
                 'expiry_date' => $expiryDate,
             ]);
-
-            if ($sellingPrice !== null) {
-                $product->forceFill(['selling_price' => $sellingPrice])->save();
-            }
 
             $this->saveInventorySummary($locked, $after);
 
@@ -116,5 +112,15 @@ class InventoryBatchService
             ->count() + 1;
 
         return $prefix . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    private function latestSellingPrice(Product $product): float
+    {
+        return (float) (InventoryBatch::query()
+            ->where('product_id', $product->id)
+            ->where('business_id', $product->business_id)
+            ->latest('received_at')
+            ->latest('id')
+            ->value('selling_price') ?? 0);
     }
 }

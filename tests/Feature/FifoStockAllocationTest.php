@@ -15,7 +15,6 @@ test('sales consume inventory batches fifo oldest first', function () {
     $product = Product::factory()->create([
         'business_id' => $business->id,
         'category_id' => $category->id,
-        'selling_price' => 20,
     ]);
 
     $oldBatch = InventoryBatch::factory()->create([
@@ -24,6 +23,7 @@ test('sales consume inventory batches fifo oldest first', function () {
         'quantity_received' => 5,
         'quantity_remaining' => 5,
         'unit_cost' => 8,
+        'selling_price' => 20,
         'received_at' => now()->subDays(10),
     ]);
     $newBatch = InventoryBatch::factory()->create([
@@ -32,6 +32,7 @@ test('sales consume inventory batches fifo oldest first', function () {
         'quantity_received' => 10,
         'quantity_remaining' => 10,
         'unit_cost' => 9,
+        'selling_price' => 20,
         'received_at' => now()->subDay(),
     ]);
     $product->inventory->forceFill(['quantity' => 15, 'available_stock' => 15])->save();

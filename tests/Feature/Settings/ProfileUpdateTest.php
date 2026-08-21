@@ -75,6 +75,41 @@ test('user can delete their account', function () {
     expect($user->fresh())->toBeNull();
 });
 
+test('super admin cannot delete their account from settings', function () {
+    $user = User::factory()->create(['role' => Role::SuperAdmin]);
+
+    $this
+        ->actingAs($user)
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('settings/profile')
+            ->where('canDeleteAccount', false));
+
+    $this
+        ->actingAs($user)
+        ->delete(route('profile.destroy'), [
+            'password' => 'password',
+        ])
+        ->assertForbidden();
+
+    expect($user->fresh())->not->toBeNull();
+});
+
+test('super admin cannot access business owner notification preferences', function () {
+    $user = User::factory()->create(['role' => Role::SuperAdmin]);
+
+    $this
+        ->actingAs($user)
+        ->get(route('preferences.edit'))
+        ->assertForbidden();
+
+    $this
+        ->actingAs($user)
+        ->put(route('preferences.update'), [])
+        ->assertForbidden();
+});
+
 test('correct password must be provided to delete account', function () {
     $user = User::factory()->create(['role' => Role::Cashier]);
 

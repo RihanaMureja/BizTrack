@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { BadgeDollarSign, Building2, CreditCard, TrendingUp } from 'lucide-react';
-import { RevenueOverview } from '@/components/charts/revenue-overview';
+import { AdminBarPanel, AdminDonutPanel, AdminGatewayGrid, AdminRankedBars } from '@/components/admin/admin-analytics';
+import type { AdminPoint } from '@/components/admin/admin-analytics';
 import { DataTable } from '@/components/data-table/data-table';
 import type { DataTableColumn } from '@/components/data-table/data-table';
 import { StatCard } from '@/components/stat-card/stat-card';
@@ -10,7 +11,7 @@ type SummaryPoint = { label: string; value: string };
 type ChartPoint = { label: string; value: number };
 type RevenueRow = { name: string; price: number; duration_months: number; max_cashiers: number; businesses_count: number; estimated_mrr: number; status: string };
 type TopPlan = RevenueRow;
-type Props = { report: { title: string; summary: SummaryPoint[]; chart: ChartPoint[]; rows: RevenueRow[]; topPlans: TopPlan[] } };
+type Props = { report: { title: string; summary: SummaryPoint[]; chart: ChartPoint[]; rows: RevenueRow[]; topPlans: TopPlan[]; gatewayMix: AdminPoint[]; revenueHealth: AdminPoint[] } };
 
 export default function AdminRevenue({ report }: Props) {
     const columns: DataTableColumn<RevenueRow>[] = [
@@ -40,7 +41,21 @@ export default function AdminRevenue({ report }: Props) {
                     ))}
                 </div>
 
-                <RevenueOverview title={report.title} description="Estimated monthly revenue contribution by active subscription plan" data={report.chart} />
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
+                    <AdminBarPanel
+                        title={report.title}
+                        description="Estimated monthly revenue contribution by active subscription plan."
+                        data={report.chart}
+                        icon={BadgeDollarSign}
+                    />
+                    <AdminDonutPanel
+                        title="Revenue coverage"
+                        description="Businesses assigned to plans compared with businesses still without a plan."
+                        data={report.revenueHealth}
+                    />
+                </div>
+
+                <AdminGatewayGrid data={report.gatewayMix} />
 
                 <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
                     <div className="rounded-md border bg-card p-4 shadow-sm">
@@ -48,19 +63,13 @@ export default function AdminRevenue({ report }: Props) {
                         <DataTable columns={columns} data={report.rows} rowKey={(row) => row.name} emptyMessage="No active plans found yet." />
                     </div>
 
-                    <aside className="rounded-md border bg-card p-4 shadow-sm">
-                        <h2 className="font-semibold">Top plans</h2>
-                        <div className="mt-4 grid gap-3">
-                            {report.topPlans.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">Top-plan ranking will appear once businesses are assigned to active plans.</p>
-                            ) : report.topPlans.map((plan) => (
-                                <div key={plan.name} className="rounded-md border p-3">
-                                    <p className="font-medium">{plan.name}</p>
-                                    <p className="text-xs text-muted-foreground">{plan.businesses_count} businesses</p>
-                                    <p className="mt-2 text-sm font-semibold">{plan.estimated_mrr.toFixed(2)} ETB</p>
-                                </div>
-                            ))}
-                        </div>
+                    <aside>
+                        <AdminRankedBars
+                            title="Top plans"
+                            description="Highest estimated recurring value."
+                            data={report.topPlans.map((plan) => ({ label: plan.name, value: plan.estimated_mrr, count: plan.businesses_count }))}
+                            valueSuffix="ETB"
+                        />
                     </aside>
                 </section>
             </div>

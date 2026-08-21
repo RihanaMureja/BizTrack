@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Events\PaymentCompleted;
 use App\Models\Business;
+use App\Models\CustomerCredit;
 use App\Models\Payment;
 use App\Models\Sale;
 use App\Models\User;
@@ -165,6 +166,102 @@ class PaymentService
         });
     }
 
+    /**
+     * @param array{method: string, amount: float|int|string, phone?: ?string, account_number?: ?string, reference?: ?string, notes?: ?string} $line
+     */
+    public function createCompletedSalePayment(Sale $sale, User $user, array $line): Payment
+    {
+        $method = PaymentMethod::from($line['method']);
+        $amount = round((float) $line['amount'], 2);
+        $reference = ($line['reference'] ?? null) ?: strtoupper($method->value).'-'.$sale->id.'-'.now()->format('YmdHis');
+        $customerReference = $line['phone'] ?? $line['account_number'] ?? null;
+        $gatewayReference = $customerReference
+            ? $method->value.':'.$customerReference.':'.$reference
+            : $reference;
+
+        $payment = Payment::create([
+            'business_id' => $sale->business_id,
+            'sale_id' => $sale->id,
+            'customer_id' => $sale->customer_id,
+            'user_id' => $user->id,
+            'payment_number' => $this->nextPaymentNumber($sale->business),
+            'method' => $method,
+            'status' => PaymentStatus::Completed,
+            'amount' => $amount,
+            'reference' => $reference,
+            'gateway_reference' => $gatewayReference,
+            'notes' => $line['notes'] ?? 'POS '.$method->label().' payment confirmed.',
+            'paid_at' => now(),
+            'verified_at' => now(),
+        ]);
+
+        $payment = $this->paymentReceiptService->ensureReceipt($payment);
+        PaymentCompleted::dispatch($payment->load(['business.owner', 'sale', 'customer', 'user']));
+
+        return $payment->load(['sale', 'customer', 'user']);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<int, Payment>
+     */
+    public function createCustomerCreditRepayment(CustomerCredit $credit, User $user, array $data): array
+    {
+        return DB::transaction(function () use ($credit, $user, $data): array {
+            $credit = CustomerCredit::query()
+                ->with(['business', 'sale'])
+                ->whereKey($credit->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $sale = Sale::query()
+                ->where('business_id', $credit->business_id)
+                ->whereKey($credit->sale_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $amount = round((float) $data['amount'], 2);
+            $remainingBalance = round((float) $credit->remaining_balance, 2);
+
+            if ($amount > $remainingBalance) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Repayment cannot exceed the outstanding credit balance.',
+                ]);
+            }
+
+            $lineTotal = round(collect($data['payment_lines'])->sum(
+                fn (array $line): float => (float) ($line['amount'] ?? 0)
+            ), 2);
+
+            if ($lineTotal !== $amount) {
+                throw ValidationException::withMessages([
+                    'payment_lines' => 'Payment method amounts must equal the repayment amount.',
+                ]);
+            }
+
+            $payments = [];
+
+            foreach ($data['payment_lines'] as $line) {
+                $lineAmount = round((float) ($line['amount'] ?? 0), 2);
+
+                if ($lineAmount <= 0) {
+                    continue;
+                }
+
+                $payments[] = $this->createCompletedSalePayment($sale, $user, [
+                    ...$line,
+                    'amount' => $lineAmount,
+                    'reference' => ($line['reference'] ?? null) ?: 'CRD-'.$credit->id.'-'.now()->format('YmdHis'),
+                    'notes' => $data['notes'] ?? 'Customer credit repayment for '.$sale->invoice_number.'.',
+                ]);
+            }
+
+            $this->syncSalePaymentStatus($sale);
+
+            return $payments;
+        });
+    }
+
     public function verify(Payment $payment, User $user, array $data): Payment
     {
         return DB::transaction(function () use ($payment, $user, $data): Payment {
@@ -226,6 +323,11 @@ class PaymentService
             ->sum('amount');
 
         return max(0, (float) $sale->grand_total - $paid);
+    }
+
+    public function syncSaleAfterPayments(Sale $sale): Sale
+    {
+        return $this->syncSalePaymentStatus($sale);
     }
 
     protected function nextPaymentNumber(Business $business): string

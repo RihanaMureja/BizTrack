@@ -41,6 +41,17 @@ type InventoryItem = {
         unit: string | null;
         reorder_level: number;
         category: { name: string } | null;
+        current_unit_cost?: number | string | null;
+        current_selling_price?: number | string | null;
+        effective_selling_price?: number | string | null;
+        is_discounted?: boolean;
+        active_discount?: {
+            price: number | null;
+            percent: number | null;
+            reason: string | null;
+            allow_below_cost: boolean;
+            insight_id: number | null;
+        };
     };
 };
 
@@ -356,6 +367,9 @@ function InventoryCard({
     const outOfStock = stock <= 0;
     const stockTarget = Math.max(item.product.reorder_level * 2, stock, 1);
     const stockHealth = Math.min((stock / stockTarget) * 100, 100);
+    const effectivePrice = Number(item.product.effective_selling_price ?? 0);
+    const regularPrice = Number(item.product.current_selling_price ?? 0);
+    const unitCost = Number(item.product.current_unit_cost ?? 0);
 
     return (
         <article className="rounded-2xl border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -432,21 +446,33 @@ function InventoryCard({
             <div className="mt-4 grid grid-cols-2 gap-3">
                 <div className="rounded-xl border bg-background p-3">
                     <p className="text-xs text-muted-foreground">
-                        Available stock
+                        Sale price
                     </p>
                     <p className="mt-1 text-lg font-semibold">
-                        {item.available_stock}
+                        {effectivePrice > 0 ? `${effectivePrice.toLocaleString()} ETB` : 'No price'}
                     </p>
+                    {item.product.is_discounted && (
+                        <p className="mt-1 text-xs text-muted-foreground line-through">
+                            {regularPrice.toLocaleString()} ETB
+                        </p>
+                    )}
                 </div>
                 <div className="rounded-xl border bg-background p-3">
                     <p className="text-xs text-muted-foreground">
-                        Recorded qty
+                        Unit cost
                     </p>
                     <p className="mt-1 text-lg font-semibold">
-                        {item.quantity}
+                        {unitCost > 0 ? `${unitCost.toLocaleString()} ETB` : 'No cost'}
                     </p>
                 </div>
             </div>
+
+            {item.product.is_discounted && (
+                <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100">
+                    Active stagnant discount: {Number(item.product.active_discount?.percent ?? 0).toFixed(0)}% off
+                    {item.product.active_discount?.allow_below_cost ? ' with below-cost override' : ''}
+                </div>
+            )}
 
             <div className="mt-4 flex min-w-0 items-center gap-2 rounded-full bg-muted/60 px-2.5 py-1.5 text-xs text-muted-foreground">
                 <Barcode className="size-4 shrink-0" />

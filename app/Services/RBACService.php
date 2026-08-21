@@ -38,6 +38,7 @@ class RBACService
                 ]),
                 $this->group('Governance', [
                     ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
+                    ['title' => 'Support', 'href' => '/support', 'icon' => 'LifeBuoy'],
                 ]),
             ],
             Role::Cashier => $this->employeeNavigation($user),
@@ -62,6 +63,8 @@ class RBACService
                 ['title' => 'Subscriptions', 'href' => '/admin/subscriptions/assignments', 'icon' => 'FileText'],
             ]),
             $this->group('Monitoring', [
+                ['title' => 'Inbox', 'href' => '/admin/inbox', 'icon' => 'Inbox'],
+                ['title' => 'Notifications', 'href' => '/admin/notifications', 'icon' => 'Bell'],
                 ['title' => 'System Health', 'href' => '/admin/system-health', 'icon' => 'Activity'],
                 ['title' => 'Audit Logs', 'href' => '/admin/audit-logs', 'icon' => 'ScrollText'],
             ]),

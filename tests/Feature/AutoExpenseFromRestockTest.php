@@ -25,6 +25,7 @@ test('restocking inventory automatically records a linked expense', function () 
         ->post(route('inventory.restock', $product->inventory), [
             'quantity' => 6,
             'unit_cost' => 25,
+            'selling_price' => 35,
             'received_at' => today()->toDateString(),
             'notes' => 'Supplier delivery',
         ])

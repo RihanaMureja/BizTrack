@@ -11,7 +11,8 @@ export function AppSidebarHeader({
 }: {
     breadcrumbs?: BreadcrumbItemType[];
 }) {
-    const { notificationSummary } = usePage<SharedData>().props;
+    const { auth, notificationSummary } = usePage<SharedData>().props;
+    const notificationsHref = auth.user?.role === 'super_admin' ? '/admin/notifications' : '/notifications';
 
     return (
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-background/80 px-6 backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
@@ -22,7 +23,7 @@ export function AppSidebarHeader({
             <div className="flex items-center gap-1">
                 <AppearanceToggleButton />
                 <Button variant="ghost" size="icon" asChild className="relative">
-                    <Link href="/notifications" aria-label="Notifications">
+                    <Link href={notificationsHref} aria-label="Notifications">
                         <Bell className="size-5" />
                         {notificationSummary.unreadCount > 0 && (
                             <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">

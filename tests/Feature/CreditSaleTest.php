@@ -23,14 +23,15 @@ function creditSaleBusinessContext(): array
 function creditSaleStockedProduct(Business $business, int $stock = 10, float $price = 100): Product
 {
     $category = Category::factory()->create(['business_id' => $business->id]);
-    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id, 'selling_price' => $price]);
+    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id]);
     $product->inventory->forceFill(['quantity' => $stock, 'available_stock' => $stock])->save();
     InventoryBatch::factory()->create([
         'product_id' => $product->id,
         'business_id' => $business->id,
         'quantity_received' => $stock,
         'quantity_remaining' => $stock,
-        'unit_cost' => $product->buy_price,
+        'unit_cost' => 40,
+        'selling_price' => $price,
         'received_at' => now()->subDay(),
     ]);
 
@@ -213,4 +214,40 @@ test('pending mobile money split does not overstate customer credit balance', fu
         ->and((float) $credit->credit_amount)->toBe(120.0)
         ->and((float) $credit->remaining_balance)->toBe(120.0)
         ->and((float) $customer->refresh()->current_balance)->toBe(120.0);
+});
+
+test('pos checkout supports owner specified cash wallet and credit split', function () {
+    [$owner, $business] = creditSaleBusinessContext();
+    $customer = Customer::factory()->create([
+        'business_id' => $business->id,
+        'credit_limit' => 500,
+        'current_balance' => 0,
+    ]);
+    $product = creditSaleStockedProduct($business, 10, 100);
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'customer_id' => $customer->id,
+            'is_credit_sale' => true,
+            'payment_lines' => [
+                ['method' => 'cash', 'amount' => 50],
+                ['method' => 'telebirr', 'amount' => 70, 'phone' => '+251911222333'],
+                ['method' => 'credit', 'amount' => 80],
+            ],
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        ])
+        ->assertRedirect();
+
+    $sale = Sale::query()->firstOrFail();
+    $credit = CustomerCredit::query()->firstOrFail();
+
+    expect((float) $sale->refresh()->paid_amount)->toBe(120.0)
+        ->and((float) $sale->balance_due)->toBe(80.0)
+        ->and((float) $sale->cash_amount)->toBe(120.0)
+        ->and((float) $sale->credit_amount)->toBe(80.0)
+        ->and(Payment::query()->count())->toBe(2)
+        ->and(Payment::query()->where('method', 'telebirr')->firstOrFail()->gateway_reference)->toContain('+251911222333')
+        ->and((float) $credit->credit_amount)->toBe(80.0)
+        ->and((float) $credit->remaining_balance)->toBe(80.0)
+        ->and((float) $customer->refresh()->current_balance)->toBe(80.0);
 });

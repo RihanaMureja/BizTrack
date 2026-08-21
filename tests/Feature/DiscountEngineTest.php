@@ -25,14 +25,14 @@ function discountStockedProduct(Business $business, int $stock = 10, float $pric
     $product = Product::factory()->create([
         'business_id' => $business->id,
         'category_id' => $category->id,
-        'selling_price' => $price,
     ]);
     InventoryBatch::factory()->create([
         'product_id' => $product->id,
         'business_id' => $business->id,
         'quantity_received' => $stock,
         'quantity_remaining' => $stock,
-        'unit_cost' => $product->buy_price,
+        'unit_cost' => 40,
+        'selling_price' => $price,
         'received_at' => now()->subDay(),
     ]);
     $product->inventory->forceFill(['quantity' => $stock, 'available_stock' => $stock])->save();

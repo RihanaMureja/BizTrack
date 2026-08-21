@@ -37,6 +37,15 @@ export type PaymentReceipt = {
     customer: { name: string; phone: string | null; email: string | null };
     cashier: { name: string };
     items: Array<{ name: string; quantity: number; unit_price: number; line_total: number }>;
+    payment_breakdown?: Array<{
+        payment_number: string;
+        receipt_number: string | null;
+        method: string;
+        status: string;
+        amount: number;
+        reference: string | null;
+        gateway_reference: string | null;
+    }>;
 };
 
 export function PaymentReceiptPreview({ receipt }: { receipt: PaymentReceipt }) {
@@ -69,6 +78,26 @@ export function PaymentReceiptPreview({ receipt }: { receipt: PaymentReceipt }) 
                 <Info label="VAT" value={receipt.sale.vat_enabled ? `${receipt.sale.vat_rate}% VAT applied` : 'Not applied'} />
             </section>
 
+            {(receipt.payment_breakdown?.length ?? 0) > 1 && (
+                <section className="border-b border-slate-200 py-4">
+                    <p className="mb-2 text-xs uppercase text-slate-500">Payment breakdown</p>
+                    <div className="grid gap-2 text-sm">
+                        {receipt.payment_breakdown?.map((payment) => (
+                            <div key={payment.payment_number} className="flex items-center justify-between gap-4 rounded-md bg-slate-50 px-3 py-2">
+                                <div>
+                                    <p className="font-medium">{payment.method}</p>
+                                    <p className="font-mono text-xs text-slate-500">{payment.reference ?? payment.gateway_reference ?? payment.payment_number}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-semibold">{money(payment.amount)}</p>
+                                    <p className="text-xs text-slate-500">{payment.status}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
             <section className="py-4">
                 <table className="w-full text-sm">
                     <thead>
@@ -97,7 +126,7 @@ export function PaymentReceiptPreview({ receipt }: { receipt: PaymentReceipt }) 
                 <Total label="Discount" value={-receipt.sale.discount_amount} />
                 <Total label="VAT" value={receipt.sale.tax_amount} />
                 <Total label="Grand total" value={receipt.sale.grand_total} strong />
-                <Total label="Paid" value={receipt.payment.amount} />
+                <Total label="Paid" value={receipt.sale.paid_amount} />
                 <Total label="Balance due" value={receipt.sale.balance_due} strong />
             </section>
 

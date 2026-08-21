@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ExpenseStatus;
+use App\Enums\ExpenseSource;
 use App\Enums\Role;
 use App\Models\Business;
 use App\Models\Category;
@@ -44,8 +45,91 @@ test('owner can view profit report with real sales and expenses', function () {
         ->assertInertia(fn ($page) => $page
             ->component('reports/index')
             ->where('report.rawSummary.revenue', 500)
+            ->where('report.rawSummary.cogs', 0)
+            ->where('report.rawSummary.operating_expenses', 125)
             ->where('report.rawSummary.expenses', 125)
+            ->where('report.rawSummary.net_profit', 375)
             ->where('report.rawSummary.profit', 375));
+});
+
+test('profit report does not treat unsold restock purchases as cogs', function () {
+    [$owner, $business] = reportBusinessContext();
+    $category = Category::factory()->create(['business_id' => $business->id]);
+    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id]);
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $product->inventory), [
+            'quantity' => 10,
+            'unit_cost' => 400,
+            'selling_price' => 780,
+            'received_at' => today()->toDateString(),
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($owner)
+        ->get(route('reports.index', [
+            'type' => 'profit',
+            'date_from' => today()->toDateString(),
+            'date_to' => today()->toDateString(),
+        ]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('reports/index')
+            ->where('report.rawSummary.revenue', 0)
+            ->where('report.rawSummary.cogs', 0)
+            ->where('report.rawSummary.gross_profit', 0)
+            ->where('report.rawSummary.operating_expenses', 0)
+            ->where('report.rawSummary.restock_purchases', 4000)
+            ->where('report.rawSummary.net_profit', 0));
+});
+
+test('profit report uses fifo cogs for sold units and separates operating expenses', function () {
+    [$owner, $business] = reportBusinessContext();
+    $category = Category::factory()->create(['business_id' => $business->id]);
+    $product = Product::factory()->create(['business_id' => $business->id, 'category_id' => $category->id]);
+    $expenseCategory = ExpenseCategory::factory()->create(['business_id' => $business->id]);
+
+    $this->actingAs($owner)
+        ->post(route('inventory.restock', $product->inventory), [
+            'quantity' => 10,
+            'unit_cost' => 400,
+            'selling_price' => 780,
+            'received_at' => today()->toDateString(),
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($owner)
+        ->post(route('sales.store'), [
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        ])
+        ->assertRedirect();
+
+    Expense::factory()->create([
+        'business_id' => $business->id,
+        'expense_category_id' => $expenseCategory->id,
+        'user_id' => $owner->id,
+        'amount' => 200,
+        'expense_date' => today(),
+        'source' => ExpenseSource::Manual,
+        'status' => ExpenseStatus::Approved,
+    ]);
+
+    $this->actingAs($owner)
+        ->get(route('reports.index', [
+            'type' => 'profit',
+            'date_from' => today()->toDateString(),
+            'date_to' => today()->toDateString(),
+        ]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('reports/index')
+            ->where('report.rawSummary.revenue', 1560)
+            ->where('report.rawSummary.cogs', 800)
+            ->where('report.rawSummary.gross_profit', 760)
+            ->where('report.rawSummary.operating_expenses', 200)
+            ->where('report.rawSummary.restock_purchases', 4000)
+            ->where('report.rawSummary.net_profit', 560)
+            ->where('report.rawSummary.profit', 560));
 });
 
 test('owner can generate and store report metadata', function () {

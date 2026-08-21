@@ -1,4 +1,4 @@
-import { ProceedToPaymentModal } from '@/components/sales/proceed-to-payment-modal';
+import { ProceedToPaymentModal, type SalePaymentLine } from '@/components/sales/proceed-to-payment-modal';
 import { IconButton } from '@/components/buttons/icon-button';
 import { Button } from '@/components/ui/button';
 import { Head, useForm } from '@inertiajs/react';
@@ -10,8 +10,12 @@ type Product = {
     name: string;
     barcode: string | null;
     selling_price: string;
+    regular_selling_price: string;
+    is_discounted: boolean;
+    discount_percent: number | null;
     unit: string | null;
     inventory: { available_stock: number } | null;
+    has_price: boolean;
 };
 type Customer = {
     id: number;
@@ -46,8 +50,7 @@ export default function Pos({ products, customers, business }: Props) {
         is_credit_sale: false,
         cash_amount: '0',
         credit_amount: '0',
-        checkout_method: 'cash' as 'cash' | 'telebirr',
-        checkout_phone: '',
+        payment_lines: [] as SalePaymentLine[],
         notes: '',
         items: [] as Array<{ product_id: number; quantity: number }>,
     });
@@ -91,11 +94,7 @@ export default function Pos({ products, customers, business }: Props) {
               )
             : 0;
     const grandTotal = taxableAmount + vatAmount;
-    const cashAmount = Number(form.data.cash_amount || 0);
     const creditAmount = Number(form.data.credit_amount || 0);
-    const splitTotal = Number((cashAmount + creditAmount).toFixed(2));
-    const splitMismatch =
-        checkoutOpen && splitTotal !== Number(grandTotal.toFixed(2));
     const exceedsCredit =
         form.data.is_credit_sale && selectedCustomer
             ? creditAmount > selectedCustomer.credit.available_credit
@@ -138,16 +137,24 @@ export default function Pos({ products, customers, business }: Props) {
     const removeItem = (id: number) =>
         setCart((items) => items.filter((item) => item.id !== id));
     const clearCart = () => setCart([]);
-    const submit = () => {
+    const submit = (paymentLines: SalePaymentLine[] = []) => {
+        const payNowAmount = paymentLines
+            .filter((line) => line.method !== 'credit')
+            .reduce((sum, line) => sum + Number(line.amount || 0), 0);
+        const saleCreditAmount = paymentLines
+            .filter((line) => line.method === 'credit')
+            .reduce((sum, line) => sum + Number(line.amount || 0), 0);
+
         form.transform((data) => ({
             ...data,
             customer_id: data.customer_id || null,
             is_credit_sale: Boolean(data.is_credit_sale),
             apply_vat: Boolean(data.apply_vat),
-            cash_amount: data.cash_amount || '0',
+            cash_amount: payNowAmount.toFixed(2),
             credit_amount: data.is_credit_sale
-                ? data.credit_amount || '0'
+                ? saleCreditAmount.toFixed(2)
                 : '0',
+            payment_lines: paymentLines,
             items: cart.map((item) => ({
                 product_id: item.id,
                 quantity: item.quantity,
@@ -213,7 +220,8 @@ export default function Pos({ products, customers, business }: Props) {
                                 onClick={() => addProduct(product)}
                                 disabled={
                                     (product.inventory?.available_stock ?? 0) <=
-                                    0
+                                    0 ||
+                                    !product.has_price
                                 }
                                 className="rounded-md border bg-card p-4 text-left shadow-sm transition hover:bg-accent disabled:opacity-50"
                             >
@@ -222,8 +230,16 @@ export default function Pos({ products, customers, business }: Props) {
                                     {product.barcode ?? 'No barcode'}
                                 </p>
                                 <p className="mt-3 font-semibold">
-                                    {product.selling_price} ETB
+                                    {product.has_price ? `${product.selling_price} ETB` : 'Restock first'}
                                 </p>
+                                {product.is_discounted && (
+                                    <p className="text-xs text-primary">
+                                        Stagnant discount {Number(product.discount_percent ?? 0).toFixed(0)}% off
+                                        <span className="ml-1 text-muted-foreground line-through">
+                                            {product.regular_selling_price} ETB
+                                        </span>
+                                    </p>
+                                )}
                                 <p className="text-xs text-muted-foreground">
                                     Stock{' '}
                                     {product.inventory?.available_stock ?? 0}{' '}
@@ -488,31 +504,14 @@ export default function Pos({ products, customers, business }: Props) {
             <ProceedToPaymentModal
                 open={checkoutOpen}
                 onOpenChange={setCheckoutOpen}
-                method={form.data.checkout_method}
-                phone={form.data.checkout_phone}
                 processing={form.processing}
                 total={grandTotal}
-                cashAmount={form.data.cash_amount}
-                creditAmount={form.data.credit_amount}
                 creditEnabled={form.data.is_credit_sale}
                 availableCredit={selectedCustomer?.credit.available_credit}
-                phoneError={form.errors.checkout_phone}
                 splitError={
+                    form.errors.payment_lines ??
                     form.errors.cash_amount ??
-                    form.errors.credit_amount ??
-                    (splitMismatch
-                        ? 'Pay now amount plus credit amount must equal the sale total.'
-                        : undefined)
-                }
-                onMethodChange={(method) =>
-                    form.setData('checkout_method', method)
-                }
-                onPhoneChange={(phone) => form.setData('checkout_phone', phone)}
-                onCashAmountChange={(amount) =>
-                    form.setData('cash_amount', amount)
-                }
-                onCreditAmountChange={(amount) =>
-                    form.setData('credit_amount', amount)
+                    form.errors.credit_amount
                 }
                 onConfirm={submit}
             />

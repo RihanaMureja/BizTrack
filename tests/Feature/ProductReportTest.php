@@ -27,14 +27,13 @@ test('product report profit uses real fifo batch cost data', function () {
     $product = Product::factory()->create([
         'business_id' => $business->id,
         'category_id' => $category->id,
-        'selling_price' => 100,
     ]);
 
     $this->actingAs($owner)
-        ->post(route('inventory.restock', $product->inventory), ['quantity' => 2, 'unit_cost' => 20, 'received_at' => now()->subDays(2)->toDateString()])
+        ->post(route('inventory.restock', $product->inventory), ['quantity' => 2, 'unit_cost' => 20, 'selling_price' => 100, 'received_at' => now()->subDays(2)->toDateString()])
         ->assertRedirect();
     $this->actingAs($owner)
-        ->post(route('inventory.restock', $product->inventory), ['quantity' => 2, 'unit_cost' => 60, 'received_at' => now()->subDay()->toDateString()])
+        ->post(route('inventory.restock', $product->inventory), ['quantity' => 2, 'unit_cost' => 60, 'selling_price' => 100, 'received_at' => now()->subDay()->toDateString()])
         ->assertRedirect();
 
     $this->actingAs($owner)
@@ -62,12 +61,12 @@ test('reports are filterable by category and expose product drill down links', f
     [$owner, $business] = productReportContext();
     $drinks = Category::factory()->create(['business_id' => $business->id, 'name' => 'Drinks']);
     $snacks = Category::factory()->create(['business_id' => $business->id, 'name' => 'Snacks']);
-    $drink = Product::factory()->create(['business_id' => $business->id, 'category_id' => $drinks->id, 'name' => 'Filtered Juice', 'selling_price' => 40]);
-    $snack = Product::factory()->create(['business_id' => $business->id, 'category_id' => $snacks->id, 'name' => 'Hidden Biscuit', 'selling_price' => 30]);
+    $drink = Product::factory()->create(['business_id' => $business->id, 'category_id' => $drinks->id, 'name' => 'Filtered Juice']);
+    $snack = Product::factory()->create(['business_id' => $business->id, 'category_id' => $snacks->id, 'name' => 'Hidden Biscuit']);
 
-    foreach ([$drink, $snack] as $product) {
+    foreach ([[$drink, 40], [$snack, 30]] as [$product, $sellingPrice]) {
         $this->actingAs($owner)
-            ->post(route('inventory.restock', $product->inventory), ['quantity' => 5, 'unit_cost' => 10])
+            ->post(route('inventory.restock', $product->inventory), ['quantity' => 5, 'unit_cost' => 10, 'selling_price' => $sellingPrice])
             ->assertRedirect();
         $this->actingAs($owner)
             ->post(route('sales.store'), ['items' => [['product_id' => $product->id, 'quantity' => 1]]])

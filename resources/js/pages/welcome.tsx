@@ -1,18 +1,22 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
     BadgeCheck,
     CheckCircle2,
     ChevronDown,
     CircleDollarSign,
     LineChart,
+    Mail,
+    MapPin,
     PackageSearch,
+    Phone,
     ReceiptText,
+    Send,
     ShieldCheck,
     ShoppingBag,
     Sparkles,
     UsersRound,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { ImmersiveHeroSlider } from '@/components/landing/immersive-hero-slider';
 import { PremiumHeader } from '@/components/landing/premium-header';
 import { SiteFooter } from '@/components/landing/site-footer';
@@ -158,6 +162,21 @@ const faqs = [
 export default function Welcome() {
     const { auth } = usePage().props;
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+    const [landingDark, setLandingDark] = useState(false);
+
+    useEffect(() => {
+        setLandingDark(localStorage.getItem('biztrack_landing_appearance') === 'dark');
+    }, []);
+
+    const toggleLandingDark = () => {
+        setLandingDark((current) => {
+            const next = !current;
+
+            localStorage.setItem('biztrack_landing_appearance', next ? 'dark' : 'light');
+
+            return next;
+        });
+    };
 
     useEffect(() => {
         const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
@@ -182,8 +201,14 @@ export default function Welcome() {
         <>
             <Head title="BizTrack - Business Management Software" />
 
-            <main id="top" className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
-                <PremiumHeader />
+            <main
+                id="top"
+                className={cn(
+                    'landing-shell relative min-h-screen overflow-x-hidden bg-background text-foreground transition-colors duration-500',
+                    landingDark && 'landing-dark',
+                )}
+            >
+                <PremiumHeader landingDark={landingDark} onToggleLandingDark={toggleLandingDark} />
 
                 <section data-header-theme="hero" className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-950 pt-24">
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(52,211,153,0.18),transparent_34%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.08),transparent_28%)]" />
@@ -659,8 +684,114 @@ export default function Welcome() {
                     </div>
                 </section>
 
+                <ContactSection />
+
                 <SiteFooter />
             </main>
         </>
+    );
+}
+
+function ContactSection() {
+    const form = useForm({
+        full_name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+        website: '',
+    });
+
+    const submit = (event: FormEvent) => {
+        event.preventDefault();
+        form.post('/contact', {
+            preserveScroll: true,
+            onSuccess: () => form.reset(),
+        });
+    };
+
+    const fieldClass = 'h-11 rounded-xl border-slate-200 bg-white/85 px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100';
+    const textareaClass = `${fieldClass} min-h-32 py-3`;
+
+    return (
+        <section id="contact" data-header-theme="light" className="scroll-mt-28 px-4 pb-16 sm:px-5 lg:px-8">
+            <div className="mx-auto grid w-full max-w-7xl gap-6 rounded-[2rem] border border-slate-200 bg-white/88 p-6 shadow-[0_24px_80px_-42px_rgba(15,23,42,0.45)] backdrop-blur sm:p-8 lg:grid-cols-[0.85fr_1.15fr]">
+                <div data-reveal="left" className="flex flex-col justify-between gap-8 rounded-[1.5rem] bg-emerald-950 p-6 text-white sm:p-8">
+                    <div>
+                        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-300">Contact Us</p>
+                        <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Talk to the BizTrack team.</h2>
+                        <p className="mt-4 text-sm leading-7 text-emerald-50/75">
+                            Have a question about pricing, onboarding, or whether BizTrack fits your business? Send a message and the platform team will review it.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-3">
+                        <ContactInfo icon={Mail} label="Email" value="support@biztrack.local" />
+                        <ContactInfo icon={Phone} label="Phone" value="+251 900 000 000" />
+                        <ContactInfo icon={MapPin} label="Location" value="Addis Ababa, Ethiopia" />
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/6 p-4 text-sm leading-6 text-emerald-50/75">
+                        Business owners can also send support requests from inside the app through the Support module.
+                    </div>
+                </div>
+
+                <form data-reveal="right" onSubmit={submit} className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <LandingField label="Full name" error={form.errors.full_name}>
+                            <input className={fieldClass} value={form.data.full_name} onChange={(event) => form.setData('full_name', event.target.value)} placeholder="Your name" />
+                        </LandingField>
+                        <LandingField label="Email" error={form.errors.email}>
+                            <input className={fieldClass} type="email" value={form.data.email} onChange={(event) => form.setData('email', event.target.value)} placeholder="you@example.com" />
+                        </LandingField>
+                        <LandingField label="Phone number" error={form.errors.phone}>
+                            <input className={fieldClass} value={form.data.phone} onChange={(event) => form.setData('phone', event.target.value)} placeholder="Optional" />
+                        </LandingField>
+                        <LandingField label="Subject" error={form.errors.subject}>
+                            <input className={fieldClass} value={form.data.subject} onChange={(event) => form.setData('subject', event.target.value)} placeholder="How can we help?" />
+                        </LandingField>
+                    </div>
+
+                    <LandingField label="Message" error={form.errors.message}>
+                        <textarea className={textareaClass} value={form.data.message} onChange={(event) => form.setData('message', event.target.value)} placeholder="Tell us what you need..." />
+                    </LandingField>
+                    <input type="text" tabIndex={-1} autoComplete="off" value={form.data.website} onChange={(event) => form.setData('website', event.target.value)} className="hidden" />
+
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="text-sm text-slate-500">
+                            {form.recentlySuccessful ? 'Message sent. We will get back to you shortly.' : 'We usually respond within one business day.'}
+                        </p>
+                        <Button type="submit" disabled={form.processing} className="rounded-full bg-emerald-600 px-6 text-white hover:bg-emerald-500">
+                            <Send className="size-4" />
+                            Send Message
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    );
+}
+
+function ContactInfo({ icon: Icon, label, value }: { icon: typeof Mail; label: string; value: string }) {
+    return (
+        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/6 p-4">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-300">
+                <Icon className="size-5" />
+            </div>
+            <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200/80">{label}</p>
+                <p className="mt-1 text-sm font-medium text-white">{value}</p>
+            </div>
+        </div>
+    );
+}
+
+function LandingField({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
+    return (
+        <label className="grid gap-2">
+            <span className="text-sm font-semibold text-slate-700">{label}</span>
+            {children}
+            {error && <span className="text-xs text-red-600">{error}</span>}
+        </label>
     );
 }

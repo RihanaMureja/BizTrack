@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Menu } from 'lucide-react';
+import { Menu, Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,9 +22,16 @@ const navItems = [
     { label: 'Features', href: '#features' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
+    { label: 'Contact Us', href: '#contact' },
 ];
 
-export function PremiumHeader({ landingPage = true }: { landingPage?: boolean }) {
+type PremiumHeaderProps = {
+    landingPage?: boolean;
+    landingDark?: boolean;
+    onToggleLandingDark?: () => void;
+};
+
+export function PremiumHeader({ landingPage = true, landingDark = false, onToggleLandingDark }: PremiumHeaderProps) {
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState<HeaderTheme>('hero');
 
@@ -84,7 +91,8 @@ visibleSections.delete(section);
         dark: 'border-white/10 bg-slate-950/84 text-white shadow-[0_12px_40px_-24px_rgba(2,6,23,0.8)] backdrop-blur-xl',
         accent: 'border-emerald-100/15 bg-emerald-950/84 text-white shadow-[0_12px_40px_-24px_rgba(2,44,34,0.9)] backdrop-blur-xl',
     } satisfies Record<HeaderTheme, string>;
-    const isLight = theme === 'light';
+    const isLight = theme === 'light' && !landingDark;
+    const ToggleIcon = landingDark ? Sun : Moon;
 
     return (
         <header
@@ -122,6 +130,22 @@ visibleSections.delete(section);
                 </nav>
 
                 <div className="hidden items-center gap-3 lg:flex">
+                    {onToggleLandingDark && (
+                        <button
+                            type="button"
+                            onClick={onToggleLandingDark}
+                            className={cn(
+                                'inline-flex size-10 items-center justify-center rounded-full border transition-[background,color,border-color,transform] hover:-translate-y-0.5',
+                                isLight
+                                    ? 'border-slate-200 bg-white/70 text-slate-800 hover:bg-emerald-50 hover:text-emerald-800'
+                                    : 'border-white/15 bg-white/8 text-white hover:bg-white/14',
+                            )}
+                            aria-label={landingDark ? 'Switch landing page to light mode' : 'Switch landing page to dark mode'}
+                            title={landingDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                        >
+                            <ToggleIcon className="size-4" />
+                        </button>
+                    )}
                     <Link
                         href={login()}
                         className={cn(
@@ -134,6 +158,22 @@ visibleSections.delete(section);
                 </div>
 
                 <div className="flex items-center gap-2 lg:hidden">
+                    {onToggleLandingDark && (
+                        <button
+                            type="button"
+                            onClick={onToggleLandingDark}
+                            className={cn(
+                                'inline-flex size-9 items-center justify-center rounded-full border transition-colors',
+                                isLight
+                                    ? 'border-slate-200 bg-white/70 text-slate-800 hover:bg-emerald-50'
+                                    : 'border-white/15 bg-white/8 text-white hover:bg-white/14',
+                            )}
+                            aria-label={landingDark ? 'Switch landing page to light mode' : 'Switch landing page to dark mode'}
+                            title={landingDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                        >
+                            <ToggleIcon className="size-4" />
+                        </button>
+                    )}
                     <Button
                         asChild
                         variant="ghost"

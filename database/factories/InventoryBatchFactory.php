@@ -25,6 +25,7 @@ class InventoryBatchFactory extends Factory
             'quantity_received' => $quantity,
             'quantity_remaining' => $quantity,
             'unit_cost' => fake()->randomFloat(2, 10, 500),
+            'selling_price' => fake()->randomFloat(2, 15, 700),
             'received_at' => now(),
             'expiry_date' => fake()->optional()->dateTimeBetween('+1 month', '+2 years'),
         ];

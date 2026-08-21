@@ -18,7 +18,7 @@ class EnsureOnboardingComplete
             return $next($request);
         }
 
-        if ($request->routeIs('onboarding.*', 'settings.business.*', 'logout', 'verification.*', 'password.*')) {
+        if ($request->routeIs('onboarding.*', 'settings.business.*', 'support.*', 'logout', 'verification.*', 'password.*')) {
             return $next($request);
         }
 
